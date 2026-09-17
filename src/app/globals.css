@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+/* Warme Papier-Palette: die App wird in der Küche und im Supermarkt benutzt,
+   nicht am Schreibtisch — hoher Kontrast, große Trefferflächen, kein Grau-auf-Grau. */
+:root {
+  --bg: #fdfaf6;
+  --surface: #ffffff;
+  --text: #24201d;
+  --muted: #6f6760;
+  --accent: #b4532a;
+  --accent-text: #ffffff;
+  --border: #e7ded4;
+  --ok: #2f6d4f;
+  --warn: #9a6a12;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #171310;
+    --surface: #211c18;
+    --text: #f0ebe5;
+    --muted: #a79d94;
+    --accent: #e08a5f;
+    --accent-text: #2a1509;
+    --border: #322a24;
+    --ok: #7dc39c;
+    --warn: #e0b45f;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-border: var(--border);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+}
+
+html {
+  /* iOS: kein Gummiband-Effekt über den Seitenrand hinaus im Standalone-Modus */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+
+/* Safe-Area-Helfer für den Standalone-Modus (Notch oben, Home-Indikator unten).
+   Einmal hier definiert, damit kein Screen es selbst zusammenbaut. */
+@utility pt-safe { padding-top: max(1rem, env(safe-area-inset-top)); }
+@utility pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+@utility px-safe {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}

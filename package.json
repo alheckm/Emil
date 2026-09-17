@@ -1,0 +1,45 @@
+{
+  "name": "emil",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "typecheck:core": "tsc -p tsconfig.core.json",
+    "depcruise": "depcruise src --config .dependency-cruiser.cjs",
+    "test": "npm run depcruise && npm run typecheck:core && vitest run",
+    "test:watch": "vitest",
+    "verify": "npm run typecheck && npm run lint && npm test",
+    "seed:units": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/generate-units-seed.mjs",
+    "seed:stammdaten": "node scripts/generate-ingredients-seed.mjs",
+    "seed": "npm run seed:units && npm run seed:stammdaten && npm run sql",
+    "sql": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-setup-sql.mjs"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.116.0",
+    "browser-image-compression": "^2.0.2",
+    "decimal.js-light": "^2.5.1",
+    "idb": "^8.0.3",
+    "next": "16.3.5",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "^4.6.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^24.13.4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dependency-cruiser": "^18.2.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.5",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^5.0.0"
+  },
+  "description": "Rezepte sammeln, Portionen umrechnen, Einkaufsliste im Haushalt teilen."
+}

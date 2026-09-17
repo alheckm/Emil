@@ -1,0 +1,14 @@
+{
+  "//": "Zweiter Typcheck nur für src/lib/core — ohne DOM-Lib und ohne Node-Typen.",
+  "//2": "dependency-cruiser prüft Importe; das hier fängt Zugriffe auf window,",
+  "//3": "document, localStorage oder process, die ohne Import auskommen.",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": [],
+    "noEmit": true,
+    "plugins": []
+  },
+  "include": ["src/lib/core/**/*.ts"],
+  "exclude": ["src/lib/core/**/__tests__/**"]
+}
