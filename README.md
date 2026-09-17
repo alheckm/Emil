@@ -18,7 +18,29 @@ laufenden Kosten. Der Plan liegt in
 | P4 | Webseiten-Import | **fertig** — Kern live geprüft, Oberfläche unter `/rezepte/importieren` |
 | P5 | Einfügen-Import & Rezeptbilder | **fertig** — JSON + Freitext, „Prompt kopieren“, Bild-Upload mit Verkleinern |
 | P6 | Offline, Suche, Tags | **fertig** — Offline-Liste, Häkchen-Puffer, Suche, Schlagwörter (live geprüft) |
-| P7 | iOS-Kurzbefehl, Datenschutz, Politur | offen |
+| P7 | iOS-Kurzbefehl, Datenschutz, Politur | **fertig** |
+
+## Rezepte aus dem Safari-Teilen-Menü (iOS-Kurzbefehl)
+
+Emil nimmt eine Adresse über `?url=` entgegen und startet den Import von
+selbst. Damit braucht es weder ein Zugriffstoken noch eine eigene Route — und
+der Prüf-Screen bleibt trotzdem dazwischen.
+
+Kurzbefehl einmalig anlegen (App „Kurzbefehle"):
+
+1. Neuer Kurzbefehl → **„In Teilen-Menü anzeigen"** aktivieren, Eingabetyp
+   *URLs* und *Safari-Webseiten*.
+2. Aktion **„URL öffnen"** hinzufügen mit:
+   `https://DEINE-ADRESSE/rezepte/importieren?url=` + `Kurzbefehleingabe`
+   (den Eingabe-Baustein anhängen, nicht abtippen).
+3. Kurzbefehl „An Emil senden" nennen.
+
+Danach in Safari auf einer Rezeptseite: Teilen → **An Emil senden**. Emil
+öffnet sich, liest das Rezept und zeigt es zum Prüfen.
+
+> Die Tabelle `household_tokens` liegt für einen späteren, wirklich
+> unbeaufsichtigten Weg bereit (etwa eine Automation ohne offene App). Für den
+> Kurzbefehl wird sie nicht gebraucht — er nutzt die bestehende Anmeldung.
 
 ## Offline-Betrieb
 
@@ -49,9 +71,10 @@ also weiterhin. Echtes Funkloch heißt: beide unerreichbar.
   liefert eine Bild-URL, aber der Browser darf sie wegen CORS nicht selbst
   laden; das bräuchte eine eigene Server-Route mit Größenbegrenzung. Ein
   eigenes Foto lässt sich jederzeit setzen.
-- **Zusammengesetzte Zutatennamen landen in „Sonstiges".** „Knoblauchzehe"
-  trifft den Seed-Eintrag „Knoblauch" nicht (Ähnlichkeit unter 0,85). Einmal
-  die Abteilung antippen genügt, danach bleibt sie gespeichert.
+- **Manche zusammengesetzten Zutatennamen landen in „Sonstiges".**
+  „Knoblauchzehe" trifft „Knoblauch" bewusst nicht (Ähnlichkeit 0,600, Schwelle
+  0,62) — eine Zehe ist keine Knolle. Einmal die Abteilung antippen genügt,
+  danach bleibt sie gespeichert. Deutsche Plurale treffen seit 0012 zuverlässig.
 
 ## Einrichten
 

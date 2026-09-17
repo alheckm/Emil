@@ -1553,6 +1553,172 @@ end;
 $$;
 
 -- ===================================================================
+-- supabase/migrations/0011_suche.sql
+-- ===================================================================
+
+-- Rezeptsuche über Titel und Zutaten.
+--
+-- Als Datenbankfunktion und nicht als Filter im Client, weil die Suche über
+-- zwei Tabellen geht: „Zwiebel" soll auch Rezepte finden, deren Titel das Wort
+-- nicht enthält. Über PostgREST wäre das ein umständlicher Mehrfachabruf; hier
+-- ist es eine Abfrage, die die vorhandenen Trigram-Indizes nutzt.
+--
+-- SECURITY INVOKER: die Funktion sieht genau das, was der Aufrufer sehen darf.
+-- Die RLS-Policies auf recipes und ingredients greifen unverändert.
+
+create or replace function search_recipes(
+  p_household_id uuid,
+  p_query text default null,
+  p_tag text default null
+)
+returns setof recipes
+language sql
+stable
+security invoker
+set search_path = public, pg_temp
+as $$
+  select r.*
+  from recipes r
+  where r.household_id = p_household_id
+    and (p_tag is null or p_tag = '' or r.tags @> array[p_tag])
+    and (
+      p_query is null or btrim(p_query) = ''
+      or r.title ilike '%' || btrim(p_query) || '%'
+      or exists (
+        select 1
+        from recipe_ingredients ri
+        left join ingredients i on i.id = ri.ingredient_id
+        where ri.recipe_id = r.id
+          and (
+            i.display_name ilike '%' || btrim(p_query) || '%'
+            or ri.raw_text ilike '%' || btrim(p_query) || '%'
+          )
+      )
+    )
+  order by r.created_at desc;
+$$;
+
+/**
+ * Alle vergebenen Schlagwörter eines Haushalts, mit Anzahl.
+ *
+ * Für die Filterleiste: nur Schlagwörter anzeigen, die es auch gibt — eine
+ * leere Auswahl zum Antippen wäre ärgerlicher als keine.
+ */
+create or replace function household_tags(p_household_id uuid)
+returns table (tag text, anzahl bigint)
+language sql
+stable
+security invoker
+set search_path = public, pg_temp
+as $$
+  select t.tag, count(*) as anzahl
+  from recipes r
+  cross join lateral unnest(r.tags) as t(tag)
+  where r.household_id = p_household_id
+  group by t.tag
+  order by count(*) desc, t.tag;
+$$;
+
+-- ===================================================================
+-- supabase/migrations/0012_zutaten_treffer.sql
+-- ===================================================================
+
+-- Zutaten-Erkennung: Schwelle der Ähnlichkeitssuche von 0,85 auf 0,62.
+--
+-- 0,85 war zu streng gewählt — gemessen an dieser Datenbank:
+--
+--   Zwiebel / Zwiebeln            0,700     Mehl / Mandelmehl        0,333
+--   Karotte / Karotten            0,700     Zwiebel / Frühlingszw.   0,316
+--   Tomate  / Tomaten             0,667     Salz / Salzmandeln       0,308
+--   Wacholderbeere(n)             0,824     Fond / Kalbsfond         0,250
+--                                           Sahne / Sauerrahm        0,143
+--
+-- Links die Paare, die zusammengehören, rechts die, die es nicht dürfen.
+-- Zwischen 0,333 und 0,667 liegt ein breiter Graben; 0,62 sitzt darin.
+--
+-- Die Folge der alten Schwelle war konkret: „Zwiebeln" aus einem Rezept und
+-- „Zwiebel" aus einem anderen wurden zu zwei Zutaten und damit zu zwei Zeilen
+-- auf der Einkaufsliste — genau das, was das Zusammenfassen verhindern soll.
+--
+-- Knoblauch / Knoblauchzehe liegt bei 0,600 und bleibt damit bewusst
+-- getrennt: eine Zehe ist keine Knolle.
+
+create or replace function resolve_ingredient(p_household_id uuid, p_name text)
+returns uuid
+language plpgsql
+security invoker
+set search_path = public, pg_temp
+as $$
+declare
+  v_norm text := normalize_ingredient_name(p_name);
+  v_id uuid;
+begin
+  if v_norm = '' then
+    raise exception 'Die Zutat braucht einen Namen';
+  end if;
+
+  select id into v_id from ingredients
+  where name_norm = v_norm
+    and (household_id = p_household_id or household_id is null)
+  order by (household_id is not null) desc
+  limit 1;
+  if v_id is not null then return v_id; end if;
+
+  select a.ingredient_id into v_id
+  from ingredient_aliases a
+  join ingredients i on i.id = a.ingredient_id
+  where a.alias_norm = v_norm
+    and (i.household_id = p_household_id or i.household_id is null)
+  order by (a.household_id is not null) desc
+  limit 1;
+  if v_id is not null then return v_id; end if;
+
+  select id into v_id from ingredients
+  where (household_id = p_household_id or household_id is null)
+    and similarity(name_norm, v_norm) >= 0.62
+  order by similarity(name_norm, v_norm) desc, (household_id is not null) desc
+  limit 1;
+  if v_id is not null then return v_id; end if;
+
+  insert into ingredients (household_id, name_norm, display_name, category_id)
+  values (p_household_id, v_norm, btrim(p_name), 'sonstiges')
+  on conflict (household_id, name_norm) where household_id is not null
+    do nothing
+  returning id into v_id;
+
+  if v_id is null then
+    select id into v_id from ingredients
+    where household_id = p_household_id and name_norm = v_norm;
+  end if;
+
+  return v_id;
+end;
+$$;
+
+-- Was die Ähnlichkeit nicht schafft, steht als Alias da: unregelmäßige
+-- Mehrzahl und geläufige Zweitnamen. Die Tabelle gab es längst, genutzt wurde
+-- sie noch nicht.
+insert into ingredient_aliases (alias_norm, ingredient_id, household_id)
+select normalize_ingredient_name(v.alias), i.id, null
+from (values
+  ('Ei', 'Eier'),
+  ('Lorbeerblätter', 'Lorbeerblatt'),
+  ('Gewürznelke', 'Nelken'),
+  ('Gewürznelken', 'Nelken'),
+  ('Kalbsfond', 'Fond'),
+  ('Rinderfond', 'Fond'),
+  ('Gemüsefond', 'Fond'),
+  ('Créme fraiche', 'Crème fraîche'),
+  ('Creme fraiche', 'Crème fraîche'),
+  ('Petersilie glatt', 'Petersilie'),
+  ('Petersilie krause', 'Petersilie')
+) as v(alias, ziel)
+join ingredients i
+  on i.household_id is null
+ and i.name_norm = normalize_ingredient_name(v.ziel)
+on conflict (alias_norm, ingredient_id) do nothing;
+
+-- ===================================================================
 -- supabase/seed/0001_units.sql
 -- ===================================================================
 

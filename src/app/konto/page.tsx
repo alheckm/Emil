@@ -24,6 +24,13 @@ export default async function AccountPage() {
       <AccountActions />
 
       <p className="text-center text-[15px]">
+        <Link
+          href="/datenschutz"
+          className="text-muted underline underline-offset-4"
+        >
+          Datenschutz
+        </Link>
+        <span className="px-2 text-muted">·</span>
         <Link href="/" className="text-muted underline underline-offset-4">
           Zurück
         </Link>

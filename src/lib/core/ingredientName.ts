@@ -15,5 +15,14 @@ export function normalizeIngredientName(name: string): string {
   return name.toLowerCase().replace(/\s+/g, " ").trim();
 }
 
-/** Schwelle der Ähnlichkeitssuche, ab der zwei Namen als dieselbe Zutat gelten. */
-export const INGREDIENT_SIMILARITY_THRESHOLD = 0.85;
+/**
+ * Schwelle der Ähnlichkeitssuche, ab der zwei Namen als dieselbe Zutat gelten.
+ *
+ * Muss mit `resolve_ingredient` in 0012_zutaten_treffer.sql übereinstimmen.
+ * Der Wert ist gemessen, nicht geschätzt: deutsche Plurale liegen bei 0,667
+ * (Tomate/Tomaten) bis 0,824 (Wacholderbeere/-beeren), während Paare, die
+ * nicht zusammenfallen dürfen, bei höchstens 0,333 liegen (Mehl/Mandelmehl).
+ * Mit den ursprünglichen 0,85 legte jeder Plural eine zweite Zutat an — und
+ * damit eine zweite Zeile auf der Einkaufsliste.
+ */
+export const INGREDIENT_SIMILARITY_THRESHOLD = 0.62;

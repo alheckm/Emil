@@ -34,6 +34,14 @@ export default async function LoginPage({
             Passwort vergessen
           </Link>
         </p>
+        <p>
+          <Link
+            href="/datenschutz"
+            className="text-muted underline underline-offset-4"
+          >
+            Datenschutz
+          </Link>
+        </p>
       </div>
     </Screen>
   );

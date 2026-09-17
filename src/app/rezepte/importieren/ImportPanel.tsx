@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { parsePastedRecipe } from "@/lib/core/parsePastedRecipe";
 import { IMPORT_PROMPT, IMPORT_PROMPT_HINT } from "@/lib/core/importPrompt";
@@ -18,17 +18,36 @@ import { RecipeForm, type ImportDraft } from "../RecipeForm";
 
 type Tab = "web" | "einfuegen";
 
-export function ImportPanel({ householdId }: { householdId: string }) {
+export function ImportPanel({
+  householdId,
+  prefillUrl = null,
+}: {
+  householdId: string;
+  /** Aus `?url=` — der Weg, den der iOS-Kurzbefehl nimmt. */
+  prefillUrl?: string | null;
+}) {
   const [tab, setTab] = useState<Tab>("web");
   const [draft, setDraft] = useState<ImportDraft | null>(null);
 
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState(prefillUrl ?? "");
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [hint, setHint] = useState("");
 
   const [pasted, setPasted] = useState("");
   const [copied, setCopied] = useState(false);
+
+  // Kommt die Adresse aus dem iOS-Kurzbefehl, soll kein weiterer Knopfdruck
+  // nötig sein — geteilt ist geteilt. Ein Merker statt Zustand, weil das kein
+  // erneutes Rendern auslösen muss; und vor jedem bedingten return, weil Hooks
+  // in jeder Runde in derselben Reihenfolge laufen müssen.
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!prefillUrl || autoStarted.current) return;
+    autoStarted.current = true;
+    void importFromUrl();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefillUrl]);
 
   // Ist ein Entwurf da, zählt nur noch das Prüfen. Der Import tritt zurück,
   // damit niemand versehentlich zweimal importiert und den Entwurf verliert.
@@ -63,6 +82,8 @@ export function ImportPanel({ householdId }: { householdId: string }) {
     );
   }
 
+  // Kommt die Adresse aus dem Kurzbefehl, soll nicht noch ein Knopfdruck
+  // nötig sein — geteilt ist geteilt. Läuft genau einmal.
   async function importFromUrl() {
     setErrors([]);
     setHint("");
