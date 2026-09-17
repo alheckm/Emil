@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useOptimistic, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { buildListItems } from "@/lib/core/mergeList";
@@ -36,9 +36,17 @@ export function RecipeActions({
   const [servings, setServings] = useState(
     plannedServings ?? recipe.baseServings,
   );
-  const [busy, setBusy] = useState<"add" | "remove" | "delete" | null>(null);
   const [error, setError] = useState("");
   const [askDelete, setAskDelete] = useState(false);
+
+  // Was der Knopf anzeigt, noch bevor der Server geantwortet hat. Geht die
+  // Anfrage schief, fällt der vorgezogene Wert von selbst wieder auf den
+  // Serverstand zurück — genau das macht `useOptimistic` gegenüber einem
+  // eigenen Zustand einfacher: kein Zurücknehmen von Hand.
+  const [planned, setPlanned] = useOptimistic(plannedServings);
+  // Nur noch fürs Löschen, weil dort tatsächlich gewartet werden muss: die
+  // Seite wechselt danach, und ein zweites Antippen würde ins Leere laufen.
+  const [deleting, setDeleting] = useState(false);
 
   function client() {
     const supabase = getBrowserSupabase();
@@ -46,47 +54,54 @@ export function RecipeActions({
     return supabase;
   }
 
-  async function onAdd() {
+  function onAdd() {
     if (!listId) return;
     const supabase = client();
     if (!supabase) return;
 
     setError("");
-    setBusy("add");
     const items = buildListItems(
       recipe.ingredients,
       recipe.baseServings,
       servings,
     );
-    const result = await addRecipeToList(
-      supabase,
-      listId,
-      recipe.id,
-      servings,
-      items,
-    );
-    setBusy(null);
-    if (!result.ok) {
-      setError(result.error);
-      return;
-    }
-    router.refresh();
+
+    startTransition(async () => {
+      // Der Knopf sagt sofort „liegt drauf“. Steht die Verbindung nicht,
+      // springt er zurück und die Meldung erklärt es.
+      setPlanned(servings);
+
+      const result = await addRecipeToList(
+        supabase,
+        listId,
+        recipe.id,
+        servings,
+        items,
+      );
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      router.refresh();
+    });
   }
 
-  async function onRemove() {
+  function onRemove() {
     if (!listId) return;
     const supabase = client();
     if (!supabase) return;
 
     setError("");
-    setBusy("remove");
-    const result = await removeRecipeFromList(supabase, listId, recipe.id);
-    setBusy(null);
-    if (!result.ok) {
-      setError(result.error);
-      return;
-    }
-    router.refresh();
+    startTransition(async () => {
+      setPlanned(null);
+
+      const result = await removeRecipeFromList(supabase, listId, recipe.id);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      router.refresh();
+    });
   }
 
   async function onDelete() {
@@ -94,14 +109,14 @@ export function RecipeActions({
     if (!supabase) return;
 
     setError("");
-    setBusy("delete");
+    setDeleting(true);
 
     // Erst von der Liste nehmen: die Kaskade würde zwar die Herkunftszeilen
     // mitnehmen, aber eine dadurch leere Listenzeile bliebe ohne Menge stehen.
     if (listId) {
       const removed = await removeRecipeFromList(supabase, listId, recipe.id);
       if (!removed.ok) {
-        setBusy(null);
+        setDeleting(false);
         setError(removed.error);
         return;
       }
@@ -109,7 +124,7 @@ export function RecipeActions({
 
     const result = await deleteRecipe(supabase, recipe.id);
     if (!result.ok) {
-      setBusy(null);
+      setDeleting(false);
       setError(result.error);
       return;
     }
@@ -136,7 +151,7 @@ export function RecipeActions({
               type="button"
               aria-label="Eine Portion weniger"
               onClick={() => setServings((value) => Math.max(1, value - 1))}
-              className="h-12 w-12 rounded-xl border border-border text-xl active:opacity-70"
+              className="h-12 w-12 rounded-xl border border-border text-xl press"
             >
               −
             </button>
@@ -150,7 +165,7 @@ export function RecipeActions({
               type="button"
               aria-label="Eine Portion mehr"
               onClick={() => setServings((value) => value + 1)}
-              className="h-12 w-12 rounded-xl border border-border text-xl active:opacity-70"
+              className="h-12 w-12 rounded-xl border border-border text-xl press"
             >
               +
             </button>
@@ -193,38 +208,34 @@ export function RecipeActions({
       </Card>
 
       <div className="space-y-2">
-        <Button onClick={() => void onAdd()} disabled={busy !== null || !listId}>
-          {busy === "add"
-            ? "Einen Moment …"
-            : plannedServings !== null
-              ? "Liste aktualisieren"
-              : "Auf die Einkaufsliste"}
+        {/* Kein „Einen Moment …“ mehr: der Knopf zeigt sofort den neuen
+            Zustand. Ein Ladetext an dieser Stelle war genau die Trägheit, um
+            die es geht — man sah eine halbe Sekunde lang, dass gewartet wird,
+            statt dass etwas passiert ist. */}
+        <Button onClick={onAdd} disabled={!listId}>
+          {planned !== null ? "Liste aktualisieren" : "Auf die Einkaufsliste"}
         </Button>
 
-        {plannedServings !== null && (
-          <Button
-            variant="quiet"
-            onClick={() => void onRemove()}
-            disabled={busy !== null}
-          >
-            {busy === "remove" ? "Einen Moment …" : "Von der Liste nehmen"}
+        {planned !== null && (
+          <Button variant="quiet" onClick={onRemove}>
+            Von der Liste nehmen
           </Button>
         )}
 
         <div className="flex gap-2">
           <Link
             href={`/rezepte/${recipe.id}/bearbeiten`}
-            className="flex h-12 flex-1 items-center justify-center rounded-xl border border-border bg-surface text-[15px] active:opacity-70"
+            className="flex h-12 flex-1 items-center justify-center rounded-xl border border-border bg-surface text-[15px] press"
           >
             Bearbeiten
           </Link>
           <button
             type="button"
-            disabled={busy !== null}
+            disabled={deleting}
             onClick={() => (askDelete ? void onDelete() : setAskDelete(true))}
-            className="h-12 flex-1 rounded-xl border border-accent text-[15px] text-accent active:opacity-70 disabled:opacity-50"
+            className="h-12 flex-1 rounded-xl border border-accent text-[15px] text-accent press disabled:opacity-50"
           >
-            {busy === "delete"
+            {deleting
               ? "Wird gelöscht …"
               : askDelete
                 ? "Wirklich löschen?"

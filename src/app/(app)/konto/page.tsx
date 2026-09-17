@@ -1,22 +1,31 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/server/supabase";
 import { Card, Screen } from "@/components/ui";
+import { TextSkeleton } from "@/components/skeletons";
 import { AccountActions } from "./AccountActions";
 
 export const metadata = { title: "Konto" };
 
-export default async function AccountPage() {
-  const user = await getCurrentUser();
-  if (!user) redirect("/anmelden");
-
+/**
+ * Das Konto.
+ *
+ * Bis auf die E-Mail-Adresse steht hier nichts, was vom Server kommen müsste —
+ * die Knöpfe zum Abmelden und Löschen arbeiten ohnehin im Browser. Also ist
+ * alles außer der einen Zeile statisch und damit in der App Shell; nur die
+ * Adresse strömt nach.
+ */
+export default function AccountPage() {
   return (
     <Screen title="Konto">
       <Card>
         <dl className="space-y-2 text-[15px]">
           <div className="flex items-center justify-between gap-4">
             <dt className="text-muted">E-Mail</dt>
-            <dd className="truncate font-medium">{user.email}</dd>
+            <Suspense fallback={<dd><TextSkeleton /></dd>}>
+              <Email />
+            </Suspense>
           </div>
         </dl>
       </Card>
@@ -30,11 +39,14 @@ export default async function AccountPage() {
         >
           Datenschutz
         </Link>
-        <span className="px-2 text-muted">·</span>
-        <Link href="/" className="text-muted underline underline-offset-4">
-          Zurück
-        </Link>
       </p>
     </Screen>
   );
+}
+
+async function Email() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/anmelden");
+
+  return <dd className="truncate font-medium">{user.email}</dd>;
 }

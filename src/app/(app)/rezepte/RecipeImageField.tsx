@@ -114,7 +114,7 @@ export function RecipeImageField({
       <div className="flex gap-2">
         <label
           htmlFor={inputId}
-          className="flex min-h-11 flex-1 cursor-pointer items-center justify-center rounded-xl border border-border bg-surface px-4 text-[15px] font-medium active:opacity-70"
+          className="flex min-h-11 flex-1 cursor-pointer items-center justify-center rounded-xl border border-border bg-surface px-4 text-[15px] font-medium press"
         >
           {busy ? "Wird verkleinert …" : shown ? "Bild ersetzen" : "Bild wählen"}
         </label>
@@ -122,7 +122,7 @@ export function RecipeImageField({
           <button
             type="button"
             onClick={remove}
-            className="min-h-11 rounded-xl border border-border bg-surface px-4 text-[15px] text-muted active:opacity-70"
+            className="min-h-11 rounded-xl border border-border bg-surface px-4 text-[15px] text-muted press"
           >
             Entfernen
           </button>

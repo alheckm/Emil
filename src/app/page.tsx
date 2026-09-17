@@ -1,19 +1,38 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SUPABASE_MISSING_MESSAGE, getSupabaseConfig } from "@/lib/server/env";
-import { getCurrentUser, getServerSupabase } from "@/lib/server/supabase";
-import { listHouseholds } from "@/lib/data/households";
-import { Notice, RowLink, Screen } from "@/components/ui";
+import { getCurrentUser } from "@/lib/server/supabase";
+import { Notice, Screen } from "@/components/ui";
 
 /**
- * Startseite — die Weiche und das Inhaltsverzeichnis.
+ * Diese Route darf blockieren — und zwar dauerhaft.
  *
- * Nicht angemeldet → Anmeldung, kein Haushalt → Haushalt anlegen. Diese
- * Prüfung gehört auf den Server; im Browser blitzte sonst kurz der falsche
- * Bildschirm auf.
+ * Sie entscheidet, ob jemand angemeldet ist, und leitet entsprechend weiter.
+ * Diese Antwort vorab auszuliefern hieße, kurz den falschen Bildschirm zu
+ * zeigen; im Standalone-Modus vom Home-Bildschirm sieht man genau das
+ * besonders deutlich. Und sie wird einmal beim Start durchlaufen, nicht in der
+ * Schleife aus Tippen und Warten, um die es beim Rest der App geht.
  *
- * Die Einkaufsliste steht bewusst oben und als einziger farbiger Knopf: sie
- * ist der Bildschirm, der im Supermarkt in Sekunden erreichbar sein muss.
+ * `instant = false` schaltet deshalb nur die Prüfung ab, die sonst bei jedem
+ * Entwicklungslauf einen Hinweis für etwas melden würde, das hier Absicht ist.
+ */
+export const instant = false;
+
+/**
+ * Die Weiche — und sonst nichts mehr.
+ *
+ * Früher war das zusätzlich das Inhaltsverzeichnis: ein Bildschirm mit vier
+ * Verweisen auf die Bereiche der App. Mit der Tab-Leiste sind diese vier
+ * Bereiche dauerhaft erreichbar, und ein eigener Startbildschirm davor wäre
+ * eine Sackgasse — wer von hier auf einen Tab tippt, käme nie wieder zurück.
+ *
+ * Also geht es direkt auf die Einkaufsliste. Das ist ohnehin der Bildschirm,
+ * der im Supermarkt in Sekunden da sein muss; ein Zwischenschritt mit einem
+ * Knopf darauf hat ihn nur langsamer gemacht.
+ *
+ * Nicht angemeldet → Anmeldung, kein Haushalt → Haushalt anlegen: diese
+ * Prüfungen gehören auf den Server. Im Browser blitzte sonst kurz der falsche
+ * Bildschirm auf, und im Standalone-Modus sieht man genau das besonders
+ * deutlich. Die Haushalts-Weiche übernimmt `requireHousehold()` auf /liste.
  */
 export default async function Home() {
   if (!getSupabaseConfig()) {
@@ -24,38 +43,6 @@ export default async function Home() {
     );
   }
 
-  const user = await getCurrentUser();
-  if (!user) redirect("/anmelden");
-
-  const supabase = await getServerSupabase();
-  if (!supabase) redirect("/anmelden");
-
-  const households = await listHouseholds(supabase);
-  if (!households.ok) {
-    return (
-      <Screen title="Emil">
-        <Notice tone="error">{households.error}</Notice>
-      </Screen>
-    );
-  }
-  if (households.value.length === 0) redirect("/haushalt/start");
-
-  const household = households.value[0];
-
-  return (
-    <Screen title="Emil" lead={household.name}>
-      <Link
-        href="/liste"
-        className="flex h-14 items-center justify-center rounded-xl bg-accent px-4 text-lg font-medium text-accent-text active:opacity-70"
-      >
-        Einkaufsliste
-      </Link>
-
-      <nav className="space-y-2">
-        <RowLink href="/rezepte">Rezepte</RowLink>
-        <RowLink href="/haushalt">Haushalt &amp; Einladungen</RowLink>
-        <RowLink href="/konto">Konto</RowLink>
-      </nav>
-    </Screen>
-  );
+  if (!(await getCurrentUser())) redirect("/anmelden");
+  redirect("/liste");
 }

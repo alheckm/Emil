@@ -60,7 +60,7 @@ export function Button({
       {...props}
       className={
         "inline-flex h-12 w-full items-center justify-center rounded-xl px-4 " +
-        "text-base font-medium transition-opacity active:opacity-70 " +
+        "text-base font-medium press " +
         "disabled:cursor-not-allowed disabled:opacity-50 " +
         look
       }
@@ -98,24 +98,53 @@ export function Notice({
   );
 }
 
-/** Rahmen für alles unterhalb des Logins: eine Spalte, Daumenbreite. */
+/**
+ * Überschrift eines Screens.
+ *
+ * Steht als eigener Baustein daneben, weil der Titel nicht immer im Voraus
+ * feststeht: beim Rezept kommt er aus den Daten und darf deshalb erst
+ * erscheinen, wenn diese da sind — also innerhalb der Suspense-Grenze, nicht
+ * im statischen Rahmen darum.
+ */
+export function ScreenHeader({
+  title,
+  lead,
+}: {
+  title: ReactNode;
+  lead?: ReactNode;
+}) {
+  return (
+    <header>
+      <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
+      {lead && (
+        <p className="mt-2 text-[15px] leading-relaxed text-muted">{lead}</p>
+      )}
+    </header>
+  );
+}
+
+/**
+ * Rahmen für alles unterhalb des Logins: eine Spalte, Daumenbreite.
+ *
+ * `title` ist absichtlich optional. Der Rahmen selbst ist statisch und landet
+ * damit in der App Shell — er steht also schon, bevor irgendwelche Daten da
+ * sind. Screens, deren Titel erst aus den Daten kommt, lassen ihn hier weg und
+ * setzen stattdessen drinnen einen `ScreenHeader`.
+ */
 export function Screen({
   title,
   lead,
   children,
 }: {
-  title: string;
-  lead?: string;
+  title?: ReactNode;
+  lead?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <main className="flex-1 px-safe pt-safe pb-safe">
-      <div className="mx-auto w-full max-w-md py-8">
-        <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
-        {lead && (
-          <p className="mt-2 text-[15px] leading-relaxed text-muted">{lead}</p>
-        )}
-        <div className="mt-8 space-y-6">{children}</div>
+      <div className="mx-auto w-full max-w-md space-y-8 py-8">
+        {title !== undefined && <ScreenHeader title={title} lead={lead} />}
+        <div className="space-y-6">{children}</div>
       </div>
     </main>
   );
@@ -177,14 +206,25 @@ export function Textarea({
 export function RowLink({
   href,
   children,
+  prefetch,
 }: {
   href: string;
   children: ReactNode;
+  /**
+   * Holt zusätzlich die URL-abhängigen Inhalte des Ziels vorab.
+   *
+   * Ohne das lädt ein `<Link>` nur die App Shell der Zielroute — alles, was an
+   * `params` hängt, kommt erst nach dem Klick. Mit `prefetch` ist auch das
+   * schon da. Der Preis ist eine Server-Runde pro sichtbarem Verweis, also
+   * gehört das an überschaubare Listen und nicht an jede Zeile.
+   */
+  prefetch?: boolean;
 }) {
   return (
     <Link
       href={href}
-      className="flex min-h-12 items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-[15px] active:opacity-70"
+      prefetch={prefetch}
+      className="flex min-h-12 items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-[15px] press tap-target"
     >
       <span className="min-w-0">{children}</span>
       <span aria-hidden className="shrink-0 text-muted">

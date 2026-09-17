@@ -34,10 +34,14 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  // Muss getUser() sein, nicht getSession(): nur getUser() legt das Token dem
-  // Auth-Server vor und erneuert es dabei. getSession() liest bloß das Cookie
-  // und glaubt ihm — was auch ein gefälschtes Cookie überstehen würde.
-  await supabase.auth.getUser();
+  // Muss prüfen, nicht bloß lesen: getSession() glaubt dem Cookie blind und
+  // überstünde auch ein gefälschtes. getClaims() verifiziert die Signatur
+  // wirklich — bei asymmetrischen Signing Keys (dieses Projekt: ES256) lokal
+  // per WebCrypto, also ohne Netzrunde zum Auth-Server. Genau das ist der
+  // Unterschied zu getUser(), das hier auf JEDEM Request eine volle Runde
+  // gekostet hat, Prefetches eingeschlossen. Läuft das Token bald ab, frischt
+  // getClaims() die Sitzung vorher selbst auf — der eigentliche Zweck bleibt.
+  await supabase.auth.getClaims();
 
   return response;
 }

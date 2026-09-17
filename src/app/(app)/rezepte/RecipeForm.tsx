@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { startTransition, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { parseIngredient } from "@/lib/core/parseIngredient";
@@ -307,8 +307,19 @@ export function RecipeForm({
       return;
     }
 
-    router.push(`/rezepte/${saved.value.recipeId}`);
-    router.refresh();
+    // In einer Transition: das Ziel hat eine eigene Suspense-Grenze und kann
+    // sofort erscheinen, während die Daten nachströmen. Ohne die Transition
+    // hinge das Formular noch an der Navigation, obwohl längst alles
+    // gespeichert ist.
+    //
+    // `busy` bleibt hier bewusst stehen und wird nicht vorgezogen: Speichern
+    // ist mehrstufig — Rezept, Bild, Einkaufsliste nachziehen — und ein
+    // zweites Antippen mittendrin legt das Rezept doppelt an. Das ist kein
+    // Wartebalken aus Verlegenheit, sondern eine Sperre mit Grund.
+    startTransition(() => {
+      router.push(`/rezepte/${saved.value.recipeId}`);
+      router.refresh();
+    });
   }
 
   return (
@@ -401,7 +412,7 @@ export function RecipeForm({
                         current.filter((other) => other.key !== row.key),
                       )
                     }
-                    className="h-11 w-11 shrink-0 rounded-lg border border-border text-muted active:opacity-70"
+                    className="h-11 w-11 shrink-0 rounded-lg border border-border text-muted press"
                   >
                     ✕
                   </button>
@@ -461,7 +472,7 @@ export function RecipeForm({
         <button
           type="button"
           onClick={() => setRows((current) => [...current, emptyRow()])}
-          className="mt-3 h-11 w-full rounded-lg border border-border text-[15px] active:opacity-70"
+          className="mt-3 h-11 w-full rounded-lg border border-border text-[15px] press"
         >
           Zeile hinzufügen
         </button>
@@ -479,7 +490,7 @@ export function RecipeForm({
           <button
             type="button"
             onClick={takeOverBulk}
-            className="mt-3 h-11 w-full rounded-lg border border-border text-[15px] active:opacity-70"
+            className="mt-3 h-11 w-full rounded-lg border border-border text-[15px] press"
           >
             Zeilen übernehmen
           </button>

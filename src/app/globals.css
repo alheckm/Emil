@@ -59,3 +59,76 @@ body {
   padding-left: max(1rem, env(safe-area-inset-left));
   padding-right: max(1rem, env(safe-area-inset-right));
 }
+
+/* ---------------------------------------------------------------------------
+   Touch-Verhalten auf dem iPhone.
+
+   Die App wird fast nur mit dem Daumen bedient, und iOS Safari bringt ein paar
+   Vorgaben mit, die sich am Handy wie Trägheit anfühlen:
+
+   - `touch-action: manipulation` schaltet die Doppeltipp-Zoom-Erkennung ab.
+     Ohne das wartet Safari nach jedem Tipp kurz, ob ein zweiter folgt.
+   - `-webkit-tap-highlight-color` ist das graue Rechteck, das iOS von sich aus
+     über die Trefferfläche legt. Es kommt verzögert und passt zu nichts —
+     die `:active`-Zustände unten sind die bessere Rückmeldung.
+   - `cursor: pointer` steht hier nicht für die Maus: iOS Safari wendet
+     `:active` auf Elemente ohne Zeiger-Affordanz unzuverlässig an.
+--------------------------------------------------------------------------- */
+button,
+a,
+select,
+[role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+/* Trefferflächen, die man im Supermarkt in Bewegung antippt: kein Langdruck-
+   Menü und keine Textauswahl, die beim Wischen aus Versehen greift. Bewusst
+   nur hier und nicht global — Rezepttext und Mengen müssen markierbar bleiben. */
+@utility tap-target {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Der Aktiv-Zustand muss im selben Frame stehen wie der Finger. Ein Übergang
+   beim Drücken macht genau die Verzögerung, die hier weg soll; beim Loslassen
+   ist er dagegen richtig, sonst blitzt es hart zurück. */
+@utility press {
+  transition: opacity 120ms ease-out, transform 120ms ease-out;
+
+  &:active {
+    transition-duration: 0ms;
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+}
+
+/* Wie `press`, aber ohne Skalierung — für Flächen, die Teil einer zusammen-
+   gesetzten Zeile sind. Dort würde jede Hälfte für sich schrumpfen und die
+   gemeinsame Umrandung sichtbar aufreißen. */
+@utility press-flat {
+  transition: opacity 120ms ease-out;
+
+  &:active {
+    transition-duration: 0ms;
+    opacity: 0.7;
+  }
+}
+
+/* Blass werden, solange oben im Baum etwas lädt.
+
+   Bewusst als eigene Regel statt als Tailwind-Variante: der Auslöser ist ein
+   `data-pending` an einem Vorfahren, und diese Richtung („irgendwo über mir
+   läuft etwas“) liest sich hier klarer als eine Kette von Präfixen. Gedimmt
+   statt durch ein Skelett ersetzt — ein Wechsel, bei dem der halbe Bildschirm
+   verschwindet, wirkt langsamer als einer, bei dem der alte Inhalt kurz
+   verblasst. */
+@utility dims-when-pending {
+  transition: opacity 150ms ease-out;
+
+  [data-pending] & {
+    opacity: 0.5;
+  }
+}

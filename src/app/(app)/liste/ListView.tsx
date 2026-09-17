@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { formatAmount } from "@/lib/core/format";
 import { parseAmount } from "@/lib/core/numbers";
 import { mergeUnitFor, UNITS } from "@/lib/core/units";
@@ -49,22 +48,39 @@ export function ListView({
 }) {
   const router = useRouter();
   const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const [checkedNow, setCheckedNow] = useState<Record<string, boolean>>({});
+
+  // Zeilen, die schon weg sind, obwohl der Server es noch nicht bestätigt hat.
+  const [removed, setRemoved] = useState<Set<string>>(() => new Set());
+  // Was gerade von Hand ergänzt wurde und noch nicht zurückgekommen ist. Die
+  // stehen bewusst in einer eigenen Liste und nicht zwischen den echten
+  // Zeilen: welcher Abteilung eine neue Zutat zugeschlagen wird, entscheidet
+  // der Server (`resolve_ingredient`). Sie hier zu raten und anschließend
+  // umspringen zu lassen wäre unehrlicher als ein eigener kurzer Abschnitt.
+  const [adding, setAdding] = useState<{ id: string; label: string }[]>([]);
 
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [unitCode, setUnitCode] = useState("");
 
-  // Neue Daten vom Server: die eigenen, vorgezogenen Häkchen sind darin
+  // Neue Daten vom Server: die eigenen, vorgezogenen Änderungen sind darin
   // enthalten und werden hier wieder fallen gelassen. Das passiert beim
   // Rendern und nicht in einem Effekt — sonst zeigte die Liste für einen
   // Durchgang den alten Stand über den neuen Daten.
+  //
+  // Genau hierfür steht der vorgezogene Zustand in gewöhnlichem `useState` und
+  // nicht in `useOptimistic`: `router.refresh()` liefert kein Versprechen
+  // zurück, das man abwarten könnte. Eine Transition wäre also schon zu Ende,
+  // bevor die frischen Daten da sind — und die abgehakte Zeile blitzte für
+  // einen Moment wieder auf. Hier fällt der vorgezogene Stand erst, wenn die
+  // neuen Daten wirklich anliegen.
   const [shownEntries, setShownEntries] = useState(entries);
   if (shownEntries !== entries) {
     setShownEntries(entries);
     setCheckedNow({});
+    setRemoved(new Set());
+    setAdding([]);
   }
 
   const online = useOnlineStatus();
@@ -80,7 +96,9 @@ export function ListView({
   useEffect(() => {
     const supabase = getBrowserSupabase();
     if (!supabase) return;
-    return subscribeToList(supabase, listId, () => router.refresh());
+    return subscribeToList(supabase, listId, () =>
+      startTransition(() => router.refresh()),
+    );
   }, [listId, router]);
 
   // Frische Serverdaten in den lokalen Spiegel schreiben. Nur dann — eine
@@ -117,7 +135,9 @@ export function ListView({
       const supabase = getBrowserSupabase();
       if (online && supabase) {
         const result = await flushOutbox(supabase);
-        if (result.sent > 0 && !cancelled) router.refresh();
+        if (result.sent > 0 && !cancelled) {
+          startTransition(() => router.refresh());
+        }
       }
       const open = await pendingToggles();
       if (!cancelled) setPending(open);
@@ -171,23 +191,67 @@ export function ListView({
     // holt die Seite aus dem Zwischenspeicher — samt weggeworfener Anzeige.
     // Das passiert real, wenn Supabase erreichbar ist, der eigene Server aber
     // nicht: die Änderung IST gespeichert, nur sieht man sie dann nicht mehr.
-    if (online) router.refresh();
+    //
+    // In einer Transition, damit das Nachladen die Liste nicht anhält: das
+    // Häkchen steht längst, hier wird nur noch der Serverstand nachgezogen.
+    if (online) startTransition(() => router.refresh());
   }
 
-  async function run(action: () => Promise<{ ok: boolean; error?: string }>) {
+  /**
+   * Eine Änderung abschicken, ohne die Oberfläche anzuhalten.
+   *
+   * Vorher stand hier ein `busy`-Schalter, der während des Wartens *jeden*
+   * Knopf der Liste gesperrt hat — bei einer Runde über Mobilfunk also die
+   * ganze Liste für eine halbe Sekunde. Der Aufrufer zieht die Anzeige jetzt
+   * selbst vor; hier bleibt nur noch Abschicken, Fehler melden und
+   * nachladen.
+   *
+   * `zurueck` nimmt die vorgezogene Anzeige wieder weg, wenn es schiefging.
+   */
+  function run(
+    action: () => Promise<{ ok: boolean; error?: string }>,
+    zurueck?: () => void,
+  ) {
     setError("");
-    setBusy(true);
-    const result = await action();
-    setBusy(false);
-    if (!result.ok) {
-      setError(result.error ?? "Das hat nicht geklappt.");
-      return false;
-    }
-    router.refresh();
-    return true;
+    startTransition(async () => {
+      const result = await action();
+      if (!result.ok) {
+        zurueck?.();
+        setError(result.error ?? "Das hat nicht geklappt.");
+        return;
+      }
+      router.refresh();
+    });
   }
 
-  async function addByHand() {
+  function removeEntry(entry: ListEntry) {
+    // Zuerst verschwinden lassen, dann senden. Kommt ein Fehler zurück, steht
+    // die Zeile wieder da und die Meldung erklärt, warum.
+    setRemoved((current) => new Set(current).add(entry.id));
+
+    const supabase = getBrowserSupabase();
+    if (!supabase) {
+      setRemoved((current) => {
+        const next = new Set(current);
+        next.delete(entry.id);
+        return next;
+      });
+      setError("Supabase ist nicht konfiguriert.");
+      return;
+    }
+
+    run(
+      () => deleteEntry(supabase, entry.id),
+      () =>
+        setRemoved((current) => {
+          const next = new Set(current);
+          next.delete(entry.id);
+          return next;
+        }),
+    );
+  }
+
+  function addByHand() {
     if (!name.trim()) return;
     const supabase = getBrowserSupabase();
     if (!supabase) {
@@ -203,22 +267,35 @@ export function ListView({
       return;
     }
     const unit = unitCode || null;
+    const label = name.trim();
+    const id = crypto.randomUUID();
 
-    const done = await run(() =>
-      addManualEntry(
-        supabase,
-        householdId,
-        listId,
-        name.trim(),
-        mergeUnitFor(unit),
-        toMergeAmount(parsed, unit),
-      ),
+    // Felder sofort leeren und die Zutat sofort anzeigen. Wer im Laden drei
+    // Dinge hintereinander eintippt, soll nicht zwischendurch auf den Server
+    // warten müssen.
+    setAdding((current) => [...current, { id, label }]);
+    setName("");
+    setAmount("");
+    setUnitCode("");
+
+    run(
+      () =>
+        addManualEntry(
+          supabase,
+          householdId,
+          listId,
+          label,
+          mergeUnitFor(unit),
+          toMergeAmount(parsed, unit),
+        ),
+      () => {
+        setAdding((current) => current.filter((item) => item.id !== id));
+        // Zurück ins Feld, damit nichts verloren geht.
+        setName(label);
+        setAmount(amount);
+        setUnitCode(unitCode);
+      },
     );
-    if (done) {
-      setName("");
-      setAmount("");
-      setUnitCode("");
-    }
   }
 
   // Was tatsächlich auf dem Bildschirm steht: der beste bekannte Serverstand —
@@ -229,7 +306,11 @@ export function ListView({
   // Bewusst hier abgeleitet statt im Effekt zurückgesetzt — React rät davon
   // ab, Zustand in Effekten zu spiegeln.
   const base = !online && mirrored ? mirrored : shownEntries;
-  const visibleEntries = applyPendingToggles(base, pending);
+  // Zuletzt noch das, was gerade entfernt wurde — es soll im selben Frame
+  // verschwinden, in dem getippt wurde, nicht wenn der Server geantwortet hat.
+  const visibleEntries = applyPendingToggles(base, pending).filter(
+    (entry) => !removed.has(entry.id),
+  );
 
   const groups: { name: string; entries: ListEntry[] }[] = [];
   for (const entry of visibleEntries) {
@@ -300,15 +381,15 @@ export function ListView({
         </div>
         <button
           type="button"
-          disabled={busy || !name.trim()}
-          onClick={() => void addByHand()}
-          className="mt-3 h-11 w-full rounded-lg border border-border text-[15px] active:opacity-70 disabled:opacity-50"
+          disabled={!name.trim()}
+          onClick={addByHand}
+          className="mt-3 h-11 w-full rounded-lg border border-border text-[15px] press disabled:opacity-50"
         >
           Auf die Liste
         </button>
       </Card>
 
-      {entries.length === 0 ? (
+      {visibleEntries.length + adding.length === 0 ? (
         <Card>
           <p className="text-[15px] leading-relaxed text-muted">
             Die Liste ist leer. Leg ein Rezept auf die Liste oder ergänze etwas
@@ -317,10 +398,36 @@ export function ListView({
         </Card>
       ) : (
         <p className="text-[13px] text-muted">
-          {openCount === 0
+          {openCount + adding.length === 0
             ? "Alles abgehakt."
-            : `Noch ${openCount} von ${entries.length}`}
+            : `Noch ${openCount + adding.length} von ${
+                visibleEntries.length + adding.length
+              }`}
         </p>
+      )}
+
+      {adding.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+            Wird ergänzt
+          </h2>
+          <ul className="space-y-2">
+            {adding.map((item) => (
+              <li
+                key={item.id}
+                className="flex min-h-14 items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 opacity-50"
+              >
+                <span
+                  aria-hidden
+                  className="h-7 w-7 shrink-0 rounded-md border border-border"
+                />
+                <span className="min-w-0 text-[15px] font-medium">
+                  {item.label}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       {groups.map((group) => (
@@ -345,7 +452,7 @@ export function ListView({
                       type="button"
                       aria-pressed={checked}
                       onClick={() => void toggle(entry)}
-                      className="flex min-h-14 flex-1 items-center gap-3 px-4 py-3 text-left active:opacity-70"
+                      className="flex min-h-14 flex-1 items-center gap-3 px-4 py-3 text-left press-flat tap-target"
                     >
                       <span
                         aria-hidden
@@ -384,7 +491,7 @@ export function ListView({
                       aria-label={`Herkunft von ${entry.name}`}
                       aria-expanded={isOpen}
                       onClick={() => setOpen(isOpen ? null : entry.id)}
-                      className="w-12 shrink-0 border-l border-border text-muted active:opacity-70"
+                      className="w-12 shrink-0 border-l border-border text-muted press-flat"
                     >
                       {isOpen ? "▴" : "▾"}
                     </button>
@@ -417,9 +524,8 @@ export function ListView({
                           </span>
                           <select
                             value={entry.categoryId ?? "sonstiges"}
-                            disabled={busy}
                             onChange={(event) =>
-                              void run(() => {
+                              run(() => {
                                 const supabase = getBrowserSupabase();
                                 if (!supabase) {
                                   return Promise.resolve({
@@ -455,20 +561,8 @@ export function ListView({
 
                       <button
                         type="button"
-                        disabled={busy}
-                        onClick={() =>
-                          void run(() => {
-                            const supabase = getBrowserSupabase();
-                            if (!supabase) {
-                              return Promise.resolve({
-                                ok: false,
-                                error: "Supabase ist nicht konfiguriert.",
-                              });
-                            }
-                            return deleteEntry(supabase, entry.id);
-                          })
-                        }
-                        className="h-11 w-full rounded-lg border border-accent text-[15px] text-accent active:opacity-70 disabled:opacity-50"
+                        onClick={() => removeEntry(entry)}
+                        className="h-11 w-full rounded-lg border border-accent text-[15px] text-accent press"
                       >
                         Zeile entfernen
                       </button>
@@ -480,12 +574,6 @@ export function ListView({
           </ul>
         </section>
       ))}
-
-      <p className="text-center text-[15px]">
-        <Link href="/rezepte" className="text-muted underline underline-offset-4">
-          Rezepte
-        </Link>
-      </p>
     </div>
   );
 }
