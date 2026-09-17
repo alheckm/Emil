@@ -16,7 +16,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 export function Card({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border bg-surface p-5">
+    <div className="rounded-card border border-border bg-surface p-5">
       {children}
     </div>
   );
@@ -34,7 +34,7 @@ export function Field({
       <input
         {...props}
         className={
-          "mt-1 block h-12 w-full rounded-xl border border-border bg-bg px-3 text-base " +
+          "mt-1 block h-12 w-full rounded-2xl border border-border bg-bg px-4 text-base " +
           "text-text outline-none placeholder:text-muted/60 " +
           "focus:border-accent focus:ring-2 focus:ring-accent/30 " +
           className
@@ -50,7 +50,7 @@ export function Button({
   ...props
 }: ComponentProps<"button"> & { variant?: "primary" | "quiet" | "danger" }) {
   const look = {
-    primary: "bg-accent text-accent-text",
+    primary: "bg-brand text-brand-text",
     quiet: "border border-border bg-surface text-text",
     danger: "border border-accent text-accent",
   }[variant];
@@ -59,7 +59,9 @@ export function Button({
     <button
       {...props}
       className={
-        "inline-flex h-12 w-full items-center justify-center rounded-xl px-4 " +
+        // Vollrunde Pille statt abgerundetem Rechteck — die auffälligste Form
+        // in KptnCooks Auftritt nach der Slab-Serife.
+        "inline-flex h-12 w-full items-center justify-center rounded-pill px-5 " +
         "text-base font-medium press " +
         "disabled:cursor-not-allowed disabled:opacity-50 " +
         look
@@ -91,7 +93,7 @@ export function Notice({
   return (
     <p
       role={tone === "error" ? "alert" : "status"}
-      className={"rounded-xl border px-4 py-3 text-[15px] leading-relaxed " + look}
+      className={"rounded-card border px-4 py-3 text-[15px] leading-relaxed " + look}
     >
       {children}
     </p>
@@ -115,7 +117,9 @@ export function ScreenHeader({
 }) {
   return (
     <header>
-      <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
+      <h1 className="font-display text-[32px] font-semibold leading-[1.15] tracking-tight">
+        {title}
+      </h1>
       {lead && (
         <p className="mt-2 text-[15px] leading-relaxed text-muted">{lead}</p>
       )}
@@ -162,8 +166,8 @@ export function Select({
       <select
         {...props}
         className={
-          "mt-1 block h-12 w-full appearance-none rounded-xl border border-border " +
-          "bg-bg px-3 text-base text-text outline-none " +
+          "mt-1 block h-12 w-full appearance-none rounded-2xl border border-border " +
+          "bg-bg px-4 text-base text-text outline-none " +
           "focus:border-accent focus:ring-2 focus:ring-accent/30 " +
           className
         }
@@ -186,7 +190,7 @@ export function Textarea({
       <textarea
         {...props}
         className={
-          "mt-1 block w-full rounded-xl border border-border bg-bg p-3 text-base " +
+          "mt-1 block w-full rounded-2xl border border-border bg-bg p-4 text-base " +
           "text-text outline-none placeholder:text-muted/60 " +
           "focus:border-accent focus:ring-2 focus:ring-accent/30 " +
           className
@@ -224,10 +228,10 @@ export function RowLink({
     <Link
       href={href}
       prefetch={prefetch}
-      className="flex min-h-12 items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-[15px] press tap-target"
+      className="flex min-h-14 items-center justify-between gap-3 rounded-card border border-border bg-surface px-4 py-3 text-[15px] press tap-target"
     >
       <span className="min-w-0">{children}</span>
-      <span aria-hidden className="shrink-0 text-muted">
+      <span aria-hidden className="shrink-0 text-brand">
         ›
       </span>
     </Link>

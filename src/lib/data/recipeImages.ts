@@ -96,3 +96,34 @@ export async function getRecipeImageUrl(
   if (error || !data) return null;
   return data.signedUrl;
 }
+
+/**
+ * Anzeigbare URLs für viele Bilder auf einmal.
+ *
+ * Die Rezeptübersicht zeigt jetzt Fotos, und `getRecipeImageUrl` einmal pro
+ * Zeile aufzurufen wären bei dreißig Rezepten dreißig Runden zum Storage —
+ * genau die Art Kette, die gerade aus der App geflogen ist. `createSignedUrls`
+ * macht daraus eine einzige Anfrage.
+ *
+ * Gibt eine Zuordnung Pfad → URL zurück; was sich nicht signieren ließ, fehlt
+ * darin schlicht. Ein fehlendes Bild ist kein Fehlerfall, der einen Screen
+ * kosten darf — die Zeile zeigt dann den Platzhalter.
+ */
+export async function getRecipeImageUrls(
+  supabase: SupabaseClient,
+  paths: (string | null)[],
+): Promise<Record<string, string>> {
+  const wanted = [...new Set(paths.filter((path): path is string => !!path))];
+  if (wanted.length === 0) return {};
+
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrls(wanted, SIGNED_URL_TTL_SECONDS);
+  if (error || !data) return {};
+
+  const urls: Record<string, string> = {};
+  for (const item of data) {
+    if (item.path && item.signedUrl) urls[item.path] = item.signedUrl;
+  }
+  return urls;
+}

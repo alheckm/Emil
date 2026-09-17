@@ -384,7 +384,7 @@ export function RecipeForm({
               <div
                 key={row.key}
                 className={
-                  "rounded-xl border p-3 " +
+                  "rounded-card border p-3 " +
                   (unsure ? "border-warn bg-warn/10" : "border-border bg-bg")
                 }
               >
@@ -402,7 +402,7 @@ export function RecipeForm({
                     }
                     placeholder="Zutat"
                     autoCapitalize="sentences"
-                    className="h-11 min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 text-base outline-none focus:border-accent"
+                    className="h-11 min-w-0 flex-1 rounded-2xl border border-border bg-surface px-3 text-base outline-none focus:border-accent"
                   />
                   <button
                     type="button"
@@ -412,7 +412,7 @@ export function RecipeForm({
                         current.filter((other) => other.key !== row.key),
                       )
                     }
-                    className="h-11 w-11 shrink-0 rounded-lg border border-border text-muted press"
+                    className="h-11 w-11 shrink-0 rounded-pill border border-border text-muted press"
                   >
                     ✕
                   </button>
@@ -426,7 +426,7 @@ export function RecipeForm({
                     }
                     placeholder="Menge"
                     inputMode="decimal"
-                    className="h-11 w-24 shrink-0 rounded-lg border border-border bg-surface px-3 text-base outline-none focus:border-accent"
+                    className="h-11 w-24 shrink-0 rounded-2xl border border-border bg-surface px-3 text-base outline-none focus:border-accent"
                   />
                   <select
                     aria-label="Einheit"
@@ -434,7 +434,7 @@ export function RecipeForm({
                     onChange={(event) =>
                       updateRow(row.key, { unitCode: event.target.value })
                     }
-                    className="h-11 w-28 shrink-0 appearance-none rounded-lg border border-border bg-surface px-2 text-base outline-none focus:border-accent"
+                    className="h-11 w-28 shrink-0 appearance-none rounded-2xl border border-border bg-surface px-2 text-base outline-none focus:border-accent"
                   >
                     <option value="">ohne</option>
                     {UNITS.map((unit) => (
@@ -450,7 +450,7 @@ export function RecipeForm({
                       updateRow(row.key, { note: event.target.value })
                     }
                     placeholder="Notiz"
-                    className="h-11 min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 text-base outline-none focus:border-accent"
+                    className="h-11 min-w-0 flex-1 rounded-2xl border border-border bg-surface px-3 text-base outline-none focus:border-accent"
                   />
                 </div>
                 {unsure && (
@@ -472,7 +472,7 @@ export function RecipeForm({
         <button
           type="button"
           onClick={() => setRows((current) => [...current, emptyRow()])}
-          className="mt-3 h-11 w-full rounded-lg border border-border text-[15px] press"
+          className="mt-3 h-11 w-full rounded-pill border border-border text-[15px] press"
         >
           Zeile hinzufügen
         </button>
@@ -490,7 +490,7 @@ export function RecipeForm({
           <button
             type="button"
             onClick={takeOverBulk}
-            className="mt-3 h-11 w-full rounded-lg border border-border text-[15px] press"
+            className="mt-3 h-11 w-full rounded-pill border border-border text-[15px] press"
           >
             Zeilen übernehmen
           </button>

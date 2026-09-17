@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireHousehold } from "@/lib/server/household";
 import { getListState } from "@/lib/server/listState";
 import { listHouseholdTags, searchRecipes } from "@/lib/data/recipes";
+import { getRecipeImageUrls } from "@/lib/data/recipeImages";
 import { Notice, Screen } from "@/components/ui";
 import { RowsSkeleton } from "@/components/skeletons";
 import { RecipeBrowser } from "./RecipeBrowser";
@@ -23,13 +24,13 @@ export default function RecipesPage(props: PageProps<"/rezepte">) {
       <div className="grid grid-cols-2 gap-2">
         <Link
           href="/rezepte/importieren"
-          className="flex h-12 items-center justify-center rounded-xl bg-accent px-4 text-base font-medium text-accent-text press tap-target"
+          className="flex h-12 items-center justify-center rounded-pill bg-brand px-5 text-base font-medium text-brand-text press tap-target"
         >
           Importieren
         </Link>
         <Link
           href="/rezepte/neu"
-          className="flex h-12 items-center justify-center rounded-xl border border-border bg-surface px-4 text-base font-medium press tap-target"
+          className="flex h-12 items-center justify-center rounded-card border border-border bg-surface px-4 text-base font-medium press tap-target"
         >
           Von Hand
         </Link>
@@ -65,11 +66,18 @@ async function Results({ searchParams }: { searchParams: SearchParams }) {
 
   if (!recipes.ok) return <Notice tone="error">{recipes.error}</Notice>;
 
+  // Ein Bündelaufruf für alle Bilder statt einer Runde pro Zeile.
+  const images = await getRecipeImageUrls(
+    supabase,
+    recipes.value.map((recipe) => recipe.imagePath),
+  );
+
   return (
     <RecipeBrowser
       recipes={recipes.value}
       tags={tags.ok ? tags.value : []}
       planned={list.planned}
+      images={images}
     />
   );
 }

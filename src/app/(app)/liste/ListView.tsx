@@ -355,7 +355,7 @@ export function ListView({
             onChange={(event) => setName(event.target.value)}
             placeholder="Zahnpasta"
             autoCapitalize="sentences"
-            className="h-12 min-w-0 flex-1 rounded-xl border border-border bg-bg px-3 text-base outline-none focus:border-accent"
+            className="h-12 min-w-0 flex-1 rounded-2xl border border-border bg-bg px-3 text-base outline-none focus:border-accent"
           />
           <input
             aria-label="Menge"
@@ -363,13 +363,13 @@ export function ListView({
             onChange={(event) => setAmount(event.target.value)}
             placeholder="Menge"
             inputMode="decimal"
-            className="h-12 w-20 shrink-0 rounded-xl border border-border bg-bg px-3 text-base outline-none focus:border-accent"
+            className="h-12 w-20 shrink-0 rounded-2xl border border-border bg-bg px-3 text-base outline-none focus:border-accent"
           />
           <select
             aria-label="Einheit"
             value={unitCode}
             onChange={(event) => setUnitCode(event.target.value)}
-            className="h-12 w-24 shrink-0 appearance-none rounded-xl border border-border bg-bg px-2 text-base outline-none focus:border-accent"
+            className="h-12 w-24 shrink-0 appearance-none rounded-2xl border border-border bg-bg px-2 text-base outline-none focus:border-accent"
           >
             <option value="">ohne</option>
             {UNITS.map((unit) => (
@@ -383,7 +383,7 @@ export function ListView({
           type="button"
           disabled={!name.trim()}
           onClick={addByHand}
-          className="mt-3 h-11 w-full rounded-lg border border-border text-[15px] press disabled:opacity-50"
+          className="mt-3 h-11 w-full rounded-pill border border-border text-[15px] press disabled:opacity-50"
         >
           Auf die Liste
         </button>
@@ -415,7 +415,7 @@ export function ListView({
             {adding.map((item) => (
               <li
                 key={item.id}
-                className="flex min-h-14 items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 opacity-50"
+                className="flex min-h-14 items-center gap-3 rounded-card border border-border bg-surface px-4 py-3 opacity-50"
               >
                 <span
                   aria-hidden
@@ -445,7 +445,7 @@ export function ListView({
               return (
                 <li
                   key={entry.id}
-                  className="rounded-xl border border-border bg-surface"
+                  className="rounded-card border border-border bg-surface"
                 >
                   <div className="flex items-stretch">
                     <button
@@ -540,7 +540,7 @@ export function ListView({
                                 );
                               })
                             }
-                            className="mt-1 h-11 w-full appearance-none rounded-lg border border-border bg-bg px-3 text-base outline-none focus:border-accent"
+                            className="mt-1 h-11 w-full appearance-none rounded-2xl border border-border bg-bg px-3 text-base outline-none focus:border-accent"
                           >
                             {categories.map((category) => (
                               <option key={category.id} value={category.id}>
@@ -562,7 +562,7 @@ export function ListView({
                       <button
                         type="button"
                         onClick={() => removeEntry(entry)}
-                        className="h-11 w-full rounded-lg border border-accent text-[15px] text-accent press"
+                        className="h-11 w-full rounded-pill border border-accent text-[15px] text-accent press"
                       >
                         Zeile entfernen
                       </button>

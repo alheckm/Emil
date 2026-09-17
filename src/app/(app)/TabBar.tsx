@@ -20,10 +20,10 @@ import { startTransition, useOptimistic } from "react";
  * fühlt sich langsamer an als einer, bei dem der alte Inhalt kurz blass wird.
  */
 const TABS = [
-  { href: "/liste", label: "Liste", icon: "🛒" },
-  { href: "/rezepte", label: "Rezepte", icon: "📖" },
-  { href: "/haushalt", label: "Haushalt", icon: "🏠" },
-  { href: "/konto", label: "Konto", icon: "👤" },
+  { href: "/liste", label: "Liste" },
+  { href: "/rezepte", label: "Rezepte" },
+  { href: "/haushalt", label: "Haushalt" },
+  { href: "/konto", label: "Konto" },
 ] as const;
 
 type TabHref = (typeof TABS)[number]["href"];
@@ -41,7 +41,7 @@ function Frame({
     <nav
       aria-label="Hauptbereiche"
       data-pending={pending ? "" : undefined}
-      className="sticky bottom-0 z-10 border-t border-border bg-surface px-safe pb-safe"
+      className="sticky bottom-0 z-10 border-t border-border bg-surface/95 px-safe pb-safe backdrop-blur"
     >
       <ul className="mx-auto flex w-full max-w-md">
         {TABS.map((tab) => {
@@ -53,14 +53,22 @@ function Frame({
                 aria-current={current ? "page" : undefined}
                 onClick={() => onSelect?.(tab.href)}
                 className={
-                  "flex min-h-14 flex-col items-center justify-center gap-0.5 " +
-                  "text-[11px] press-flat tap-target " +
-                  (current ? "text-accent" : "text-muted")
+                  "flex min-h-14 flex-col items-center justify-center gap-1 " +
+                  "text-[11px] font-medium press-flat tap-target " +
+                  (current ? "text-text" : "text-muted")
                 }
               >
-                <span aria-hidden className="text-lg leading-none">
-                  {tab.icon}
-                </span>
+                {/* Der aktive Tab bekommt die helle Koralle als Punkt statt
+                    eingefärbter Schrift. Ein farbiges Wort in 11 px ist auf
+                    Creme schlechter zu lesen als ein schwarzes — die Marke
+                    trägt hier die Form, nicht die Schriftfarbe. */}
+                <span
+                  aria-hidden
+                  className={
+                    "h-1.5 w-1.5 rounded-pill transition-colors " +
+                    (current ? "bg-brand" : "bg-transparent")
+                  }
+                />
                 {tab.label}
               </Link>
             </li>

@@ -1,22 +1,24 @@
 /**
  * Platzhalter für Inhalte, die noch unterwegs sind.
  *
- * Der Punkt dieser Bausteine ist nicht Dekoration, sondern dass beim Klick
- * sofort etwas dasteht, statt dass die Oberfläche einfriert. Sie sind deshalb
- * bewusst formgleich mit dem, was sie ersetzen — ein Skelett, das andere Maße
- * hat als der echte Inhalt, lässt die Seite beim Eintreffen springen, und das
- * wirkt langsamer als gar kein Skelett.
+ * Bewusst zurückhaltend: kein Pulsieren, keine grauen Balken. Das ist ein
+ * Web-Muster, und Emil wird als App vom Home-Bildschirm benutzt — dort kennt
+ * man es nicht, und es sieht nach Webseite aus.
  *
- * `aria-hidden` und `role="status"`: Screenreader sollen „lädt“ hören, nicht
+ * Zwei Dinge machen die Arbeit:
+ *
+ * - Der **Platz** ist von der ersten Millisekunde an reserviert, damit beim
+ *   Eintreffen der Daten nichts springt. Das ist der eigentliche Zweck.
+ * - **Sichtbar** wird davon erst nach 320 ms (siehe `placeholder-box` in
+ *   globals.css). Seit die App Shell steht, sind die meisten Ladevorgänge
+ *   vorher fertig — dann sieht man nie einen Platzhalter, sondern nur, wie der
+ *   Inhalt erscheint.
+ *
+ * `aria-hidden` und `role="status"`: Screenreader sollen „lädt" hören, nicht
  * eine Handvoll leerer Kästen vorgelesen bekommen.
  */
-function Bar({ className = "" }: { className?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={"block animate-pulse rounded bg-border " + className}
-    />
-  );
+function Box({ className = "" }: { className?: string }) {
+  return <span aria-hidden className={"block placeholder-box " + className} />;
 }
 
 function Frame({ children }: { children: React.ReactNode }) {
@@ -31,24 +33,27 @@ function Frame({ children }: { children: React.ReactNode }) {
 export function HeaderSkeleton() {
   return (
     <Frame>
-      <Bar className="h-9 w-2/3" />
-      <Bar className="mt-3 h-4 w-24" />
+      <Box className="h-9 w-2/3" />
+      <Box className="mt-3 h-4 w-24" />
     </Frame>
   );
 }
 
-/** Liste aus Zeilen — Rezeptübersicht, Mitglieder, alles in der Form. */
-export function RowsSkeleton({ rows = 5 }: { rows?: number }) {
+/** Rezeptzeilen: Bildkachel links, zwei Textzeilen rechts. */
+export function RowsSkeleton({ rows = 4 }: { rows?: number }) {
   return (
     <Frame>
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {Array.from({ length: rows }, (_, index) => (
           <li
             key={index}
-            className="rounded-xl border border-border bg-surface px-4 py-3"
+            className="flex items-center gap-4 rounded-card border border-border bg-surface p-3"
           >
-            <Bar className="h-4 w-1/2" />
-            <Bar className="mt-2 h-3 w-1/3" />
+            <Box className="h-16 w-16 shrink-0 rounded-2xl" />
+            <span className="min-w-0 flex-1">
+              <Box className="h-4 w-1/2" />
+              <Box className="mt-2 h-3 w-1/3" />
+            </span>
           </li>
         ))}
       </ul>
@@ -60,15 +65,15 @@ export function RowsSkeleton({ rows = 5 }: { rows?: number }) {
 export function ListSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <Frame>
-      <Bar className="h-4 w-28" />
-      <ul className="mt-2 space-y-2">
+      <Box className="h-3 w-28" />
+      <ul className="mt-3 space-y-2">
         {Array.from({ length: rows }, (_, index) => (
           <li
             key={index}
-            className="flex min-h-14 items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3"
+            className="flex min-h-14 items-center gap-3 rounded-card border border-border bg-surface px-4 py-3"
           >
-            <Bar className="h-7 w-7 shrink-0 rounded-md" />
-            <Bar className="h-4 w-1/2" />
+            <Box className="h-7 w-7 shrink-0 rounded-lg" />
+            <Box className="h-4 w-1/2" />
           </li>
         ))}
       </ul>
@@ -86,7 +91,7 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
 export function ImageSkeleton() {
   return (
     <Frame>
-      <Bar className="aspect-[4/3] w-full rounded-2xl" />
+      <Box className="aspect-[4/3] w-full rounded-card" />
     </Frame>
   );
 }
@@ -95,16 +100,16 @@ export function ImageSkeleton() {
 export function RecipeBodySkeleton() {
   return (
     <Frame>
-      <div className="rounded-2xl border border-border bg-surface p-5">
+      <div className="rounded-card border border-border bg-surface p-5">
         <div className="flex items-center justify-between gap-4">
-          <Bar className="h-5 w-24" />
-          <Bar className="h-12 w-32 rounded-xl" />
+          <Box className="h-5 w-24" />
+          <Box className="h-12 w-32 rounded-pill" />
         </div>
-        <ul className="mt-5 space-y-3">
+        <ul className="mt-6 space-y-3">
           {Array.from({ length: 6 }, (_, index) => (
             <li key={index} className="flex gap-3">
-              <Bar className="h-4 w-20 shrink-0" />
-              <Bar className="h-4 w-full" />
+              <Box className="h-4 w-20 shrink-0" />
+              <Box className="h-4 w-full" />
             </li>
           ))}
         </ul>
@@ -113,25 +118,16 @@ export function RecipeBodySkeleton() {
   );
 }
 
-/** Die Knöpfe unter dem Rezept, solange der Listenstand noch fehlt. */
-export function ButtonsSkeleton() {
-  return (
-    <Frame>
-      <Bar className="h-12 w-full rounded-xl" />
-    </Frame>
-  );
-}
-
 /**
  * Einzelne Textzeile, die noch fehlt — etwa die E-Mail-Adresse im Konto.
  *
- * Als `<span>` und nicht als Block, damit er dort stehen kann, wo gleich der
- * echte Text steht, ohne die Zeile umzubrechen.
+ * Hier bleibt der Platz nur frei, ohne getönte Fläche: eine einzelne Zeile
+ * mitten in einer Karte als Kasten anzudeuten stört mehr, als es hilft.
  */
 export function TextSkeleton({ className = "w-40" }: { className?: string }) {
   return (
-    <span role="status" aria-label="Wird geladen">
-      <Bar className={"h-4 " + className} />
+    <span role="status" aria-label="Wird geladen" className="placeholder-space">
+      <span aria-hidden className={"inline-block h-4 " + className} />
     </span>
   );
 }

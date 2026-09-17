@@ -151,7 +151,7 @@ export function RecipeActions({
               type="button"
               aria-label="Eine Portion weniger"
               onClick={() => setServings((value) => Math.max(1, value - 1))}
-              className="h-12 w-12 rounded-xl border border-border text-xl press"
+              className="h-12 w-12 rounded-pill border border-border text-xl press"
             >
               −
             </button>
@@ -165,7 +165,7 @@ export function RecipeActions({
               type="button"
               aria-label="Eine Portion mehr"
               onClick={() => setServings((value) => value + 1)}
-              className="h-12 w-12 rounded-xl border border-border text-xl press"
+              className="h-12 w-12 rounded-pill border border-border text-xl press"
             >
               +
             </button>
@@ -225,7 +225,7 @@ export function RecipeActions({
         <div className="flex gap-2">
           <Link
             href={`/rezepte/${recipe.id}/bearbeiten`}
-            className="flex h-12 flex-1 items-center justify-center rounded-xl border border-border bg-surface text-[15px] press"
+            className="flex h-12 flex-1 items-center justify-center rounded-card border border-border bg-surface text-[15px] press"
           >
             Bearbeiten
           </Link>
@@ -233,7 +233,7 @@ export function RecipeActions({
             type="button"
             disabled={deleting}
             onClick={() => (askDelete ? void onDelete() : setAskDelete(true))}
-            className="h-12 flex-1 rounded-xl border border-accent text-[15px] text-accent press disabled:opacity-50"
+            className="h-12 flex-1 rounded-pill border border-accent text-[15px] text-accent press disabled:opacity-50"
           >
             {deleting
               ? "Wird gelöscht …"

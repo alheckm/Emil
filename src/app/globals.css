@@ -1,28 +1,54 @@
 @import "tailwindcss";
 
-/* Warme Papier-Palette: die App wird in der Küche und im Supermarkt benutzt,
-   nicht am Schreibtisch — hoher Kontrast, große Trefferflächen, kein Grau-auf-Grau. */
+/* Palette nach dem Auftritt von KptnCook: Creme als Seitenfarbe, tiefes Navy
+   als Flaeche, Koralle als einziger Akzent. Die Werte stammen aus dem
+   gerenderten Auftritt von kptncook.com, nicht aus dem Gedaechtnis.
+
+   Die Koralle hat zwei Rollen, und das ist kein Zufall, sondern Lesbarkeit:
+
+   - `--brand` #f45e45 ist die helle Koralle fuer FLAECHEN — gefuellte Knoepfe,
+     aktiver Tab, Marken. Darauf steht dunkle Schrift (`--brand-text`, 4,9:1).
+     KptnCook setzt hier weiss, das ergibt nur 3,2:1; in einer App, die
+     einhaendig im Supermarkt und bei schlechtem Licht bedient wird, ist das
+     die falsche Stelle zum Sparen. Dunkle Schrift haelt die Farbe voll
+     gesaettigt UND lesbar — ein tieferes Rot haette sie stumpf gemacht und
+     waere kaum vom alten Terracotta zu unterscheiden gewesen.
+   - `--accent` #c9452c ist dieselbe Farbe als SCHRIFT auf hellem Grund, wo sie
+     dunkler sein muss, um zu tragen (4,8:1 auf Weiss): Loeschen-Knoepfe,
+     Hinweise, Raender. */
 :root {
-  --bg: #fdfaf6;
+  --bg: #f6f4e7;
   --surface: #ffffff;
-  --text: #24201d;
-  --muted: #6f6760;
-  --accent: #b4532a;
+  --panel: #1e2832;
+  --panel-text: #f6f4e7;
+  --text: #242321;
+  --muted: #5d6b78;
+  --accent: #c9452c;
+  --brand: #f45e45;
+  --brand-text: #242321;
   --accent-text: #ffffff;
-  --border: #e7ded4;
+  --border: #e4e0cd;
   --ok: #2f6d4f;
-  --warn: #9a6a12;
+  --warn: #f28b24;
 }
 
+/* Dunkel gedreht statt weggelassen: gekocht wird abends, und im
+   Supermarkt-Halbdunkel blendet eine cremefarbene Flaeche. Das Navy wird zur
+   Flaeche, die Creme zur Schrift. Auf der Koralle steht hier dunkle Schrift —
+   weiss darauf waere im Dunkeln noch schlechter zu lesen. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #171310;
-    --surface: #211c18;
-    --text: #f0ebe5;
-    --muted: #a79d94;
-    --accent: #e08a5f;
-    --accent-text: #2a1509;
-    --border: #322a24;
+    --bg: #151c23;
+    --surface: #1e2832;
+    --panel: #0f151b;
+    --panel-text: #f6f4e7;
+    --text: #f1eee2;
+    --muted: #94a3b1;
+    --accent: #f77a63;
+    --brand: #f77a63;
+    --brand-text: #1e2832;
+    --accent-text: #1e2832;
+    --border: #2d3944;
     --ok: #7dc39c;
     --warn: #e0b45f;
   }
@@ -31,13 +57,20 @@
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-panel-text: var(--panel-text);
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-brand: var(--brand);
+  --color-brand-text: var(--brand-text);
   --color-accent-text: var(--accent-text);
   --color-border: var(--border);
   --color-ok: var(--ok);
   --color-warn: var(--warn);
+  --font-display: var(--font-slab), Georgia, "Times New Roman", serif;
+  --radius-pill: 999px;
+  --radius-card: 20px;
 }
 
 html {
@@ -130,5 +163,47 @@ select,
 
   [data-pending] & {
     opacity: 0.5;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Platzhalter.
+
+   Pulsierende graue Balken sind ein Web-Muster — native Apps auf dem iPhone
+   benutzen sie praktisch nicht, und genau als App wird Emil vom Home-Bildschirm
+   aus benutzt. Hier steht deshalb etwas anderes:
+
+   - **Kein Pulsieren.** Eine ruhige, leicht getoente Flaeche, mehr nicht.
+   - **Die ersten 320 ms ist nichts zu sehen.** Das ist der eigentliche Trick:
+     seit die App Shell steht, sind die meisten Ladevorgaenge nach deutlich
+     unter 300 ms vorbei. Ein Platzhalter, der dabei kurz aufblitzt und sofort
+     wieder verschwindet, wirkt unruhiger als gar keiner. Er erscheint nur,
+     wenn es wirklich laenger dauert.
+   - **Der Platz bleibt trotzdem von der ersten Millisekunde an reserviert.**
+     Darum ging es ohnehin: dass beim Eintreffen der Daten nichts springt.
+
+   Rein ueber `animation-fill-mode: backwards` geloest — der Startzustand der
+   Animation gilt schon waehrend der Verzoegerung, ganz ohne JavaScript. */
+@keyframes platzhalter-auf {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@utility placeholder-box {
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--muted) 12%, transparent);
+  animation: platzhalter-auf 240ms ease-out 320ms backwards;
+}
+
+/* Fuer Faelle, in denen nur Platz freigehalten wird und nie etwas erscheint —
+   etwa eine einzelne Textzeile, wo eine getoente Flaeche mehr stoert als
+   nuetzt. */
+@utility placeholder-space {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .placeholder-box {
+    animation: none;
   }
 }

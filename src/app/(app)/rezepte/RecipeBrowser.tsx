@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useId, useMemo, useOptimistic, useState, startTransition } from "react";
 import type { RecipeSummary } from "@/lib/data/recipes";
-import { Card, RowLink } from "@/components/ui";
+import { Card } from "@/components/ui";
 
 /**
  * Suche, Schlagwort-Filter und Trefferliste in einem.
@@ -29,10 +30,13 @@ export function RecipeBrowser({
   recipes,
   tags,
   planned,
+  images,
 }: {
   recipes: RecipeSummary[];
   tags: { tag: string; count: number }[];
   planned: Record<string, number>;
+  /** Pfad → signierte URL, gebündelt geholt (siehe getRecipeImageUrls). */
+  images: Record<string, string>;
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -112,7 +116,7 @@ export function RecipeBrowser({
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder="Titel oder Zutat …"
-          className="min-h-12 w-full rounded-xl border border-border bg-surface px-4 text-base outline-none focus:border-accent"
+          className="min-h-12 w-full rounded-pill border border-border bg-surface px-5 text-base outline-none focus:border-brand"
         />
 
         {tags.length > 0 && (
@@ -126,9 +130,9 @@ export function RecipeBrowser({
                   onClick={() => toggleTag(tag)}
                   aria-pressed={active}
                   className={
-                    "min-h-9 rounded-full border px-3 text-[14px] press tap-target " +
+                    "min-h-9 rounded-pill border px-4 text-[14px] press tap-target " +
                     (active
-                      ? "border-accent bg-accent text-accent-text"
+                      ? "border-brand bg-brand text-brand-text"
                       : "border-border bg-surface text-muted")
                   }
                 >
@@ -153,25 +157,65 @@ export function RecipeBrowser({
             </p>
           </Card>
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {visible.map((recipe) => {
               const servings = planned[recipe.id];
+              const image = recipe.imagePath
+                ? images[recipe.imagePath]
+                : undefined;
               return (
                 <li key={recipe.id}>
                   {/* `prefetch` holt die Rezeptseite samt ihrer URL-Daten vor
                       dem Klick. Das kostet eine Server-Runde pro sichtbarem
                       Verweis — bei einer Liste dieser Größe ist das der
                       richtige Tausch, bei tausend Rezepten wäre es keiner. */}
-                  <RowLink href={`/rezepte/${recipe.id}`} prefetch>
-                    <span className="block truncate font-medium">
-                      {recipe.title}
+                  <Link
+                    href={`/rezepte/${recipe.id}`}
+                    prefetch
+                    className="flex items-center gap-4 rounded-card border border-border bg-surface p-3 press tap-target"
+                  >
+                    {/* Foto zuerst — das ist der Kern des Auftritts. Wo keins
+                        ist, steht eine ruhige Fläche mit dem Anfangsbuchstaben
+                        statt eines leeren Kastens: die Zeilen bleiben so alle
+                        gleich hoch, und die Liste franst nicht aus. */}
+                    {image ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={image}
+                        alt=""
+                        loading="lazy"
+                        className="h-16 w-16 shrink-0 rounded-2xl object-cover"
+                      />
+                    ) : (
+                      <span
+                        aria-hidden
+                        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-panel font-display text-xl text-panel-text"
+                      >
+                        {recipe.title.slice(0, 1).toUpperCase()}
+                      </span>
+                    )}
+
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-medium">
+                        {recipe.title}
+                      </span>
+                      <span className="mt-1 block text-[13px] text-muted">
+                        {recipe.baseServings} {recipe.servingsLabel}
+                        {recipe.totalTimeMin
+                          ? ` · ${recipe.totalTimeMin} min`
+                          : ""}
+                      </span>
+                      {servings ? (
+                        <span className="mt-2 inline-block rounded-pill bg-brand/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent">
+                          Auf der Liste · {servings}
+                        </span>
+                      ) : null}
                     </span>
-                    <span className="mt-0.5 block text-[13px] text-muted">
-                      {recipe.baseServings} {recipe.servingsLabel}
-                      {recipe.totalTimeMin ? ` · ${recipe.totalTimeMin} min` : ""}
-                      {servings ? ` · auf der Liste (${servings})` : ""}
+
+                    <span aria-hidden className="shrink-0 text-brand">
+                      ›
                     </span>
-                  </RowLink>
+                  </Link>
                 </li>
               );
             })}

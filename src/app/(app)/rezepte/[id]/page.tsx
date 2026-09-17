@@ -173,7 +173,7 @@ async function RecipeImage({ imagePath }: { imagePath: string }) {
     <img
       src={imageUrl}
       alt=""
-      className="aspect-[4/3] w-full rounded-2xl border border-border object-cover"
+      className="aspect-[4/3] w-full rounded-card border border-border object-cover"
     />
   );
 }
