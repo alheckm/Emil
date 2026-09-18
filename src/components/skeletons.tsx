@@ -47,7 +47,7 @@ export function RowsSkeleton({ rows = 4 }: { rows?: number }) {
         {Array.from({ length: rows }, (_, index) => (
           <li
             key={index}
-            className="flex items-center gap-4 rounded-soft bg-surface p-3 shadow-card"
+            className="flex items-center gap-4 rounded-soft bg-soft p-3"
           >
             <Box className="h-16 w-16 shrink-0 rounded-soft" />
             <span className="min-w-0 flex-1">
@@ -70,7 +70,7 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
         {Array.from({ length: rows }, (_, index) => (
           <li
             key={index}
-            className="flex min-h-14 items-center gap-3 rounded-soft bg-surface px-4 py-3 shadow-card"
+            className="flex min-h-14 items-center gap-3 rounded-soft bg-soft px-4 py-3"
           >
             <Box className="h-7 w-7 shrink-0 rounded-lg" />
             <Box className="h-4 w-1/2" />
@@ -82,17 +82,17 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
 }
 
 /**
- * Die Rezeptkarte, solange das Rezept noch unterwegs ist.
+ * Der Rezept-Screen, solange das Rezept noch unterwegs ist.
  *
- * Maßgleich mit der echten Karte: dieselbe Rundung, dasselbe Seitenverhältnis
- * des Fotos, derselbe Innenabstand. Das Foto-Bett ist hier keine getönte
- * Fläche, sondern schon der dunkle Ton, den die fertige Karte trägt — beim
+ * Maßgleich mit dem echten: dasselbe Seitenverhältnis des Fotos über die volle
+ * Breite, derselbe Seitenrand darunter. Das Foto-Bett ist hier keine getönte
+ * Fläche, sondern schon der dunkle Ton, den der fertige Screen trägt — beim
  * Eintreffen der Daten wechselt also nur der Inhalt, nicht die Farbe.
  */
 export function RecipeCardSkeleton() {
   return (
     <Frame>
-      <div className="overflow-hidden rounded-card bg-surface shadow-card">
+      <div>
         <div aria-hidden className="aspect-[9/10] w-full bg-photo" />
         <div className="px-5 pb-6 pt-5">
           <div className="flex items-center justify-between gap-4">
@@ -127,16 +127,14 @@ export function RecipeCardSkeleton() {
 export function RecipeGridSkeleton({ cards = 2 }: { cards?: number }) {
   return (
     <Frame>
-      <ul className="space-y-6">
+      <ul className="space-y-8">
         {Array.from({ length: cards }, (_, index) => (
-          <li
-            key={index}
-            className="overflow-hidden rounded-card bg-surface shadow-card"
-          >
-            <div aria-hidden className="aspect-[9/10] w-full bg-photo" />
-            <div className="px-5 py-4">
-              <Box className="h-4 w-28" />
-            </div>
+          <li key={index}>
+            <div
+              aria-hidden
+              className="aspect-[9/10] w-full rounded-card bg-photo"
+            />
+            <Box className="mt-3 h-4 w-28" />
           </li>
         ))}
       </ul>
@@ -148,7 +146,7 @@ export function RecipeGridSkeleton({ cards = 2 }: { cards?: number }) {
 export function RecipeBodySkeleton() {
   return (
     <Frame>
-      <div className="rounded-card bg-surface p-5 shadow-card">
+      <div className="px-5">
         <div className="flex items-center justify-between gap-4">
           <Box className="h-5 w-24" />
           <Box className="h-12 w-32 rounded-pill" />
@@ -170,7 +168,7 @@ export function RecipeBodySkeleton() {
  * Einzelne Textzeile, die noch fehlt — etwa die E-Mail-Adresse im Konto.
  *
  * Hier bleibt der Platz nur frei, ohne getönte Fläche: eine einzelne Zeile
- * mitten in einer Karte als Kasten anzudeuten stört mehr, als es hilft.
+ * mitten im Text als Kasten anzudeuten stört mehr, als es hilft.
  */
 export function TextSkeleton({ className = "w-40" }: { className?: string }) {
   return (

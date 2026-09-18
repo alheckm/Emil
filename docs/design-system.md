@@ -23,9 +23,11 @@ Die Farbe trägt das Essen. Alles andere ist Grau, Off-White, Weiß und Schwarz.
 Was Emil ausdrücklich **nicht** sein soll — jede dieser Erscheinungen ist ein
 Grund zur Überarbeitung, nicht eine Geschmacksfrage:
 
-- Material-Design-Kärtchen mit sichtbarer Umrandung
+- Karten: weder mit Umrandung noch mit Schatten. Der Entwurf zeigt innerhalb
+  des Bildschirms **keine** — nicht auf dem Rezept, nicht in der Übersicht,
+  nirgends. Trennung kommt aus Weißraum und Überschriften.
 - Farbflächen als UI (bunte Chips, farbige Kopfzeilen, Verläufe)
-- harte Schlagschatten
+- Schlagschatten, harte wie weiche
 - große, bildschirmbreite CTA-Knöpfe auf inhaltlichen Screens
 - Standard-Formularelemente des Browsers im sichtbaren Auslieferungszustand
 - Emojis als Symbole
@@ -35,12 +37,30 @@ Grund zur Überarbeitung, nicht eine Geschmacksfrage:
 
 ---
 
-## 2. Der Maßstabsfehler — bitte zuerst lesen
+## 2. Zwei Lesefehler an der Referenz — bitte zuerst lesen
 
-`app_design.jpg` ist 1000 × 750 px groß und zeigt zwei **Mockup-Handys**. Die
-Bildfläche eines Geräts darin ist rund 265 px breit. Ein echtes iPhone hat
-390 pt. Jede in der Referenz abgemessene Pixelzahl ist damit um etwa **Faktor
-1,47** zu klein.
+`app_design.jpg` ist 1000 × 750 px groß und zeigt **zwei iPhone-Screenshots,
+die nebeneinander auf einer hellgrauen Fläche liegen**. Beides ist schon
+zweimal falsch gelesen worden.
+
+### Das Grau ist nicht die App
+
+Das Hellgrau (`#d7d5d6`) links, rechts und zwischen den Geräten ist die
+Präsentationsfläche, auf der die beiden Screenshots liegen — der Tisch, nicht
+die App. Es war eine Zeit lang als `--bg` im Code, mit dem Off-White als Karte
+darauf. Ergebnis: ein sichtbarer Rand um jeden Inhalt, den der Entwurf nirgends
+zeigt.
+
+**Innerhalb der Gerätekanten gibt es genau eine Fläche**, und die ist warmes
+Off-White. Sie läuft von der Statusleiste bis zum Home-Indikator durch. Das
+Foto liegt darauf und reicht bis an die Gerätekanten — es sitzt nicht in einer
+Karte. Wer im JPEG etwas abliest, liest **innerhalb** eines Geräts ab.
+
+### Die Maße sind zu klein
+
+Die Bildfläche eines Geräts im Mockup ist rund 265 px breit. Ein echtes iPhone
+hat 390 pt. Jede in der Referenz abgemessene Pixelzahl ist damit um etwa
+**Faktor 1,47** zu klein.
 
 Wer die Referenz mit dem Lineal ausliest, landet bei „Body 12 px" und
 „Zutatenkreis 54 px" — beides wäre auf dem Gerät unlesbar bzw. unbedienbar.
@@ -82,28 +102,31 @@ unterscheiden sich **nur** in der Lautstärke der Aktionen.
 
 ## 4. Farbe
 
-Aus `app_design.jpg` gemessen, nicht geschätzt. Der Entwurf arbeitet mit **zwei**
-Flächen: die warme Karte liegt auf einem neutral-grauen Canvas — nicht
-umgekehrt. Genau daher kommt der Eindruck, dass die Karte schwebt.
+Aus `app_design.jpg` gemessen, und zwar **innerhalb der Geräte** (Abschnitt 2).
+Es gibt genau **eine** Fläche: warmes Off-White, durchgehend von oben bis
+unten. Keine Karte darauf, kein zweiter Grund darunter.
 
 ### Tokens (hell)
 
 | Token | Wert | Rolle |
 |---|---|---|
-| `--bg` | `#d7d5d6` | Canvas. Trägt **keinen** Fließtext. |
-| `--surface` | `#f5f1ee` | Karte, Inhaltsfläche. Alles Gelesene steht hier. |
+| `--bg` | `#f5f1ee` | Der Grund. Durchgehend, überall, auch hinter der Tab-Leiste. Alles Gelesene steht hier. |
 | `--chip` | `#ffffff` | Nur Zutatenkreise. |
-| `--soft` | `#ece7e3` | Leise UI-Fläche: Stepper, Felder, ruhende Zustände. |
+| `--soft` | `#ece7e3` | Die einzige zweite Fläche: leise Bedienelemente — Suchfeld, Filter, Portionswähler, Formularfelder, Detailkasten in der Liste. |
 | `--panel` | `#080808` | Der Ziffernkasten. Die einzige kräftige Fläche im Screen. |
 | `--panel-text` | `#ffffff` | Ziffer darin. |
-| `--text` | `#242321` | Fließtext. 13,98:1 auf `--surface`. |
-| `--muted` | `#8a827b` | Nebentext — **siehe Abschnitt 11, Kontrast ist zu gering.** |
-| `--border` | `#d8d1cc` | Haarlinie. Sparsam. |
+| `--text` | `#242321` | Fließtext. 13,98:1 auf `--bg`. |
+| `--muted` | `#756d66` | Nebentext. 4,52:1 auf `--bg`. |
+| `--border` | `#e2dbd5` | Haarlinie. Sparsam — Tab-Leiste, Feldkanten, leise Umriss-Knöpfe. |
 | `--accent` | `#b5442c` | **Keine Markenfarbe.** Nur Warnung: Löschen, Fehler. |
 | `--photo` | `#2b2622` | Bett unter dem Rezeptfoto, in beiden Modi gleich. |
 | `--scrim` | `rgba(12,10,9,.72)` | Verlauf unter dem Titel auf dem Foto. |
 | `--control` | `#ffffff` | Kleine runde Bedienfläche: die Kreise im Stepper. |
 | `--ok` / `--warn` | `#3f6f52` / `#b5762a` | Statusmeldungen, sonst nichts. |
+
+`--surface` gibt es **nicht mehr**. Es war der Name für „die warme Karte auf
+dem grauen Canvas" — und genau diese Karte ist der Lesefehler aus Abschnitt 2.
+Wer sie wiederhaben will, führt den Rand wieder ein.
 
 **Zum Scrim-Wert.** Hier stand `rgba(12,10,9,.34)`, gemessen am Entwurf. Auf
 dem Foto der Referenz geht das auf — es ist mitteldunkles Teal. Ein Rezeptfoto
@@ -125,21 +148,22 @@ andere Ton gäbe einen sichtbaren Ring.
 
 ### Regeln
 
-1. **Keine zusätzliche Akzentfarbe.** Farbe kommt aus dem Essen.
-2. `--accent` ist ein Warnton, keine Marke. Er erscheint an Löschen und
+1. **Ein Grund, überall.** `--bg` läuft durch. Kein Screen, kein Abschnitt und
+   keine Liste bekommt einen eigenen Hintergrund, um sich abzuheben.
+2. **Keine zusätzliche Akzentfarbe.** Farbe kommt aus dem Essen.
+3. `--accent` ist ein Warnton, keine Marke. Er erscheint an Löschen und
    Fehlern, nirgends sonst. Ein primärer Knopf in Koralle ist ein Fehler.
-3. Fließtext steht auf `--surface`, nie auf `--bg`. Der Canvas trägt nur
-   Flächen.
-4. Keine Verläufe außer dem Scrim unter dem Titel auf dem Foto.
+4. Braucht ein Bedienelement eine sichtbare Fläche, bekommt es `--soft` —
+   nicht einen Schatten und nicht eine Umrandung.
+5. Keine Verläufe außer dem Scrim unter dem Titel auf dem Foto.
 
 ### Dunkel
 
 Nicht weggelassen, sondern gedreht: gekocht wird abends, und im
-Supermarkt-Halbdunkel blendet eine cremefarbene Fläche. Die Rollen tauschen,
-der Kontrast bleibt. Aus dem Canvas wird ein kühles Fast-Schwarz (`#121110`),
-aus der Karte ein warmes Dunkelbraun (`#1f1c19`), und der schwarze
+Supermarkt-Halbdunkel blendet eine cremefarbene Fläche. Aus dem einen warmen
+Off-White wird ein einziges warmes Dunkelbraun (`#1f1c19`), und der schwarze
 Ziffernkasten wird cremefarben mit dunkler Ziffer — ein schwarzes Quadrat auf
-dunkler Karte wäre schlicht nicht mehr da.
+dunklem Grund wäre schlicht nicht mehr da.
 
 `--chip` bleibt auch dunkel weiß. Siehe oben: die Fotos darin haben weißen Grund.
 
@@ -209,16 +233,22 @@ Serife und gemischt.
 **Abstände** auf 4er-Raster: 4, 8, 12, 16, 20, 24, 32. Im Zweifel den größeren
 Wert — die Referenz lebt vom Weißraum.
 
-- Karteninnenabstand: 20 px
-- Screen-Seitenrand: 16 px, über `px-safe` zusammen mit der Safe Area
-- Abstand zwischen Karten: 24 px
+- Screen-Seitenrand: **20 px**, über `px-safe` zusammen mit der Safe Area.
+  Derselbe Wert auf jedem Screen — auch die Abschnitte unter dem Rezeptfoto
+  (`px-5`) fluchten damit, seit die Karte samt ihrem eigenen Innenabstand weg
+  ist.
+- Abstand zwischen Blöcken: 24 px, zwischen Rezeptkacheln in der Übersicht
+  32 px — ohne Karte trägt allein der Abstand die Trennung.
 - Inhaltsbreite: `max-w-md` (448 px), zentriert
+- **Eine Ausnahme vom Seitenrand:** der Rezept-Screen. Dort läuft das Foto über
+  die volle Breite und bis unter die Statusleiste (`<Screen bleed>`); die
+  Abschnitte darunter setzen ihren Seitenrand selbst.
 
 **Radien**
 
 | Token | Wert | Wofür |
 |---|---|---|
-| `--radius-card` | 28 px | Karten, Fotos, Hero |
+| `--radius-card` | 28 px | Nur noch das Foto einer Rezeptkachel in der Übersicht. Das Foto auf dem Rezept-Screen rundet nichts — es reicht bis an die Gerätekante. |
 | `--radius-soft` | 11 px | Felder, kleine Knöpfe, Meldungen |
 | `--radius-pill` | 999 px | Kreise, Zutatenkreise, Stepper, Suchfeld, Absenden-Knöpfe |
 | — | 6 px | Ziffernkasten (einziger Sonderwert, in der Komponente) |
@@ -228,14 +258,15 @@ bekommen deshalb `--radius-soft`.
 
 **Schatten**
 
-```
---shadow-card:  0 8px 30px rgba(0,0,0,.06)   /* Karte löst sich vom Canvas */
---shadow-float: 0 2px 10px rgba(0,0,0,.12)   /* nur schwebende Elemente */
-```
+Es gibt keine. `--shadow-card` und `--shadow-float` sind gestrichen. Sie waren
+nur nötig, solange eine warme Karte sich von einem grauen Canvas lösen musste —
+und dieser Canvas war der Tisch, auf dem die Mockups liegen (Abschnitt 2). Auf
+einem durchgehenden Grund hebt ein Schatten nichts ab, er zeichnet nur eine
+Kante dorthin, wo der Entwurf keine hat.
 
-Kein harter Schlagschatten. Karten haben **keine** Umrandung — sie lösen sich
-allein über den Schatten. Eine Linie darum herum ist das Material-Kärtchen, das
-der Entwurf vermeidet.
+Was eine sichtbare Fläche braucht, bekommt `--soft`. Was eine Kante braucht,
+bekommt eine Haarlinie in `--border` — und das sind wenige Stellen: die
+Tab-Leiste, Formularfelder, leise Umriss-Knöpfe.
 
 **Trefferflächen** 44 × 44 px, auch wenn die sichtbare Fläche kleiner ist. Ein
 32-px-Kreis bekommt seine Trefferfläche über Padding oder ein Pseudoelement,
@@ -246,16 +277,24 @@ verschiedene Maße.
 
 ## 7. Bausteine
 
-### Screen / Card / ScreenHeader
+### Screen / Section / ScreenHeader
 `src/components/ui.tsx`. `Screen` ist der statische Rahmen (Spalte,
-Daumenbreite, Safe Areas) und steht in der App Shell, bevor Daten da sind.
-`Card` ist die warme Fläche: `rounded-card bg-surface shadow-card`, ohne
-Umrandung, 20 px innen.
+Daumenbreite, Safe Areas) und steht in der App Shell, bevor Daten da sind. Mit
+`bleed` gibt er Seitenrand und oberen Abstand ab — für den Rezept-Screen, auf
+dem das Foto bis an die Gerätekanten läuft.
+
+`Section` ist der Nachfolger von `Card` und hat **keine eigene Optik**: kein
+Hintergrund, keine Rundung, kein Schatten. Es ist nur der Name für „das gehört
+zusammen" und die eine Stelle, an der eine spätere Änderung greifen würde. Wer
+ihm wieder eine Fläche gibt, baut die Karte zurück, die hier gerade
+verschwunden ist.
 
 ### RecipeHero
-Das Foto füllt die Kartenbreite, sitzt oben, hat oben dieselbe Rundung wie die
-Karte und nimmt **42–46 % der Kartenhöhe** ein. `object-fit: cover`, kein
-Rahmen. Darunter liegt `--photo`, damit nichts springt, solange die signierte
+Das Foto füllt die **volle Bildschirmbreite**, sitzt ganz oben, läuft unter die
+Statusleiste und hat keine Rundung — so steht es im Entwurf. Seitenverhältnis
+9:10, damit es **42–46 % der Screenhöhe** einnimmt. `object-fit: cover`, kein
+Rahmen. Die beiden Knöpfe darauf tragen zusätzlich `pt-safe`, sonst sitzen sie
+auf einem iPhone hinter der Uhr. Darunter liegt `--photo`, damit nichts springt, solange die signierte
 Bildadresse noch unterwegs ist — und damit ein Rezept ohne Foto denselben
 Auftritt hat.
 
@@ -267,7 +306,7 @@ hellen Foto weg.
 **Auf dem Foto steht nur der Titel.** Die Kochzeit stand hier zwischendurch als
 zweite Zeile darunter; 13 px Weiß kommt auch über dem Scrim nicht auf die
 4,5:1, die kleine Schrift braucht. Sie steht jetzt unten in der Karte bei den
-Schlagwörtern, auf `--surface`. Die Referenz zeigt an dieser Stelle ebenfalls
+Schlagwörtern, auf dem Off-White. Die Referenz zeigt an dieser Stelle ebenfalls
 nichts außer dem Titel.
 
 Oben links und oben rechts je ein Kreis, 36 px sichtbar / 44 px Trefferfläche:
@@ -291,15 +330,18 @@ Die Rezeptübersicht ist ein Stapel derselben Karten, eine Spalte, 24 px
 Abstand — keine Zeilenliste mit Miniaturbild. Was ein Rezept ausmacht, sieht
 man am Essen, nicht an seinem Namen.
 
-Aufbau wie die Rezeptkarte im Kleinen: Foto im selben Verhältnis, derselbe
-Scrim, Titel weiß in Display 32/1,15 darauf, darunter auf `--surface` eine
-Zeile in 13 px mit Portionen und Zeit. Liegt das Rezept auf der Einkaufsliste,
+Aufbau wie der Rezept-Screen im Kleinen: Foto im selben Verhältnis, gerundet
+(`--radius-card`, das einzige, was diesen Radius noch trägt), derselbe Scrim,
+Titel weiß in Display 32/1,15 darauf, darunter eine Zeile in 13 px mit
+Portionen und Zeit. Keine Fläche, kein Schatten, keine Umrandung: was die
+Kachel zusammenhält, ist das Foto, und was sie von der nächsten trennt, ist der
+Abstand. Liegt das Rezept auf der Einkaufsliste,
 sitzt oben links dieselbe Milchglasfläche wie die Knöpfe auf dem Rezeptfoto,
 mit dunkler Schrift: „Auf der Liste · 4".
 
-Auf dem Canvas trägt `--border` nicht — der Ton liegt zu dicht am Canvas-Grau.
-Flächen, die dort eine Kante brauchen (die Schlagwort-Chips, „Von Hand"),
-bekommen sie über `--surface` plus `--shadow-card`, nicht über eine Haarlinie.
+Suchfeld, Schlagwort-Filter und „Von Hand" brauchen eine sichtbare Fläche,
+damit man sie als bedienbar erkennt. Die kommt aus `--soft` — nicht aus einer
+Haarlinie und nicht aus einem Schatten.
 
 ### IngredientRail
 Waagerechte Reihe aus Zutatenkreisen unter der Überschrift „Zutaten". Kreis
@@ -360,9 +402,10 @@ die einzige kräftige Fläche im Screen. Daneben der Text in 15/1,55, Abstand
 zwischen den Schritten 16 px, Spalte hängend ausgerichtet.
 
 ### RowLink / TabBar
-`RowLink`: mindestens 56 px hoch, Karte mit Chevron rechts, `press tap-target`.
+`RowLink`: mindestens 56 px hoch, `bg-soft` mit Chevron rechts,
+`press tap-target`.
 
-`TabBar`: unten, `sticky`, `bg-surface/95` mit `backdrop-blur`, Haarlinie oben,
+`TabBar`: unten, `sticky`, `bg-bg/95` mit `backdrop-blur`, Haarlinie oben,
 zwei Einträge (Einkauf, Rezepte). Aktiv trägt allein die Farbe — Symbol und
 Wort werden zusammen `--text`, inaktiv `--muted`. Kein farbiger Punkt, kein
 Hintergrund. Der angetippte Tab wird im selben Frame aktiv (`useOptimistic`),
@@ -372,7 +415,7 @@ und `data-pending` dimmt währenddessen nur den Inhalt darüber.
 Werkzeug-Register. Felder: 48 px hoch, `rounded-soft`, `bg-soft`,
 Haarlinie, 16 px Schrift, Fokus über `border-text` statt farbigem Ring.
 `Button`: 48 px, bildschirmbreit, `rounded-pill`; `primary` = `bg-brand`,
-`quiet` = Haarlinie auf `--surface`, `danger` = Kontur in `--accent`.
+`quiet` = Haarlinie ohne Fläche, `danger` = Kontur in `--accent`.
 **Nur auf Werkzeug-Screens.** `Notice` mit `role="alert"` bei Fehlern — ohne
 die Ansage liest VoiceOver eine nach dem Absenden erscheinende Meldung nicht
 vor.
@@ -462,18 +505,15 @@ dem Daumen nicht erscheint.
 
 | Paar | Verhältnis | Urteil |
 |---|---|---|
-| `--text` `#242321` auf `--surface` | 13,98 : 1 | gut |
-| `--muted` `#756d66` auf `--surface` | 4,52 : 1 | gut (war `#8a827b` mit 3,36 : 1) |
+| `--text` `#242321` auf `--bg` | 13,98 : 1 | gut |
+| `--muted` `#756d66` auf `--bg` | 4,52 : 1 | gut (war `#8a827b` mit 3,36 : 1) |
+| `--muted` `#756d66` auf `--soft` `#ece7e3` | 4,20 : 1 | knapp darunter — auf `--soft` steht Nebentext deshalb in `--text` |
 | `--muted` dunkel `#a29a92` auf `#1f1c19` | 6,12 : 1 | gut |
 
-`--muted` ist im hellen Modus auf `#756d66` gezogen — 4,52 : 1 auf
-`--surface`, optisch kaum dunkler, aber über der Grenze. Der dunkle Modus
-bleibt.
-
-**Achtung, das gilt nur auf `--surface`.** Auf dem Canvas (`#d7d5d6`) kommt
-derselbe Ton nur auf 3,5 : 1. Text auf dem Canvas steht deshalb in `--text` —
-leise wird er dort über Größe und Position, nicht über Blässe. Das betrifft in
-der Praxis genau eine Stelle: „Rezept löschen" unter der Rezeptkarte.
+Mit dem Wegfall des Canvas ist die frühere Sonderregel hinfällig: es gibt nur
+noch einen Grund, und auf dem hält `--muted` die 4,5 : 1. Die verbleibende
+Vorsicht gilt `--soft` — dort ist die Fläche heller, und Nebentext darauf
+nimmt `--text`.
 
 ---
 
@@ -486,7 +526,7 @@ Bewusst und begründet. Alles andere im Prompt gilt unverändert.
 | DM Serif Display + Inter | Playfair Display + Poppins | Vom Prompt erlaubt, wenn näher an der Referenz; Strichkontrast und geometrische Grotesk treffen das JPEG besser. Beides Google-Schriften. |
 | Body 11–13 px, Kreise 52–58 px | 15 px, 72 px | Mockup-Maße, siehe Abschnitt 2. Auf dem Gerät unlesbar bzw. unter der Trefferflächengrenze. |
 | Lucide-Bibliothek | eigene Inline-SVG nach Lucide-Regeln | Ein Paket für acht Pfade; die App wird über Mobilfunk im Supermarkt geladen. |
-| „Recipe Card" mit 330–350 px Breite | Karte auf Canvas, `max-w-md` | In der Referenz ist die „Karte" der Handyrahmen. Auf dem Gerät ist der Screen die Fläche; die Kartensprache bleibt über `--surface` auf `--bg` erhalten. |
+| „Recipe Card" mit 330–350 px Breite | keine Karte, `max-w-md` | In der Referenz ist die „Karte" der Handyrahmen — das Grau darum ist die Fläche, auf der die Screenshots liegen. Auf dem Gerät ist der Screen die Fläche, und eine Karte darauf wäre ein Rand, den der Entwurf nicht zeigt. |
 | keine großen Primärknöpfe | gilt redaktionell, nicht im Werkzeug-Register | Abschnitt 3. Ein Login ohne eindeutigen Absenden-Knopf ist kein gutes Design, sondern ein Rätsel. |
 | Hell-Modus | Hell **und** Dunkel | Gekocht wird abends; eine cremefarbene Fläche blendet im Halbdunkel. |
 | keine Akzentfarbe | `--accent` nur als Warnton | Löschen und Fehler brauchen ein Signal. Als Markenfarbe wäre es der Bruch. |
@@ -497,10 +537,10 @@ Bewusst und begründet. Alles andere im Prompt gilt unverändert.
 
 Stand 18.09.2026 — Arbeitsliste, keine Beschreibung des Ist-Zustands.
 
-Die Punkte 1 bis 6 der vorigen Fassung sind umgesetzt: Hero mit Titel auf dem
-Foto, Zutatenkreise auf der Rezeptseite, Portionswähler als Pille neben
-„Zutaten", leise Einkaufslisten-Fläche, Ziffernkästen, `--muted` korrigiert.
-Offen bleibt:
+Umgesetzt: Hero mit Titel auf dem Foto, Zutatenkreise, Portionswähler als
+Pille, leise Einkaufslisten-Fläche, Ziffernkästen, `--muted` korrigiert — und
+zuletzt der Wegfall von Canvas, Karte und Schatten (Abschnitt 2 und 4). Offen
+bleibt:
 
 1. **Es gibt keine Favoriten.** Im Entwurf sitzt oben rechts ein Herz; in Emil
    sitzt dort vorläufig der Stift zum Bearbeiten (Abschnitt 7). Kommt die
@@ -523,8 +563,9 @@ Offen bleibt:
 
 - [ ] Verhältnis Foto zu Inhalt 42–46 %
 - [ ] Titel weiß, Serife, regulär, zwei Zeilen möglich, auf dem Foto
-- [ ] Karte ohne Umrandung, Schatten weich, Radius 28
-- [ ] Canvas grau, Karte warm — nicht umgekehrt
+- [ ] Foto auf dem Rezept über die volle Breite, bis unter die Statusleiste
+- [ ] **Ein** Off-White von oben bis unten — keine Karte, kein zweiter Grund
+- [ ] kein Schatten und keine Umrandung um irgendeinen Inhaltsblock
 - [ ] Zutatenkreise weiß, vierter angeschnitten
 - [ ] Ziffernkasten schwarz, kursive Ziffer
 - [ ] keine Farbfläche außer dem Ziffernkasten

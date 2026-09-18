@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/server/supabase";
 import { requireHousehold } from "@/lib/server/household";
 import { listMembers, listOpenInvites } from "@/lib/data/households";
-import { Card, Notice, Screen, ScreenHeader } from "@/components/ui";
+import { Section, Notice, Screen, ScreenHeader } from "@/components/ui";
 import { HeaderSkeleton, RowsSkeleton } from "@/components/skeletons";
 import { InviteSection } from "./InviteSection";
 
@@ -25,7 +25,7 @@ export default function HouseholdPage() {
         <Title />
       </Suspense>
 
-      <Card>
+      <Section>
         <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Mitglieder
         </h2>
@@ -34,9 +34,9 @@ export default function HouseholdPage() {
             <Members />
           </Suspense>
         </div>
-      </Card>
+      </Section>
 
-      <Card>
+      <Section>
         <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Einladen
         </h2>
@@ -48,7 +48,7 @@ export default function HouseholdPage() {
             <Invites />
           </Suspense>
         </div>
-      </Card>
+      </Section>
     </Screen>
   );
 }

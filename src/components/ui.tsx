@@ -15,36 +15,21 @@ import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 
 /**
- * Die Grundform des ganzen Auftritts: eine warme Fläche auf grauem Canvas.
+ * Ein Block, der inhaltlich zusammengehört — mehr nicht.
  *
- * Keine Umrandung. Im Entwurf hat die Karte keine — sie löst sich allein über
- * einen sehr weichen Schatten vom Hintergrund. Eine Linie darum herum wäre das
- * Material-Design-Kärtchen, das der Entwurf gerade vermeidet.
+ * Hier stand bis zuletzt `Card`: warme Fläche, 28 px Radius, weicher Schatten,
+ * auf grauem Canvas. Das war ein Lesefehler an `app_design.jpg`. Das Grau
+ * darin ist die Fläche, auf der die beiden **Screenshots** liegen, nicht der
+ * Hintergrund der App; innerhalb der Geräte gibt es genau eine durchgehende
+ * warme Fläche und keine Karte darauf. Übrig blieb ein sichtbarer Rand um
+ * alles — genau das, was der Entwurf nicht zeigt.
+ *
+ * Trennung kommt jetzt aus Weißraum und Überschriften. Deshalb hat dieser
+ * Baustein keine eigene Optik mehr: er bleibt als Name für „das gehört
+ * zusammen" und als eine Stelle, an der eine spätere Änderung greifen würde.
  */
-export function Card({
-  bleed,
-  children,
-}: {
-  /**
-   * Nimmt der Karte ihren Innenabstand.
-   *
-   * Für Karten, die ihr Inneres selbst aufteilen — beim Rezept muss das Foto
-   * bis an die Kante laufen, und die Abschnitte darunter setzen ihren Abstand
-   * dann selbst.
-   */
-  bleed?: boolean;
-  children: ReactNode;
-}) {
-  return (
-    <div
-      className={
-        "overflow-hidden rounded-card bg-surface shadow-card " +
-        (bleed ? "" : "p-5")
-      }
-    >
-      {children}
-    </div>
-  );
+export function Section({ children }: { children: ReactNode }) {
+  return <div>{children}</div>;
 }
 
 export function Field({
@@ -76,7 +61,7 @@ export function Button({
 }: ComponentProps<"button"> & { variant?: "primary" | "quiet" | "danger" }) {
   const look = {
     primary: "bg-brand text-brand-text",
-    quiet: "border border-border bg-surface text-text",
+    quiet: "border border-border text-text",
     danger: "border border-accent text-accent",
   }[variant];
 
@@ -180,20 +165,33 @@ export function Screen({
   title,
   lead,
   action,
+  bleed,
   children,
 }: {
   title?: ReactNode;
   lead?: ReactNode;
   action?: ReactNode;
+  /**
+   * Nimmt dem Rahmen Seitenrand und Abstand nach oben.
+   *
+   * Für den einen Screen, auf dem ein Foto bis an den Bildschirmrand läuft und
+   * unter der Statusleiste beginnt — so steht es im Entwurf. Die Abschnitte
+   * darunter setzen ihren Seitenrand dann selbst.
+   */
+  bleed?: boolean;
   children: ReactNode;
 }) {
   return (
-    <main className="flex-1 px-safe pt-safe pb-safe">
-      <div className="mx-auto w-full max-w-md space-y-8 py-8">
+    <main className={"flex-1 pb-safe " + (bleed ? "" : "px-safe pt-safe")}>
+      <div
+        className={
+          "mx-auto w-full max-w-md " + (bleed ? "" : "space-y-8 py-8")
+        }
+      >
         {title !== undefined && (
           <ScreenHeader title={title} lead={lead} action={action} />
         )}
-        <div className="space-y-6">{children}</div>
+        <div className={bleed ? "" : "space-y-6"}>{children}</div>
       </div>
     </main>
   );
@@ -273,7 +271,7 @@ export function RowLink({
     <Link
       href={href}
       prefetch={prefetch}
-      className="flex min-h-14 items-center justify-between gap-3 rounded-soft bg-surface px-4 py-3 text-[15px] shadow-card press tap-target"
+      className="flex min-h-14 items-center justify-between gap-3 rounded-soft bg-soft px-4 py-3 text-[15px] press tap-target"
     >
       <span className="min-w-0">{children}</span>
       <span aria-hidden className="shrink-0 text-brand">

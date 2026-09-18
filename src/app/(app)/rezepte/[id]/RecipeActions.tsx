@@ -380,13 +380,13 @@ function ShoppingListButton({
 }
 
 /**
- * Löschen — als einziges außerhalb der Karte.
+ * Löschen — ganz unten, nach allem anderen.
  *
- * Es gehört nicht in die Rezeptkarte: die ist das Rezept, und ein roter Knopf
- * mittendrin wäre genau die Standard-UI, die der Entwurf vermeidet. Unter der
- * Karte auf dem grauen Canvas steht es da, wo die Verwaltung hingehört —
- * leise, aber erreichbar. Der Weg zum Bearbeiten sitzt oben rechts auf dem
- * Foto (siehe RecipeHero).
+ * Es gehört nicht zwischen Zutaten und Zubereitung: dort steht das Rezept, und
+ * ein roter Knopf mittendrin wäre genau die Standard-UI, die der Entwurf
+ * vermeidet. Unter dem letzten Abschnitt, mit reichlich Luft davor, steht es
+ * da, wo die Verwaltung hingehört — leise, aber erreichbar. Der Weg zum
+ * Bearbeiten sitzt oben rechts auf dem Foto (siehe RecipeHero).
  */
 export function DeleteRecipe({
   listId,
@@ -434,7 +434,7 @@ export function DeleteRecipe({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 px-5 pb-10 pt-4">
       {error && <Notice tone="error">{error}</Notice>}
       <div className="text-center">
         <button
@@ -444,10 +444,10 @@ export function DeleteRecipe({
           className={
             "min-h-11 rounded-soft px-4 text-[13px] press tap-target " +
             "disabled:opacity-50 " +
-            // Nicht `--muted`: der Knopf steht auf dem Canvas, und dort
-            // kommt der Nebenton nicht über 4,5:1. Leise wird er hier über
-            // Größe und Position, nicht über Blässe.
-            (ask ? "border border-accent text-accent" : "text-text")
+            // Leise über Größe und Position, nicht über Blässe: `--muted`
+            // wäre hier korrekt lesbar, zöge aber die Aufmerksamkeit auf
+            // einen Unterschied, der keiner sein soll.
+            (ask ? "border border-accent text-accent" : "text-muted")
           }
         >
           {deleting

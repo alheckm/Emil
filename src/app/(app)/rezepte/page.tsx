@@ -34,10 +34,10 @@ export default function RecipesPage(props: PageProps<"/rezepte">) {
         </Link>
         <Link
           href="/rezepte/neu"
-          className=// Warme Fläche statt Haarlinie: `--border` ist ein Ton für Linien auf
-            // der Karte. Auf dem grauen Canvas liegt er so dicht daneben, dass
-            // der Knopf schlicht keine Kante hätte.
-            "inline-flex min-h-11 items-center rounded-soft bg-surface px-4 text-[13px] font-medium shadow-card press tap-target"
+          className=// Leise Fläche statt Haarlinie: `--soft` ist der Ton für
+            // Bedienflächen, die auf dem durchgehenden Off-White eine Kante
+            // brauchen, ohne eine Linie zu ziehen.
+            "inline-flex min-h-11 items-center rounded-soft bg-soft px-4 text-[13px] font-medium press tap-target"
         >
           Von Hand
         </Link>

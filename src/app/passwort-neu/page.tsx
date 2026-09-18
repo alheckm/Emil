@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/server/supabase";
-import { Card, Notice, Screen } from "@/components/ui";
+import { Section, Notice, Screen } from "@/components/ui";
 import { NewPasswordForm } from "./NewPasswordForm";
 
 /**
@@ -31,9 +31,9 @@ export default async function NewPasswordPage() {
   return (
     <Screen title="Neues Passwort">
       {user ? (
-        <Card>
+        <Section>
           <NewPasswordForm />
-        </Card>
+        </Section>
       ) : (
         <>
           <Notice tone="error">

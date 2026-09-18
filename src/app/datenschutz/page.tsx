@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Card, Screen } from "@/components/ui";
+import { Section, Screen } from "@/components/ui";
 
 export const metadata = {
   title: "Datenschutz",
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
       title="Datenschutz"
       lead="Was Emil speichert, wo es liegt und wie du es wieder loswirst."
     >
-      <Card>
+      <Section>
         <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Verantwortlich
         </h2>
@@ -30,9 +30,9 @@ export default function PrivacyPage() {
           [Name], [Anschrift], [E-Mail-Adresse]. Emil wird privat betrieben und
           nicht kommerziell angeboten.
         </p>
-      </Card>
+      </Section>
 
-      <Card>
+      <Section>
         <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Welche Daten gespeichert werden
         </h2>
@@ -61,9 +61,9 @@ export default function PrivacyPage() {
           außer denen, die die Anmeldung braucht, und keine Weitergabe an
           Dritte.
         </p>
-      </Card>
+      </Section>
 
-      <Card>
+      <Section>
         <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Wo die Daten liegen
         </h2>
@@ -77,9 +77,9 @@ export default function PrivacyPage() {
           Der Zugriff ist in der Datenbank selbst geregelt: Rezepte und
           Einkaufsliste sind nur für Mitglieder deines Haushalts lesbar.
         </p>
-      </Card>
+      </Section>
 
-      <Card>
+      <Section>
         <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Löschen
         </h2>
@@ -93,7 +93,7 @@ export default function PrivacyPage() {
           Haushalt mit allen Rezepten, Bildern und Listen. Das lässt sich nicht
           rückgängig machen.
         </p>
-      </Card>
+      </Section>
 
       <p className="text-center text-[15px]">
         <Link href="/" className="text-muted underline underline-offset-4">

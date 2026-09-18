@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/server/supabase";
-import { Card, Screen } from "@/components/ui";
+import { Section, Screen } from "@/components/ui";
 import { RegisterForm } from "./RegisterForm";
 
 /**
@@ -29,9 +29,9 @@ export default async function RegisterPage() {
       title="Konto anlegen"
       lead="Danach legst du einen Haushalt an oder trittst mit einem Code einem bestehenden bei."
     >
-      <Card>
+      <Section>
         <RegisterForm />
-      </Card>
+      </Section>
       <p className="text-center text-[15px]">
         <Link href="/anmelden" className="text-muted underline underline-offset-4">
           Ich habe schon ein Konto

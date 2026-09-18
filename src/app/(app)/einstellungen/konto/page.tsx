@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/server/supabase";
-import { Card, Screen } from "@/components/ui";
+import { Section, Screen } from "@/components/ui";
 import { TextSkeleton } from "@/components/skeletons";
 import { AccountActions } from "./AccountActions";
 
@@ -18,7 +18,7 @@ export const metadata = { title: "Konto" };
 export default function AccountPage() {
   return (
     <Screen title="Konto">
-      <Card>
+      <Section>
         <dl className="space-y-2 text-[15px]">
           <div className="flex items-center justify-between gap-4">
             <dt className="text-muted">E-Mail</dt>
@@ -27,7 +27,7 @@ export default function AccountPage() {
             </Suspense>
           </div>
         </dl>
-      </Card>
+      </Section>
 
       <AccountActions />
     </Screen>

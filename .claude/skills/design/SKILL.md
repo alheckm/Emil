@@ -40,8 +40,11 @@ Dokument ist rund 480 Zeilen; die Abschnitte, die du je nach Aufgabe brauchst:
    die Handyfläche darin ~265 px gegen 390 pt auf dem Gerät. Übertragen werden
    Proportionen. Untergrenzen: 16 px in Eingabefeldern, 44 px Trefferfläche,
    15 px Fließtext.
-3. **Karten haben keine Umrandung.** Warme Fläche (`--surface`) auf grauem
-   Canvas (`--bg`), weicher Schatten. Nicht umgekehrt, keine Linie darum.
+3. **Es gibt keine Karten.** Ein warmes Off-White (`--bg`) läuft durch den
+   ganzen Screen — kein zweiter Hintergrund, kein Schatten, keine Umrandung um
+   einen Inhaltsblock. Das Grau in `app_design.jpg` ist die Fläche, auf der die
+   beiden iPhone-Screenshots liegen, nicht die App. Gemessen wird innerhalb der
+   Gerätekanten. Braucht ein Bedienelement eine Fläche, nimmt es `--soft`.
 4. **Keine Akzentfarbe.** `--accent` erscheint an Löschen und Fehlern, sonst
    nirgends. Die Farbe im Screen kommt aus dem Essen.
 5. **Zwei Register.** Rezept und Einkauf: leise Aktionen neben dem Inhalt, kein

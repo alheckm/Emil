@@ -1,14 +1,25 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Die Farben stammen aus app_design.jpg — gemessen, nicht geschaetzt.
+   Die Farben stammen aus app_design.jpg — und zwar von **innerhalb** der
+   Geraete.
 
-   Der Entwurf arbeitet mit **zwei** Flaechen, nicht mit einer: die Rezeptkarte
-   ist warmes Off-White (#f5f1ee, 56 % aller Pixel im Inhaltsbereich) und liegt
-   auf einem neutral-grauen Canvas (#d7d5d6, exakt der Ton links und rechts der
-   Handys). Vorher war das Cremeweiss der Seitenhintergrund und die Karten
-   waren weiss — also genau andersherum. Der Unterschied ist der ganze
-   Auftritt: so schwebt die Karte, vorher lag sie flach auf.
+   Das war der Fehler der vorigen Fassung: app_design.jpg zeigt zwei
+   iPhone-Screenshots, die nebeneinander auf einer hellgrauen Praesentations-
+   flaeche liegen. Dieses Grau (#d7d5d6) ist der Tisch, auf dem die Mockups
+   liegen — nicht der Hintergrund der App. Es wurde trotzdem als `--bg`
+   uebernommen, und damit bekam jeder Screen eine warme Karte auf grauem Grund:
+   ein sichtbarer Rand um alles, den der Entwurf nirgends zeigt.
+
+   Emil hat **eine** Flaeche. Das warme Off-White #f5f1ee laeuft von der
+   Statusleiste bis zum Home-Indikator durch; das Foto liegt darauf, nicht in
+   einer Karte darauf. Es gibt deshalb kein `--surface` mehr — `--bg` ist der
+   Grund, und alles Gelesene steht darauf.
+
+   Was sich davon absetzen muss, tut das ueber einen eigenen Ton und nicht
+   ueber einen Schatten: `--soft` (#ece7e3) ist die leise Bedienflaeche —
+   Felder, Portionswaehler, Filter. Schatten gibt es keine mehr; im Entwurf ist
+   innerhalb des Bildschirms keiner zu sehen.
 
    Reines Weiss bleibt einer einzigen Sache vorbehalten: den Kreisen unter den
    Zutaten. Das ist im Entwurf die hellste Flaeche ueberhaupt, und sie traegt
@@ -16,18 +27,15 @@
    andere Ton gaebe einen sichtbaren Ring.
 
    **Es gibt keine Akzentfarbe.** Im Entwurf traegt die Farbe das Essen; alles
-   andere ist Grau, Off-White, Weiss und Schwarz. Die Schritt-Ziffern stehen in
+   andere ist Off-White, Weiss und Schwarz. Die Schritt-Ziffern stehen in
    schwarzen Kaesten (#000 im JPEG), und das ist die einzige kraeftige Flaeche
    im ganzen Screen. Genau das ist `--brand`.
 
    Die Koralle bleibt als `--accent` und nur noch dort, wo gewarnt wird —
-   Loeschen, Fehler. Sie als Markenfarbe zu behalten und gleichzeitig den
-   Entwurf zu uebernehmen ginge nicht: zwei kraeftige Farben auf Creme ergeben
-   den unruhigen Auftritt, den der Entwurf gerade vermeidet.
+   Loeschen, Fehler.
 --------------------------------------------------------------------------- */
 :root {
-  --bg: #d7d5d6;
-  --surface: #f5f1ee;
+  --bg: #f5f1ee;
   --chip: #ffffff;
   --soft: #ece7e3;
   --panel: #080808;
@@ -38,7 +46,7 @@
   --brand: #080808;
   --brand-text: #ffffff;
   --accent-text: #ffffff;
-  --border: #d8d1cc;
+  --border: #e2dbd5;
   --ok: #3f6f52;
   --warn: #b5762a;
   --scrim: rgba(12, 10, 9, 0.72);
@@ -57,17 +65,15 @@
 }
 
 /* Dunkel gedreht statt weggelassen: gekocht wird abends, und im
-   Supermarkt-Halbdunkel blendet eine cremefarbene Flaeche. Die Rollen tauschen,
-   der Kontrast bleibt — aus dem Canvas wird ein kuehles Fast-Schwarz, aus der
-   Karte ein warmes Dunkelbraun, und der schwarze Ziffernkasten wird cremefarben
-   mit dunkler Ziffer. Ein schwarzes Quadrat auf dunkler Karte waere sonst
-   schlicht nicht mehr da.
+   Supermarkt-Halbdunkel blendet eine cremefarbene Flaeche. Aus dem einen
+   warmen Off-White wird ein einziges warmes Dunkelbraun, und der schwarze
+   Ziffernkasten wird cremefarben mit dunkler Ziffer — ein schwarzes Quadrat
+   auf dunklem Grund waere sonst schlicht nicht mehr da.
 
    `--chip` bleibt weiss: darin liegen freigestellte Fotos auf weissem Grund. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #121110;
-    --surface: #1f1c19;
+    --bg: #1f1c19;
     --chip: #ffffff;
     --soft: #2a2622;
     --panel: #f2ede7;
@@ -89,7 +95,6 @@
 
 @theme inline {
   --color-bg: var(--bg);
-  --color-surface: var(--surface);
   --color-chip: var(--chip);
   --color-soft: var(--soft);
   --color-panel: var(--panel);
@@ -109,15 +114,11 @@
   --font-display: var(--font-serif), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --radius-pill: 999px;
-  /* Im Entwurf gemessen: die Karte ist deutlich, aber nicht uebertrieben
-     gerundet. Kleinere Flaechen — Knoepfe, Felder — bekommen `radius-soft`,
-     sonst wirkt ein 28er Radius an einem 34 px hohen Knopf wie eine Pille. */
+  /* Nur noch fuer Flaechen, die wirklich eine eigene Form haben: das Foto
+     einer Rezeptkachel in der Uebersicht. Die Rezeptseite selbst rundet
+     nichts — dort laeuft das Foto bis an den Bildschirmrand. */
   --radius-card: 28px;
   --radius-soft: 11px;
-  /* Kein harter Drop Shadow. Die Karte soll sich vom Canvas loesen, nicht
-     darueber schweben. */
-  --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.06);
-  --shadow-float: 0 2px 10px rgba(0, 0, 0, 0.12);
 }
 
 html {
@@ -136,8 +137,8 @@ body {
 @utility pt-safe { padding-top: max(1rem, env(safe-area-inset-top)); }
 @utility pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
 @utility px-safe {
-  padding-left: max(1rem, env(safe-area-inset-left));
-  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
 }
 
 /* ---------------------------------------------------------------------------

@@ -21,7 +21,7 @@ import {
   type Category,
   type ListEntry,
 } from "@/lib/data/shoppingList";
-import { Card, Notice } from "@/components/ui";
+import { Section, Notice } from "@/components/ui";
 
 /**
  * Die Einkaufsliste, wie sie im Supermarkt benutzt wird.
@@ -349,7 +349,7 @@ export function ListView({
         </Notice>
       )}
 
-      <Card>
+      <Section>
         <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Etwas ergänzen
         </h2>
@@ -392,15 +392,15 @@ export function ListView({
         >
           Auf die Liste
         </button>
-      </Card>
+      </Section>
 
       {visibleEntries.length + adding.length === 0 ? (
-        <Card>
+        <Section>
           <p className="text-[15px] leading-relaxed text-muted">
             Die Liste ist leer. Leg ein Rezept auf die Liste oder ergänze etwas
             von Hand.
           </p>
-        </Card>
+        </Section>
       ) : (
         <p className="text-[13px]">
           {openCount + adding.length === 0
@@ -533,7 +533,7 @@ export function ListView({
                       onClick={() => setOpen(isOpen ? null : entry.id)}
                       className={
                         "absolute right-0 top-0 flex h-8 w-8 items-center justify-center " +
-                        "rounded-pill bg-surface text-[15px] leading-none shadow-card press-flat " +
+                        "rounded-pill bg-soft text-[15px] leading-none press-flat " +
                         (isOpen ? "text-text" : "text-muted")
                       }
                     >
@@ -545,7 +545,7 @@ export function ListView({
             </ul>
 
             {openEntry && (
-              <div className="space-y-3 rounded-card bg-surface p-4 shadow-card">
+              <div className="space-y-3 rounded-soft bg-soft p-4">
                 <p className="text-[15px] font-medium">{openEntry.name}</p>
 
                 {openEntry.note && (

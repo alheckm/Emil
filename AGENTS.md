@@ -9,15 +9,18 @@ Umsetzung korrigiert und nicht die Abweichung zur Designentscheidung erklärt.
 Wer etwas unter `src/app/`, `src/components/` oder an `src/app/globals.css`
 anfasst, liest das Dokument vorher — der Skill `design` lädt es.
 
-Die sechs Regeln, die am schnellsten verloren gehen:
+Die Regeln, die am schnellsten verloren gehen:
 
 - **Nur Tokens.** Farbe, Radius, Schatten kommen aus `globals.css`. Kein
   Hex-Wert im Komponentencode, keine Maße außerhalb der Skala in Abschnitt 5.
 - **Die Referenz nicht abmessen.** Das JPEG ist ein Mockup im Maßstab ~1:1,47.
   Untergrenzen: 16 px Schrift in Eingabefeldern (sonst zoomt iOS hinein),
   44 px Trefferfläche, 15 px Fließtext.
-- **Karten ohne Umrandung** — warme Fläche auf grauem Canvas, weicher Schatten.
-  Eine Linie darum herum ist das Material-Kärtchen, das der Entwurf vermeidet.
+- **Das Grau im JPEG ist nicht die App.** Es ist die Fläche, auf der die beiden
+  iPhone-Screenshots liegen. Gemessen wird *innerhalb* der Gerätekanten.
+- **Keine Karten.** Ein Off-White (`--bg`) läuft durch den ganzen Screen — kein
+  zweiter Hintergrund, kein Schatten, keine Umrandung um Inhaltsblöcke.
+  Trennung kommt aus Weißraum. Was eine Bedienfläche braucht, nimmt `--soft`.
 - **Keine Akzentfarbe.** `--accent` ist ein Warnton für Löschen und Fehler,
   keine Marke. Farbe trägt das Essen.
 - **Keine bildschirmbreiten CTA-Knöpfe auf Rezept- und Einkaufsscreens.** Dort

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { parsePastedRecipe } from "@/lib/core/parsePastedRecipe";
 import { IMPORT_PROMPT, IMPORT_PROMPT_HINT } from "@/lib/core/importPrompt";
-import { Button, Card, Field, Notice, Textarea } from "@/components/ui";
+import { Button, Section, Field, Notice, Textarea } from "@/components/ui";
 import { RecipeForm, type ImportDraft } from "../RecipeForm";
 
 /**
@@ -197,7 +197,7 @@ export function ImportPanel({
       {hint && <Notice tone="info">{hint}</Notice>}
 
       {tab === "web" ? (
-        <Card>
+        <Section>
           <div className="space-y-4">
             <Field
               label="Adresse des Rezepts"
@@ -214,9 +214,9 @@ export function ImportPanel({
               {busy ? "Wird gelesen …" : "Rezept holen"}
             </Button>
           </div>
-        </Card>
+        </Section>
       ) : (
-        <Card>
+        <Section>
           <div className="space-y-4">
             <div className="space-y-2">
               <p className="text-[15px] leading-relaxed">
@@ -236,7 +236,7 @@ export function ImportPanel({
             />
             <Button onClick={importFromPaste}>Rezept übernehmen</Button>
           </div>
-        </Card>
+        </Section>
       )}
 
       <p className="text-center text-[15px]">
@@ -270,7 +270,7 @@ function TabButton({
         "min-h-11 flex-1 rounded-xl border px-4 text-[15px] font-medium " +
         (active
           ? "border-accent bg-accent text-accent-text"
-          : "border-border bg-surface text-muted")
+          : "border-border text-muted")
       }
     >
       {children}

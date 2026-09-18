@@ -4,19 +4,20 @@ import { requireHousehold } from "@/lib/server/household";
 import { getListState } from "@/lib/server/listState";
 import { getRecipe, type Recipe } from "@/lib/data/recipes";
 import { getRecipeImageUrl } from "@/lib/data/recipeImages";
-import { Card, Notice, Screen, ScreenHeader } from "@/components/ui";
+import { Notice, Screen, ScreenHeader } from "@/components/ui";
 import { RecipeCardSkeleton } from "@/components/skeletons";
 import { DeleteRecipe, IngredientsSection } from "./RecipeActions";
 import { RecipeHero } from "./RecipeHero";
 
 /**
- * Das Rezept — eine einzige Karte, wie in app_design.jpg.
+ * Das Rezept — ein Screen, eine Fläche, wie in app_design.jpg.
  *
  * Der Aufbau ist der des Entwurfs und nicht der einer Formularseite: oben das
- * Foto über die ganze Breite, der Titel als weiße Serife darauf, darunter im
- * warmen Off-White die Zutaten und die Zubereitung. Es gibt keine Kopfzeile
- * mehr über dem Bild und keine Karten-Stapelung — alles sitzt in **einer**
- * Fläche, und die schwebt auf grauem Canvas.
+ * Foto über die volle Bildschirmbreite bis unter die Statusleiste, der Titel
+ * als weiße Serife darauf, darunter im warmen Off-White die Zutaten und die
+ * Zubereitung. Keine Kopfzeile über dem Bild, keine Karte darum: der Screen
+ * **ist** die Fläche. Deshalb `bleed` — der Rahmen gibt seinen Seitenrand ab,
+ * und die Abschnitte unter dem Foto setzen ihren eigenen (20 px, `px-5`).
  *
  * An der Aufteilung fürs Streaming ändert das nichts:
  *
@@ -33,7 +34,7 @@ import { RecipeHero } from "./RecipeHero";
  */
 export default function RecipePage(props: PageProps<"/rezepte/[id]">) {
   return (
-    <Screen>
+    <Screen bleed>
       <Suspense fallback={<RecipeCardSkeleton />}>
         <RecipeDetail params={props.params} />
       </Suspense>
@@ -49,20 +50,20 @@ async function RecipeDetail({ params }: { params: Params }) {
   const context = await requireHousehold();
   if (!context.ok) {
     return (
-      <>
+      <div className="space-y-6 px-safe py-8">
         <ScreenHeader title="Rezept" />
         <Notice tone="error">{context.error}</Notice>
-      </>
+      </div>
     );
   }
 
   const recipe = await getRecipe(context.supabase, id);
   if (!recipe.ok) {
     return (
-      <>
+      <div className="space-y-6 px-safe py-8">
         <ScreenHeader title="Rezept" />
         <Notice tone="error">{recipe.error}</Notice>
-      </>
+      </div>
     );
   }
   // Ein Rezept aus einem fremden Haushalt kommt wegen RLS gar nicht erst an;
@@ -73,62 +74,60 @@ async function RecipeDetail({ params }: { params: Params }) {
 
   return (
     <>
-      <Card bleed>
-        <RecipeHero title={value.title} recipeId={value.id}>
-          {value.imagePath && (
-            <Suspense fallback={null}>
-              <RecipeImage imagePath={value.imagePath} />
-            </Suspense>
-          )}
-        </RecipeHero>
-
-        <ListAwareIngredients recipe={value} />
-
-        {value.instructions.length > 0 && (
-          <RecipeSteps steps={value.instructions} />
+      <RecipeHero title={value.title} recipeId={value.id}>
+        {value.imagePath && (
+          <Suspense fallback={null}>
+            <RecipeImage imagePath={value.imagePath} />
+          </Suspense>
         )}
+      </RecipeHero>
 
-        {value.notes && (
-          <section className="px-5 pb-6">
-            <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
-              Notizen
-            </h2>
-            <p className="mt-3 whitespace-pre-line text-[15px] leading-[1.55]">
-              {value.notes}
+      <ListAwareIngredients recipe={value} />
+
+      {value.instructions.length > 0 && (
+        <RecipeSteps steps={value.instructions} />
+      )}
+
+      {value.notes && (
+        <section className="px-5 pb-6">
+          <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
+            Notizen
+          </h2>
+          <p className="mt-3 whitespace-pre-line text-[15px] leading-[1.55]">
+            {value.notes}
+          </p>
+        </section>
+      )}
+
+      {(value.tags.length > 0 || value.sourceUrl || value.totalTimeMin) && (
+        <div className="space-y-1 px-5 pb-6 text-[13px] text-muted">
+          {/* Kochzeit und Schlagwörter in einer Zeile: beides ist Beiwerk,
+              beides wird selten gelesen, und beides gehört unter den Text und
+              nicht auf das Foto. */}
+          {(value.totalTimeMin || value.tags.length > 0) && (
+            <p>
+              {[
+                value.totalTimeMin ? `${value.totalTimeMin} Minuten` : null,
+                ...value.tags,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
             </p>
-          </section>
-        )}
-
-        {(value.tags.length > 0 || value.sourceUrl || value.totalTimeMin) && (
-          <div className="space-y-1 px-5 pb-6 text-[13px] text-muted">
-            {/* Kochzeit und Schlagwörter in einer Zeile: beides ist Beiwerk,
-                beides wird selten gelesen, und beides gehört auf die warme
-                Fläche und nicht auf das Foto. */}
-            {(value.totalTimeMin || value.tags.length > 0) && (
-              <p>
-                {[
-                  value.totalTimeMin ? `${value.totalTimeMin} Minuten` : null,
-                  ...value.tags,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
-              </p>
-            )}
-            {value.sourceUrl && (
-              <p className="truncate">
-                <a
-                  href={value.sourceUrl}
-                  className="underline underline-offset-4"
-                  rel="noreferrer noopener"
-                  target="_blank"
-                >
-                  Quelle
-                </a>
-              </p>
-            )}
-          </div>
-        )}
-      </Card>
+          )}
+          {value.sourceUrl && (
+            <p className="truncate">
+              <a
+                href={value.sourceUrl}
+                className="underline underline-offset-4"
+                rel="noreferrer noopener"
+                target="_blank"
+              >
+                Quelle
+              </a>
+            </p>
+          )}
+        </div>
+      )}
 
       <ListAwareDelete recipeId={value.id} />
     </>

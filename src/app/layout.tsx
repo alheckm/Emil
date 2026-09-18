@@ -69,9 +69,10 @@ export const viewport: Viewport = {
   // die *-safe-Utilities Abstand. Zoom bleibt bewusst erlaubt.
   viewportFit: "cover",
   themeColor: [
-    // Der Ton der Fläche ganz oben am Bildschirm, also der Canvas.
-    { media: "(prefers-color-scheme: light)", color: "#d7d5d6" },
-    { media: "(prefers-color-scheme: dark)", color: "#121110" },
+    // Der Ton der Fläche ganz oben am Bildschirm — und das ist seit dem
+    // Wegfall des Canvas überall derselbe: das warme Off-White.
+    { media: "(prefers-color-scheme: light)", color: "#f5f1ee" },
+    { media: "(prefers-color-scheme: dark)", color: "#1f1c19" },
   ],
 };
 

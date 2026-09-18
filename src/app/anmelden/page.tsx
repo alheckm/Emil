@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/server/supabase";
-import { Card, Screen } from "@/components/ui";
+import { Section, Screen } from "@/components/ui";
 import { LoginForm } from "./LoginForm";
 
 /**
@@ -31,9 +31,9 @@ export default async function LoginPage({
 
   return (
     <Screen title="Emil" lead="Rezepte, Portionen, Einkaufsliste — geteilt im Haushalt.">
-      <Card>
+      <Section>
         <LoginForm initialError={fehler} />
-      </Card>
+      </Section>
 
       <div className="space-y-2 text-center text-[15px]">
         <p>

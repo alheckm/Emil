@@ -22,7 +22,7 @@ export function SettingsButton() {
     <Link
       href="/einstellungen"
       aria-label="Einstellungen"
-      className="flex h-11 w-11 items-center justify-center rounded-pill bg-surface text-muted shadow-card press tap-target"
+      className="flex h-11 w-11 items-center justify-center rounded-pill bg-soft text-muted press tap-target"
     >
       <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" aria-hidden>
         <path

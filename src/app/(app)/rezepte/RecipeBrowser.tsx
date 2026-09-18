@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useId, useMemo, useOptimistic, useState, startTransition } from "react";
 import type { RecipeSummary } from "@/lib/data/recipes";
-import { Card } from "@/components/ui";
+import { Section } from "@/components/ui";
 
 /**
  * Suche, Schlagwort-Filter und Trefferliste in einem.
@@ -116,7 +116,7 @@ export function RecipeBrowser({
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder="Titel oder Zutat …"
-          className="min-h-12 w-full rounded-pill bg-surface px-5 text-base shadow-card outline-none placeholder:text-muted/70"
+          className="min-h-12 w-full rounded-pill bg-soft px-5 text-base outline-none placeholder:text-muted/70"
         />
 
         {tags.length > 0 && (
@@ -133,7 +133,7 @@ export function RecipeBrowser({
                     "min-h-11 rounded-pill px-4 text-[13px] press tap-target " +
                     (active
                       ? "bg-brand text-brand-text"
-                      : "bg-surface text-muted shadow-card")
+                      : "bg-soft text-muted")
                   }
                 >
                   {tag}
@@ -149,19 +149,23 @@ export function RecipeBrowser({
           Rahmen und die Filter darüber bleiben scharf und bedienbar. */}
       <div className="dims-when-pending">
         {visible.length === 0 ? (
-          <Card>
+          <Section>
             <p className="text-[15px] leading-[1.55] text-muted">
               {currentQuery || activeTag
                 ? "Nichts gefunden. Gesucht wird in Titeln und Zutaten — vielleicht heißt die Zutat im Rezept anders."
                 : "Noch kein Rezept. Am schnellsten geht es über „Importieren“: die Adresse einer Rezeptseite einfügen, oder ein Kochbuch-Foto in claude.ai digitalisieren und das Ergebnis hier einsetzen."}
             </p>
-          </Card>
+          </Section>
         ) : (
           /* Karten statt Zeilen — so steht es im Entwurf, und es ist auch der
              ehrlichere Auftritt: was ein Rezept ausmacht, sieht man am Essen,
-             nicht an seinem Namen. Eine Spalte, 24 px Abstand; die Inhalts-
-             breite bleibt `max-w-md` (Design-System, Abschnitt 6). */
-          <ul className="space-y-6">
+             nicht an seinem Namen. Eine Spalte, 32 px Abstand; die Inhalts-
+             breite bleibt `max-w-md` (Design-System, Abschnitt 6).
+
+             Die Kachel ist keine Karte: keine Fläche, kein Schatten, keine
+             Umrandung. Was sie zusammenhält, ist das gerundete Foto — auf dem
+             durchgehenden Off-White trennt der Abstand. */
+          <ul className="space-y-8">
             {visible.map((recipe) => {
               const servings = planned[recipe.id];
               const image = recipe.imagePath
@@ -176,7 +180,7 @@ export function RecipeBrowser({
                   <Link
                     href={`/rezepte/${recipe.id}`}
                     prefetch
-                    className="block overflow-hidden rounded-card bg-surface shadow-card press tap-target"
+                    className="block overflow-hidden rounded-card press tap-target"
                   >
                     {/* Dieselbe Form wie die Rezeptkarte selbst: 9:10, Foto
                         über die ganze Fläche, Titel als weiße Serife darauf.
@@ -214,12 +218,11 @@ export function RecipeBrowser({
                       </div>
                     </div>
 
-                    {/* Portionen und Zeit stehen unter dem Foto auf der warmen
-                        Fläche, nicht darauf: 13 px Weiß kommt auch mit
-                        Schleier nicht über 4,5:1, und die Karte bekommt so
-                        denselben Aufbau wie die Rezeptseite — Foto oben,
-                        Inhalt darunter. */}
-                    <p className="px-5 py-4 text-[13px] text-muted">
+                    {/* Portionen und Zeit stehen unter dem Foto, nicht
+                        darauf: 13 px Weiß kommt auch mit Schleier nicht über
+                        4,5:1. Ohne Seitenrand — der Text fluchtet mit dem
+                        Fotorand, nicht mit einem Karteninneren. */}
+                    <p className="pt-3 text-[13px] text-muted">
                       {recipe.baseServings} {recipe.servingsLabel}
                       {recipe.totalTimeMin
                         ? ` · ${recipe.totalTimeMin} min`

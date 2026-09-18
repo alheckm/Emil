@@ -15,8 +15,8 @@ export default function manifest(): MetadataRoute.Manifest {
     // Der Canvas aus app_design.jpg. Das ist die Fläche, die iOS beim Start
     // zeigt, bevor das erste Pixel der App da ist — steht hier etwas anderes,
     // blitzt beim Öffnen ein fremder Ton auf.
-    background_color: "#d7d5d6",
-    theme_color: "#d7d5d6",
+    background_color: "#f5f1ee",
+    theme_color: "#f5f1ee",
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
       { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },

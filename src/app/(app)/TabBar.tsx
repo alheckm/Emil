@@ -90,7 +90,7 @@ function Frame({
     <nav
       aria-label="Hauptbereiche"
       data-pending={pending ? "" : undefined}
-      className="sticky bottom-0 z-10 border-t border-border bg-surface/95 px-safe pb-safe backdrop-blur"
+      className="sticky bottom-0 z-10 border-t border-border bg-bg/95 px-safe pb-safe backdrop-blur"
     >
       <ul className="mx-auto flex w-full max-w-md">
         {TABS.map((tab) => {

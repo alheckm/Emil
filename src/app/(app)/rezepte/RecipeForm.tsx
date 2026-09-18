@@ -17,7 +17,7 @@ import { saveRecipe, type Recipe, type RecipeSource } from "@/lib/data/recipes";
 import { refreshRecipeOnLists } from "@/lib/data/shoppingList";
 import { removeRecipeImage, uploadRecipeImage } from "@/lib/data/recipeImages";
 import { RecipeImageField, type ImageChange } from "./RecipeImageField";
-import { Button, Card, Field, Notice, Textarea } from "@/components/ui";
+import { Button, Section, Field, Notice, Textarea } from "@/components/ui";
 
 /**
  * Rezept anlegen und ändern — und zugleich der Prüf-Screen.
@@ -326,7 +326,7 @@ export function RecipeForm({
     <div className="space-y-6">
       {error && <Notice tone="error">{error}</Notice>}
 
-      <Card>
+      <Section>
         <div className="space-y-4">
           <Field
             label="Titel"
@@ -370,9 +370,9 @@ export function RecipeForm({
             onChange={setImageChange}
           />
         </div>
-      </Card>
+      </Section>
 
-      <Card>
+      <Section>
         <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Zutaten
         </h2>
@@ -384,7 +384,7 @@ export function RecipeForm({
               <div
                 key={row.key}
                 className={
-                  "rounded-card border p-3 " +
+                  "rounded-soft border p-3 " +
                   (unsure ? "border-warn bg-warn/10" : "border-border bg-soft")
                 }
               >
@@ -495,9 +495,9 @@ export function RecipeForm({
             Zeilen übernehmen
           </button>
         </div>
-      </Card>
+      </Section>
 
-      <Card>
+      <Section>
         <div className="space-y-4">
           <Textarea
             label="Zubereitung"
@@ -520,7 +520,7 @@ export function RecipeForm({
             hint="Mit Komma getrennt."
           />
         </div>
-      </Card>
+      </Section>
 
       <div className="space-y-2">
         <Button onClick={() => void save()} disabled={busy}>

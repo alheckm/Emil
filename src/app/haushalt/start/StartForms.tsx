@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getBrowserSupabase } from "@/lib/client/supabase";
 import { createHousehold, redeemInvite } from "@/lib/data/households";
-import { Button, Card, Field, Notice } from "@/components/ui";
+import { Button, Section, Field, Notice } from "@/components/ui";
 
 /**
  * Der erste Bildschirm nach der Anmeldung: Haushalt anlegen oder beitreten.
@@ -49,7 +49,7 @@ export function StartForms() {
     <>
       {error && <Notice tone="error">{error}</Notice>}
 
-      <Card>
+      <Section>
         <h2 className="text-lg font-semibold">Haushalt anlegen</h2>
         <p className="mt-1 text-[15px] leading-relaxed text-muted">
           Du wirst Eigentümer und kannst danach jemanden einladen.
@@ -77,9 +77,9 @@ export function StartForms() {
             {busy === "create" ? "Einen Moment …" : "Anlegen"}
           </Button>
         </form>
-      </Card>
+      </Section>
 
-      <Card>
+      <Section>
         <h2 className="text-lg font-semibold">Einladung einlösen</h2>
         <p className="mt-1 text-[15px] leading-relaxed text-muted">
           Acht Zeichen vom anderen Handy. Groß- und Kleinschreibung egal.
@@ -110,7 +110,7 @@ export function StartForms() {
             {busy === "join" ? "Einen Moment …" : "Beitreten"}
           </Button>
         </form>
-      </Card>
+      </Section>
     </>
   );
 }
