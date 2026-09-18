@@ -49,6 +49,11 @@ next-env.d.ts
 # Werkzeuge, nicht die App: Skills werden per `npx skills add` installiert,
 # und die lokalen Einstellungen gehören niemandem außer diesem Rechner.
 /.agents/
-/.claude/skills/
+# `/*` statt `/`: Git steigt in ein ausgeschlossenes Verzeichnis gar nicht
+# erst hinab, eine Ausnahme darin bliebe sonst wirkungslos.
+/.claude/skills/*
+# `design` ist nicht installiert, sondern gehört zum Projekt. Ohne ihn liest
+# ein frischer Klon docs/design-system.md nie.
+!/.claude/skills/design/
 /.claude/helpers/
 .claude/settings.local.json
