@@ -206,7 +206,7 @@ export function RecipeBrowser({
                           : ""}
                       </span>
                       {servings ? (
-                        <span className="mt-2 inline-block rounded-pill bg-brand/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent">
+                        <span className="mt-2 inline-block rounded-pill bg-brand px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-brand-text">
                           Auf der Liste · {servings}
                         </span>
                       ) : null}

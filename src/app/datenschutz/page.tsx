@@ -85,7 +85,7 @@ export default function PrivacyPage() {
         </h2>
         <p className="mt-2 text-[15px] leading-relaxed">
           Unter{" "}
-          <Link href="/konto" className="underline underline-offset-4">
+          <Link href="/einstellungen/konto" className="underline underline-offset-4">
             Konto
           </Link>{" "}
           kannst du dein Konto jederzeit selbst löschen. Damit verschwinden

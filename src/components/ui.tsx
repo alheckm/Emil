@@ -111,15 +111,28 @@ export function Notice({
 export function ScreenHeader({
   title,
   lead,
+  action,
 }: {
   title: ReactNode;
   lead?: ReactNode;
+  /**
+   * Etwas rechts neben der Überschrift — in der Praxis der Zugang zu den
+   * Einstellungen.
+   *
+   * Als Slot und nicht fest eingebaut, weil er nur auf die beiden Haupt-Tabs
+   * gehört. Auf einem Rezept oder in einem Formular steht oben ein Weg zurück,
+   * und zwei konkurrierende Ziele an derselben Ecke wären eine Falle.
+   */
+  action?: ReactNode;
 }) {
   return (
     <header>
-      <h1 className="font-display text-[32px] font-semibold leading-[1.15] tracking-tight">
-        {title}
-      </h1>
+      <div className="flex items-start justify-between gap-4">
+        <h1 className="font-display text-[32px] font-semibold leading-[1.15] tracking-tight">
+          {title}
+        </h1>
+        {action && <div className="shrink-0 pt-1">{action}</div>}
+      </div>
       {lead && (
         <p className="mt-2 text-[15px] leading-relaxed text-muted">{lead}</p>
       )}
@@ -138,16 +151,20 @@ export function ScreenHeader({
 export function Screen({
   title,
   lead,
+  action,
   children,
 }: {
   title?: ReactNode;
   lead?: ReactNode;
+  action?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <main className="flex-1 px-safe pt-safe pb-safe">
       <div className="mx-auto w-full max-w-md space-y-8 py-8">
-        {title !== undefined && <ScreenHeader title={title} lead={lead} />}
+        {title !== undefined && (
+          <ScreenHeader title={title} lead={lead} action={action} />
+        )}
         <div className="space-y-6">{children}</div>
       </div>
     </main>

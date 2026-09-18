@@ -3,6 +3,7 @@
 import { startTransition, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatAmount } from "@/lib/core/format";
+import { ingredientImage } from "@/lib/core/ingredientImages";
 import { parseAmount } from "@/lib/core/numbers";
 import { mergeUnitFor, UNITS } from "@/lib/core/units";
 import { toMergeAmount } from "@/lib/core/mergeList";
@@ -27,11 +28,15 @@ import { Card, Notice } from "@/components/ui";
  *
  * Drei Entscheidungen, die aus genau dieser Situation kommen:
  *
- * - **Antippen hakt ab.** Die ganze Zeile ist die Trefferfläche, nicht ein
+ * - **Antippen hakt ab.** Die ganze Kachel ist die Trefferfläche, nicht ein
  *   kleines Kästchen — die App wird einhändig und in Bewegung bedient.
- * - **Abgehaktes bleibt stehen.** Zeilen nach unten wandern zu lassen sieht
- *   aufgeräumt aus, verschiebt aber im selben Moment die Zeile darunter unter
+ * - **Abgehaktes bleibt stehen.** Einträge nach unten wandern zu lassen sieht
+ *   aufgeräumt aus, verschiebt aber im selben Moment die Kachel darunter unter
  *   den Daumen, der schon unterwegs ist.
+ * - **Drei pro Reihe, Bild oben, Name und Menge darunter** — nach dem Entwurf
+ *   in app_design.jpg. Ein Bild ist im Laden schneller erfasst als ein Wort;
+ *   man sucht im Regal nach der Sache, nicht nach ihrem Namen. Fehlt das Bild,
+ *   steht der Anfangsbuchstabe im Kreis, damit die Reihe nicht ausfranst.
  * - **Das Häkchen wirkt sofort**, auch bevor der Server geantwortet hat. Geht
  *   es schief, springt es zurück und die Meldung erklärt warum.
  */
@@ -407,21 +412,15 @@ export function ListView({
       )}
 
       {adding.length > 0 && (
-        <section className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <section className="space-y-3">
+          <h2 className="font-display text-[19px] font-semibold tracking-tight">
             Wird ergänzt
           </h2>
-          <ul className="space-y-2">
+          <ul className="grid grid-cols-3 gap-x-3 gap-y-5">
             {adding.map((item) => (
-              <li
-                key={item.id}
-                className="flex min-h-14 items-center gap-3 rounded-card border border-border bg-surface px-4 py-3 opacity-50"
-              >
-                <span
-                  aria-hidden
-                  className="h-7 w-7 shrink-0 rounded-md border border-border"
-                />
-                <span className="min-w-0 text-[15px] font-medium">
+              <li key={item.id} className="flex flex-col items-center gap-2 opacity-50">
+                <span className="aspect-square w-full rounded-pill bg-surface" />
+                <span className="w-full text-center text-[13px] font-medium leading-tight">
                   {item.label}
                 </span>
               </li>
@@ -430,57 +429,98 @@ export function ListView({
         </section>
       )}
 
-      {groups.map((group) => (
-        <section key={group.name} className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-            {group.name}
-          </h2>
+      {groups.map((group) => {
+        // Die aufgeklappten Details stehen unter dem Raster und nicht in der
+        // Kachel: eine Kachel ist gut 100 px breit, darin wäre eine Auswahlbox
+        // für die Abteilung nicht zu bedienen.
+        const openEntry = group.entries.find((entry) => entry.id === open);
 
-          <ul className="space-y-2">
-            {group.entries.map((entry) => {
-              const checked = checkedNow[entry.id] ?? entry.checked;
-              const { text } = formatAmount(entry.amount, entry.mergeUnit);
-              const isOpen = open === entry.id;
+        return (
+          <section key={group.name} className="space-y-3">
+            <h2 className="font-display text-[19px] font-semibold tracking-tight">
+              {group.name}
+            </h2>
 
-              return (
-                <li
-                  key={entry.id}
-                  className="rounded-card border border-border bg-surface"
-                >
-                  <div className="flex items-stretch">
+            <ul className="grid grid-cols-3 gap-x-3 gap-y-5">
+              {group.entries.map((entry) => {
+                const checked = checkedNow[entry.id] ?? entry.checked;
+                const { text } = formatAmount(entry.amount, entry.mergeUnit);
+                const src = ingredientImage(entry.name);
+                const menge = [
+                  text,
+                  entry.hasUnquantified ? (text ? "+ etwas" : "etwas") : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ");
+                const isOpen = open === entry.id;
+
+                return (
+                  <li key={entry.id} className="relative">
                     <button
                       type="button"
                       aria-pressed={checked}
                       onClick={() => void toggle(entry)}
-                      className="flex min-h-14 flex-1 items-center gap-3 px-4 py-3 text-left press-flat tap-target"
+                      className="flex w-full flex-col items-center gap-2 press-flat tap-target"
                     >
-                      <span
-                        aria-hidden
-                        className={
-                          "flex h-7 w-7 shrink-0 items-center justify-center rounded-md border text-sm " +
-                          (checked
-                            ? "border-ok bg-ok text-bg"
-                            : "border-border")
-                        }
-                      >
-                        {checked ? "✓" : ""}
-                      </span>
-                      <span
-                        className={
-                          "min-w-0 text-[15px] " +
-                          (checked ? "text-muted line-through" : "")
-                        }
-                      >
-                        <span className="font-medium">{entry.name}</span>
-                        {(text || entry.hasUnquantified) && (
-                          <span className="block text-[13px] text-muted">
-                            {text}
-                            {entry.hasUnquantified && (text ? " + etwas" : "etwas")}
+                      <span className="relative block aspect-square w-full">
+                        <span
+                          className={
+                            "flex h-full w-full items-center justify-center " +
+                            "overflow-hidden rounded-pill bg-surface " +
+                            // Abgehakt wird das Bild blass, das Häkchen
+                            // darüber bleibt kräftig — sonst verschwindet
+                            // genau die Rückmeldung mit, auf die man wartet.
+                            (checked ? "opacity-40" : "")
+                          }
+                        >
+                          {src ? (
+                            /* Kein next/image: die Datei liegt schon in genau
+                               der Größe im public-Ordner, in der sie gebraucht
+                               wird. Der Optimierer hätte hier nichts zu tun
+                               und käme nur als zusätzliche Runde dazu. */
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img
+                              src={src}
+                              alt=""
+                              width={192}
+                              height={192}
+                              loading="lazy"
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <span
+                              aria-hidden
+                              className="text-[24px] font-medium text-muted"
+                            >
+                              {entry.name.slice(0, 1).toUpperCase()}
+                            </span>
+                          )}
+                        </span>
+
+                        {checked && (
+                          <span className="absolute inset-0 flex items-center justify-center">
+                            <span
+                              aria-hidden
+                              className="flex h-9 w-9 items-center justify-center rounded-pill bg-text text-[17px] text-bg"
+                            >
+                              ✓
+                            </span>
                           </span>
                         )}
-                        {entry.note && (
-                          <span className="block text-[13px] text-muted">
-                            {entry.note}
+                      </span>
+
+                      <span className="w-full text-center">
+                        <span
+                          className={
+                            "block text-[13px] font-medium leading-tight " +
+                            (checked ? "text-muted line-through" : "")
+                          }
+                        >
+                          {entry.name}
+                        </span>
+                        {menge && (
+                          <span className="mt-0.5 block text-[12px] leading-tight text-muted">
+                            {menge}
                           </span>
                         )}
                       </span>
@@ -488,92 +528,98 @@ export function ListView({
 
                     <button
                       type="button"
-                      aria-label={`Herkunft von ${entry.name}`}
+                      aria-label={`Details zu ${entry.name}`}
                       aria-expanded={isOpen}
                       onClick={() => setOpen(isOpen ? null : entry.id)}
-                      className="w-12 shrink-0 border-l border-border text-muted press-flat"
+                      className={
+                        "absolute right-0 top-0 flex h-8 w-8 items-center justify-center " +
+                        "rounded-pill border border-border bg-surface text-[15px] leading-none press-flat " +
+                        (isOpen ? "text-text" : "text-muted")
+                      }
                     >
-                      {isOpen ? "▴" : "▾"}
+                      ⋯
                     </button>
-                  </div>
+                  </li>
+                );
+              })}
+            </ul>
 
-                  {isOpen && (
-                    <div className="space-y-3 border-t border-border px-4 py-3">
-                      {entry.sources.length > 0 ? (
-                        <ul className="space-y-1 text-[13px] text-muted">
-                          {entry.sources.map((source, index) => (
-                            <li key={`${source.recipeId}-${index}`}>
-                              {source.recipeTitle ?? "Rezept"}
-                              {source.servings ? ` (${source.servings})` : ""}
-                              {source.amount
-                                ? `: ${formatAmount(source.amount, entry.mergeUnit).text}`
-                                : ": ohne Menge"}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-[13px] text-muted">
-                          Von Hand ergänzt.
-                        </p>
-                      )}
+            {openEntry && (
+              <div className="space-y-3 rounded-card border border-border bg-surface p-4">
+                <p className="text-[15px] font-medium">{openEntry.name}</p>
 
-                      {entry.categoryEditable ? (
-                        <label className="block">
-                          <span className="text-[13px] text-muted">
-                            Abteilung
-                          </span>
-                          <select
-                            value={entry.categoryId ?? "sonstiges"}
-                            onChange={(event) =>
-                              run(() => {
-                                const supabase = getBrowserSupabase();
-                                if (!supabase) {
-                                  return Promise.resolve({
-                                    ok: false,
-                                    error: "Supabase ist nicht konfiguriert.",
-                                  });
-                                }
-                                return setIngredientCategory(
-                                  supabase,
-                                  entry.ingredientId,
-                                  event.target.value,
-                                );
-                              })
-                            }
-                            className="mt-1 h-11 w-full appearance-none rounded-2xl border border-border bg-bg px-3 text-base outline-none focus:border-accent"
-                          >
-                            {categories.map((category) => (
-                              <option key={category.id} value={category.id}>
-                                {category.name}
-                              </option>
-                            ))}
-                          </select>
-                          <span className="mt-1 block text-[13px] text-muted">
-                            Bleibt für diese Zutat gespeichert.
-                          </span>
-                        </label>
-                      ) : (
-                        <p className="text-[13px] text-muted">
-                          Abteilung „{entry.categoryName}“ — aus der
-                          Zutatenliste, für alle Haushalte gleich.
-                        </p>
-                      )}
+                {openEntry.note && (
+                  <p className="text-[13px] text-muted">{openEntry.note}</p>
+                )}
 
-                      <button
-                        type="button"
-                        onClick={() => removeEntry(entry)}
-                        className="h-11 w-full rounded-pill border border-accent text-[15px] text-accent press"
-                      >
-                        Zeile entfernen
-                      </button>
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
+                {openEntry.sources.length > 0 ? (
+                  <ul className="space-y-1 text-[13px] text-muted">
+                    {openEntry.sources.map((source, index) => (
+                      <li key={`${source.recipeId}-${index}`}>
+                        {source.recipeTitle ?? "Rezept"}
+                        {source.servings ? ` (${source.servings})` : ""}
+                        {source.amount
+                          ? `: ${formatAmount(source.amount, openEntry.mergeUnit).text}`
+                          : ": ohne Menge"}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-[13px] text-muted">Von Hand ergänzt.</p>
+                )}
+
+                {openEntry.categoryEditable ? (
+                  <label className="block">
+                    <span className="text-[13px] text-muted">Abteilung</span>
+                    <select
+                      value={openEntry.categoryId ?? "sonstiges"}
+                      onChange={(event) =>
+                        run(() => {
+                          const supabase = getBrowserSupabase();
+                          if (!supabase) {
+                            return Promise.resolve({
+                              ok: false,
+                              error: "Supabase ist nicht konfiguriert.",
+                            });
+                          }
+                          return setIngredientCategory(
+                            supabase,
+                            openEntry.ingredientId,
+                            event.target.value,
+                          );
+                        })
+                      }
+                      className="mt-1 h-11 w-full appearance-none rounded-2xl border border-border bg-bg px-3 text-base outline-none focus:border-accent"
+                    >
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="mt-1 block text-[13px] text-muted">
+                      Bleibt für diese Zutat gespeichert.
+                    </span>
+                  </label>
+                ) : (
+                  <p className="text-[13px] text-muted">
+                    Abteilung „{openEntry.categoryName}“ — aus der Zutatenliste,
+                    für alle Haushalte gleich.
+                  </p>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => removeEntry(openEntry)}
+                  className="h-11 w-full rounded-pill border border-accent text-[15px] text-accent press"
+                >
+                  Von der Liste nehmen
+                </button>
+              </div>
+            )}
+          </section>
+        );
+      })}
     </div>
   );
 }

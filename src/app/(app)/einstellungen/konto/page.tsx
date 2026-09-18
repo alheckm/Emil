@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/server/supabase";
 import { Card, Screen } from "@/components/ui";
@@ -31,15 +30,6 @@ export default function AccountPage() {
       </Card>
 
       <AccountActions />
-
-      <p className="text-center text-[15px]">
-        <Link
-          href="/datenschutz"
-          className="text-muted underline underline-offset-4"
-        >
-          Datenschutz
-        </Link>
-      </p>
     </Screen>
   );
 }

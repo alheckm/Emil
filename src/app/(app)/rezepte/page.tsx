@@ -6,6 +6,7 @@ import { listHouseholdTags, searchRecipes } from "@/lib/data/recipes";
 import { getRecipeImageUrls } from "@/lib/data/recipeImages";
 import { Notice, Screen } from "@/components/ui";
 import { RowsSkeleton } from "@/components/skeletons";
+import { SettingsButton } from "../SettingsButton";
 import { RecipeBrowser } from "./RecipeBrowser";
 
 export const metadata = { title: "Rezepte" };
@@ -20,7 +21,7 @@ export const metadata = { title: "Rezepte" };
  */
 export default function RecipesPage(props: PageProps<"/rezepte">) {
   return (
-    <Screen title="Rezepte">
+    <Screen title="Rezepte" action={<SettingsButton />}>
       <div className="grid grid-cols-2 gap-2">
         <Link
           href="/rezepte/importieren"

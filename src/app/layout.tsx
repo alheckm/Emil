@@ -1,29 +1,44 @@
 import type { Metadata, Viewport } from "next";
-import { Roboto_Slab } from "next/font/google";
+import { Playfair_Display, Poppins } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "./ServiceWorkerRegistration";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 /**
- * Roboto Slab für Überschriften.
+ * Die beiden Schriften aus app_design.jpg.
  *
- * Die Slab-Serife ist das Auffälligste an KptnCooks Auftritt; ohne sie wäre es
- * nur eine Farbpalette. Nur ein Schnitt und nur für Überschriften — der
- * Fließtext bleibt die Systemschrift, die null Bytes kostet und auf dem iPhone
- * ohnehin die beste ist.
+ * Der Entwurf setzt zwei Familien gegeneinander, und der Gegensatz ist der
+ * ganze Auftritt:
  *
- * `next/font` lädt die Datei zur Bauzeit herunter und liefert sie von der
- * eigenen Domain aus. Kein Aufruf zu Google zur Laufzeit — schneller, und
- * datenschutzseitig ist es die einzige saubere Variante.
+ * - **Playfair Display** für Überschriften — eine Serife mit starkem
+ *   Strichkontrast. Vorher stand hier Roboto Slab; eine Slab-Serife hat
+ *   gleichmäßige Striche und wirkt technisch, der Entwurf will das Elegante.
+ * - **Poppins** für alles andere. Das ist der Bruch mit der bisherigen Regel,
+ *   die Systemschrift zu nehmen — die kostet null Bytes und ist auf dem iPhone
+ *   hervorragend. Poppins kostet zwei Schnitte, aber die geometrischen,
+ *   kreisrunden Buchstaben sind im Entwurf deutlich zu erkennen, und mit
+ *   San Francisco sieht der Screen schlicht anders aus als das JPEG.
  *
- * `display: swap`: lieber sofort in der Systemschrift lesen und einmal
- * umspringen, als die Überschrift zurückzuhalten.
+ * Nur die wirklich benutzten Schnitte: zwei je Familie. Jeder weitere ist eine
+ * Datei, die im Supermarkt über Mobilfunk geladen werden will.
+ *
+ * `next/font` lädt zur Bauzeit herunter und liefert von der eigenen Domain —
+ * kein Aufruf zu Google zur Laufzeit, und datenschutzseitig die einzige
+ * saubere Variante.
  */
-const slab = Roboto_Slab({
+const serif = Playfair_Display({
   subsets: ["latin"],
-  weight: ["600"],
+  weight: ["600", "700"],
+  style: ["normal", "italic"],
   display: "swap",
-  variable: "--font-slab",
+  variable: "--font-serif",
+});
+
+const sans = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
+  variable: "--font-sans-ui",
 });
 
 export const metadata: Metadata = {
@@ -49,8 +64,8 @@ export const viewport: Viewport = {
   // die *-safe-Utilities Abstand. Zoom bleibt bewusst erlaubt.
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f4e7" },
-    { media: "(prefers-color-scheme: dark)", color: "#151c23" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f1ee" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1815" },
   ],
 };
 
@@ -60,7 +75,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="de" className={`h-full antialiased ${slab.variable}`}>
+    <html
+      lang="de"
+      className={`h-full antialiased ${serif.variable} ${sans.variable}`}
+    >
       <body className="min-h-full flex flex-col">
         <ServiceWorkerRegistration />
         {children}

@@ -1,54 +1,52 @@
 @import "tailwindcss";
 
-/* Palette nach dem Auftritt von KptnCook: Creme als Seitenfarbe, tiefes Navy
-   als Flaeche, Koralle als einziger Akzent. Die Werte stammen aus dem
-   gerenderten Auftritt von kptncook.com, nicht aus dem Gedaechtnis.
+/* Palette aus app_design.jpg gemessen, nicht geschaetzt: die Inhaltsflaeche
+   dort ist #f5f1ee (56 % aller Pixel im Inhaltsbereich), die Karten und
+   Zutaten-Kreise reines Weiss.
 
-   Die Koralle hat zwei Rollen, und das ist kein Zufall, sondern Lesbarkeit:
+   Der auffaelligste Unterschied zu vorher: **es gibt keine Akzentfarbe mehr.**
+   Im Entwurf traegt die Farbe das Essen — Foto und Zutaten-Kreise — und alles
+   andere ist warmes Off-White, Weiss und Schwarz. Die Schritt-Ziffern stehen
+   in schwarzen Kaesten, und das ist die einzige kraeftige Flaeche im ganzen
+   Screen. Genau das uebernimmt `--brand`: Schwarz statt Koralle.
 
-   - `--brand` #f45e45 ist die helle Koralle fuer FLAECHEN — gefuellte Knoepfe,
-     aktiver Tab, Marken. Darauf steht dunkle Schrift (`--brand-text`, 4,9:1).
-     KptnCook setzt hier weiss, das ergibt nur 3,2:1; in einer App, die
-     einhaendig im Supermarkt und bei schlechtem Licht bedient wird, ist das
-     die falsche Stelle zum Sparen. Dunkle Schrift haelt die Farbe voll
-     gesaettigt UND lesbar — ein tieferes Rot haette sie stumpf gemacht und
-     waere kaum vom alten Terracotta zu unterscheiden gewesen.
-   - `--accent` #c9452c ist dieselbe Farbe als SCHRIFT auf hellem Grund, wo sie
-     dunkler sein muss, um zu tragen (4,8:1 auf Weiss): Loeschen-Knoepfe,
-     Hinweise, Raender. */
+   Die Koralle bleibt als `--accent` und nur noch dort, wo eine Warnung noetig
+   ist — Loeschen, Fehler. Sie als Markenfarbe zu behalten und gleichzeitig den
+   Entwurf zu uebernehmen ginge nicht: zwei kraeftige Farben auf Creme ergeben
+   den unruhigen Auftritt, den der Entwurf gerade vermeidet. */
 :root {
-  --bg: #f6f4e7;
+  --bg: #f5f1ee;
   --surface: #ffffff;
-  --panel: #1e2832;
-  --panel-text: #f6f4e7;
-  --text: #242321;
-  --muted: #5d6b78;
-  --accent: #c9452c;
-  --brand: #f45e45;
-  --brand-text: #242321;
+  --panel: #1b1917;
+  --panel-text: #f5f1ee;
+  --text: #1b1917;
+  --muted: #837b74;
+  --accent: #b5442c;
+  --brand: #1b1917;
+  --brand-text: #ffffff;
   --accent-text: #ffffff;
-  --border: #e4e0cd;
-  --ok: #2f6d4f;
-  --warn: #f28b24;
+  --border: #e7e0d9;
+  --ok: #3f6f52;
+  --warn: #b5762a;
 }
 
 /* Dunkel gedreht statt weggelassen: gekocht wird abends, und im
-   Supermarkt-Halbdunkel blendet eine cremefarbene Flaeche. Das Navy wird zur
-   Flaeche, die Creme zur Schrift. Auf der Koralle steht hier dunkle Schrift —
-   weiss darauf waere im Dunkeln noch schlechter zu lesen. */
+   Supermarkt-Halbdunkel blendet eine cremefarbene Flaeche. Aus dem warmen
+   Off-White wird ein warmes Fast-Schwarz, aus dem Schwarz der Knoepfe wird
+   Creme — die Rollen tauschen, der Kontrast bleibt. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #151c23;
-    --surface: #1e2832;
-    --panel: #0f151b;
-    --panel-text: #f6f4e7;
-    --text: #f1eee2;
-    --muted: #94a3b1;
-    --accent: #f77a63;
-    --brand: #f77a63;
-    --brand-text: #1e2832;
-    --accent-text: #1e2832;
-    --border: #2d3944;
+    --bg: #1a1815;
+    --surface: #23201c;
+    --panel: #0f0e0c;
+    --panel-text: #f2ede7;
+    --text: #f2ede7;
+    --muted: #a29a92;
+    --accent: #e8735a;
+    --brand: #f2ede7;
+    --brand-text: #1a1815;
+    --accent-text: #1a1815;
+    --border: #332e29;
     --ok: #7dc39c;
     --warn: #e0b45f;
   }
@@ -68,7 +66,8 @@
   --color-border: var(--border);
   --color-ok: var(--ok);
   --color-warn: var(--warn);
-  --font-display: var(--font-slab), Georgia, "Times New Roman", serif;
+  --font-display: var(--font-serif), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --radius-pill: 999px;
   --radius-card: 20px;
 }
@@ -81,7 +80,7 @@ html {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
 /* Safe-Area-Helfer für den Standalone-Modus (Notch oben, Home-Indikator unten).

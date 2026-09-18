@@ -1,0 +1,3 @@
+# Rohbilder: ~350 PNGs, ca. 100 MB. Werden lokal erzeugt (generate.py) und
+# zu kleinen WebPs unter public/ verarbeitet — nur die gehoeren ins Repo.
+raw/

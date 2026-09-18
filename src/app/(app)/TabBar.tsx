@@ -18,12 +18,61 @@ import { startTransition, useOptimistic } from "react";
  * — das Layout dimmt darüber nur den Inhalt und tauscht ihn nicht gegen ein
  * Skelett aus. Ein Tab-Wechsel, bei dem der halbe Bildschirm verschwindet,
  * fühlt sich langsamer an als einer, bei dem der alte Inhalt kurz blass wird.
+ *
+ * Nur noch zwei Einträge: Konto und Haushalt sind in die Einstellungen
+ * gewandert. Tabs sind für Orte, an denen gearbeitet wird — nicht für
+ * Konfiguration, die man dreimal im Jahr anfasst.
  */
+
+/**
+ * Die Symbole.
+ *
+ * Bewusst inline und nicht aus einer Bibliothek: es sind zwei Stück, und ein
+ * Paket dafür wären ein paar hundert Kilobyte für zwei Pfade. Einfarbig über
+ * `currentColor`, damit der aktive Zustand allein über die Textfarbe läuft und
+ * das Symbol nie gegen sein Label verrutscht.
+ *
+ * 24er-Raster wie bei iOS-Symbolen, damit beide optisch gleich schwer wirken.
+ */
+function BasketIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden>
+      <path
+        fill="currentColor"
+        d="M4.6 8.4h14.8l.85 11.6a1.6 1.6 0 0 1-1.6 1.7H5.35a1.6 1.6 0 0 1-1.6-1.7L4.6 8.4Z"
+      />
+      {/* Der Henkel als Kontur — als Fläche wäre der Beutel ein Klumpen. */}
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        d="M8.6 8.9V6.6a3.4 3.4 0 0 1 6.8 0v2.3"
+      />
+    </svg>
+  );
+}
+
+function BookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden>
+      {/* Zwei Hälften mit Spalt dazwischen: als ein Pfad wäre es ein Rechteck
+          und kein aufgeschlagenes Buch. */}
+      <path
+        fill="currentColor"
+        d="M11.2 6.9C9.7 5.7 7.9 5.1 5.9 5.1H3.6a.85.85 0 0 0-.85.85v11.5c0 .47.38.85.85.85h2.3c2 0 3.8.6 5.3 1.8V6.9Z"
+      />
+      <path
+        fill="currentColor"
+        d="M12.8 6.9c1.5-1.2 3.3-1.8 5.3-1.8h2.3c.47 0 .85.38.85.85v11.5a.85.85 0 0 1-.85.85h-2.3c-2 0-3.8.6-5.3 1.8V6.9Z"
+      />
+    </svg>
+  );
+}
+
 const TABS = [
-  { href: "/liste", label: "Liste" },
-  { href: "/rezepte", label: "Rezepte" },
-  { href: "/haushalt", label: "Haushalt" },
-  { href: "/konto", label: "Konto" },
+  { href: "/liste", label: "Einkauf", Icon: BasketIcon },
+  { href: "/rezepte", label: "Rezepte", Icon: BookIcon },
 ] as const;
 
 type TabHref = (typeof TABS)[number]["href"];
@@ -53,22 +102,15 @@ function Frame({
                 aria-current={current ? "page" : undefined}
                 onClick={() => onSelect?.(tab.href)}
                 className={
-                  "flex min-h-14 flex-col items-center justify-center gap-1 " +
-                  "text-[11px] font-medium press-flat tap-target " +
+                  "flex min-h-14 flex-col items-center justify-center gap-0.5 " +
+                  "pt-1.5 pb-1 text-[11px] font-medium press-flat tap-target " +
+                  // Aktiv trägt allein die Farbe: Symbol und Wort werden
+                  // zusammen dunkel. Vorher lag darunter ein farbiger Punkt —
+                  // mit Symbolen wäre das ein drittes Element in 11 px Höhe.
                   (current ? "text-text" : "text-muted")
                 }
               >
-                {/* Der aktive Tab bekommt die helle Koralle als Punkt statt
-                    eingefärbter Schrift. Ein farbiges Wort in 11 px ist auf
-                    Creme schlechter zu lesen als ein schwarzes — die Marke
-                    trägt hier die Form, nicht die Schriftfarbe. */}
-                <span
-                  aria-hidden
-                  className={
-                    "h-1.5 w-1.5 rounded-pill transition-colors " +
-                    (current ? "bg-brand" : "bg-transparent")
-                  }
-                />
+                <tab.Icon />
                 {tab.label}
               </Link>
             </li>
