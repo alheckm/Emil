@@ -23,7 +23,7 @@ export default function PrivacyPage() {
       lead="Was Emil speichert, wo es liegt und wie du es wieder loswirst."
     >
       <Card>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Verantwortlich
         </h2>
         <p className="mt-2 text-[15px] leading-relaxed">
@@ -33,7 +33,7 @@ export default function PrivacyPage() {
       </Card>
 
       <Card>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Welche Daten gespeichert werden
         </h2>
         <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[15px] leading-relaxed">
@@ -64,7 +64,7 @@ export default function PrivacyPage() {
       </Card>
 
       <Card>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Wo die Daten liegen
         </h2>
         <p className="mt-2 text-[15px] leading-relaxed">
@@ -80,7 +80,7 @@ export default function PrivacyPage() {
       </Card>
 
       <Card>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Löschen
         </h2>
         <p className="mt-2 text-[15px] leading-relaxed">

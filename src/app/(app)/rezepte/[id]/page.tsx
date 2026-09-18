@@ -5,21 +5,20 @@ import { getListState } from "@/lib/server/listState";
 import { getRecipe, type Recipe } from "@/lib/data/recipes";
 import { getRecipeImageUrl } from "@/lib/data/recipeImages";
 import { Card, Notice, Screen, ScreenHeader } from "@/components/ui";
-import {
-  HeaderSkeleton,
-  ImageSkeleton,
-  RecipeBodySkeleton,
-} from "@/components/skeletons";
-import { RecipeActions } from "./RecipeActions";
+import { RecipeCardSkeleton } from "@/components/skeletons";
+import { DeleteRecipe, IngredientsSection } from "./RecipeActions";
+import { RecipeHero } from "./RecipeHero";
 
 /**
- * Das Rezept — vorher die langsamste Seite der App.
+ * Das Rezept — eine einzige Karte, wie in app_design.jpg.
  *
- * Hier lagen sieben Netzrunden hintereinander, bevor überhaupt etwas zu sehen
- * war: zweimal Sitzung prüfen, Haushalt, Rezept, aktive Liste, geplante
- * Portionen, signierte Bildadresse. Jede wartete auf die vorige.
+ * Der Aufbau ist der des Entwurfs und nicht der einer Formularseite: oben das
+ * Foto über die ganze Breite, der Titel als weiße Serife darauf, darunter im
+ * warmen Off-White die Zutaten und die Zubereitung. Es gibt keine Kopfzeile
+ * mehr über dem Bild und keine Karten-Stapelung — alles sitzt in **einer**
+ * Fläche, und die schwebt auf grauem Canvas.
  *
- * Aufgeteilt ist das jetzt so:
+ * An der Aufteilung fürs Streaming ändert das nichts:
  *
  * - **Rahmen** (`Screen`) ist statisch und steht sofort.
  * - **Rezept** hängt an der Adresse (`params.id`), und URL-Daten kommen nicht
@@ -27,22 +26,15 @@ import { RecipeActions } from "./RecipeActions";
  *   dieselben Maße hat, statt hinter einer eingefrorenen Seite. Die Verweise
  *   von der Übersicht tragen `prefetch`, damit es meist schon da ist.
  * - **Bild** bekommt eine eigene Grenze. Die signierte Adresse ist eine
- *   weitere Runde zum Storage, und das darf den Text nie aufhalten.
+ *   weitere Runde zum Storage, und das darf den Titel nie aufhalten — der
+ *   steht auf dem dunklen Bett, das ohne das Foto genauso aussieht.
  * - **Listenstand** kommt aus `getListState()` und liegt damit schon im
  *   Zwischenspeicher, bevor geklickt wurde.
  */
 export default function RecipePage(props: PageProps<"/rezepte/[id]">) {
   return (
     <Screen>
-      <Suspense
-        fallback={
-          <>
-            <HeaderSkeleton />
-            <ImageSkeleton />
-            <RecipeBodySkeleton />
-          </>
-        }
-      >
+      <Suspense fallback={<RecipeCardSkeleton />}>
         <RecipeDetail params={props.params} />
       </Suspense>
     </Screen>
@@ -81,80 +73,124 @@ async function RecipeDetail({ params }: { params: Params }) {
 
   return (
     <>
-      <ScreenHeader
-        title={value.title}
-        lead={value.totalTimeMin ? `${value.totalTimeMin} Minuten` : undefined}
-      />
-
-      {value.imagePath && (
-        <Suspense fallback={<ImageSkeleton />}>
-          <RecipeImage imagePath={value.imagePath} />
-        </Suspense>
-      )}
-
-      <ListAwareActions recipe={value} />
-
-      {value.instructions.length > 0 && (
-        <Card>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-            Zubereitung
-          </h2>
-          <ol className="mt-3 space-y-3 text-[15px] leading-relaxed">
-            {value.instructions.map((step, index) => (
-              <li key={index} className="flex gap-3">
-                <span className="shrink-0 text-muted">{index + 1}.</span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
-        </Card>
-      )}
-
-      {value.notes && (
-        <Card>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-            Notizen
-          </h2>
-          <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed">
-            {value.notes}
-          </p>
-        </Card>
-      )}
-
-      {(value.tags.length > 0 || value.sourceUrl) && (
-        <div className="space-y-3 text-[13px] text-muted">
-          {value.tags.length > 0 && <p>{value.tags.join(" · ")}</p>}
-          {value.sourceUrl && (
-            <p className="truncate">
-              <a
-                href={value.sourceUrl}
-                className="underline underline-offset-4"
-                rel="noreferrer noopener"
-                target="_blank"
-              >
-                Quelle
-              </a>
-            </p>
+      <Card bleed>
+        <RecipeHero title={value.title} recipeId={value.id}>
+          {value.imagePath && (
+            <Suspense fallback={null}>
+              <RecipeImage imagePath={value.imagePath} />
+            </Suspense>
           )}
-        </div>
-      )}
+        </RecipeHero>
+
+        <ListAwareIngredients recipe={value} />
+
+        {value.instructions.length > 0 && (
+          <RecipeSteps steps={value.instructions} />
+        )}
+
+        {value.notes && (
+          <section className="px-5 pb-6">
+            <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
+              Notizen
+            </h2>
+            <p className="mt-3 whitespace-pre-line text-[15px] leading-[1.55]">
+              {value.notes}
+            </p>
+          </section>
+        )}
+
+        {(value.tags.length > 0 || value.sourceUrl || value.totalTimeMin) && (
+          <div className="space-y-1 px-5 pb-6 text-[13px] text-muted">
+            {/* Kochzeit und Schlagwörter in einer Zeile: beides ist Beiwerk,
+                beides wird selten gelesen, und beides gehört auf die warme
+                Fläche und nicht auf das Foto. */}
+            {(value.totalTimeMin || value.tags.length > 0) && (
+              <p>
+                {[
+                  value.totalTimeMin ? `${value.totalTimeMin} Minuten` : null,
+                  ...value.tags,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            )}
+            {value.sourceUrl && (
+              <p className="truncate">
+                <a
+                  href={value.sourceUrl}
+                  className="underline underline-offset-4"
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >
+                  Quelle
+                </a>
+              </p>
+            )}
+          </div>
+        )}
+      </Card>
+
+      <ListAwareDelete recipeId={value.id} />
     </>
   );
 }
 
-async function ListAwareActions({ recipe }: { recipe: Recipe }) {
+/**
+ * Die Zubereitung.
+ *
+ * Die Ziffer steht in einem kleinen schwarzen Quadrat — im Entwurf die einzige
+ * kräftige Fläche des ganzen Screens, und der Grund, warum die Schritte sich
+ * lesen wie ein Kochbuch und nicht wie eine Aufzählung. Kursive Serife darin,
+ * wie im JPEG; `aria-hidden`, weil eine geordnete Liste die Nummer ohnehin
+ * ansagt und sie sonst doppelt käme.
+ */
+function RecipeSteps({ steps }: { steps: string[] }) {
+  return (
+    <section className="px-5 pb-6">
+      <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
+        Zubereitung
+      </h2>
+      <ol className="mt-4 space-y-4">
+        {steps.map((step, index) => (
+          <li key={index} className="flex gap-4">
+            <span
+              aria-hidden
+              className="flex size-6 shrink-0 items-center justify-center rounded-[6px] bg-panel font-display text-[13px] italic text-panel-text"
+            >
+              {index + 1}
+            </span>
+            <span className="min-w-0 text-[15px] leading-[1.55]">{step}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+async function ListAwareIngredients({ recipe }: { recipe: Recipe }) {
   const list = await getListState();
 
   return (
     <>
-      {list.error && <Notice tone="error">{list.error}</Notice>}
-      <RecipeActions
+      {list.error && (
+        <div className="px-5 pt-5">
+          <Notice tone="error">{list.error}</Notice>
+        </div>
+      )}
+      <IngredientsSection
         listId={list.listId}
         recipe={recipe}
         plannedServings={list.planned[recipe.id] ?? null}
       />
     </>
   );
+}
+
+async function ListAwareDelete({ recipeId }: { recipeId: string }) {
+  // Zweiter Aufruf, aber keine zweite Netzrunde: `getListState()` ist für die
+  // Dauer des Requests zwischengespeichert.
+  const list = await getListState();
+  return <DeleteRecipe listId={list.listId} recipeId={recipeId} />;
 }
 
 async function RecipeImage({ imagePath }: { imagePath: string }) {
@@ -168,12 +204,14 @@ async function RecipeImage({ imagePath }: { imagePath: string }) {
 
   return (
     /* Kein next/image: die Adresse ist signiert und läuft nach einer Stunde
-       ab — der Optimierer würde daraus nur wechselnde Cache-Einträge machen. */
+       ab — der Optimierer würde daraus nur wechselnde Cache-Einträge machen.
+       Absolut über dem Bett im Hero: so ist der Platz von Anfang an reserviert
+       und der Titel steht schon, während das Foto noch unterwegs ist. */
     /* eslint-disable-next-line @next/next/no-img-element */
     <img
       src={imageUrl}
       alt=""
-      className="aspect-[4/3] w-full rounded-card border border-border object-cover"
+      className="absolute inset-0 h-full w-full object-cover"
     />
   );
 }

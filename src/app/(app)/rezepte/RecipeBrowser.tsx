@@ -116,7 +116,7 @@ export function RecipeBrowser({
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder="Titel oder Zutat …"
-          className="min-h-12 w-full rounded-pill border border-border bg-surface px-5 text-base outline-none focus:border-brand"
+          className="min-h-12 w-full rounded-pill bg-surface px-5 text-base shadow-card outline-none placeholder:text-muted/70"
         />
 
         {tags.length > 0 && (
@@ -130,10 +130,10 @@ export function RecipeBrowser({
                   onClick={() => toggleTag(tag)}
                   aria-pressed={active}
                   className={
-                    "min-h-9 rounded-pill border px-4 text-[14px] press tap-target " +
+                    "min-h-11 rounded-pill px-4 text-[13px] press tap-target " +
                     (active
-                      ? "border-brand bg-brand text-brand-text"
-                      : "border-border bg-surface text-muted")
+                      ? "bg-brand text-brand-text"
+                      : "bg-surface text-muted shadow-card")
                   }
                 >
                   {tag}
@@ -150,14 +150,18 @@ export function RecipeBrowser({
       <div className="dims-when-pending">
         {visible.length === 0 ? (
           <Card>
-            <p className="text-[15px] leading-relaxed text-muted">
+            <p className="text-[15px] leading-[1.55] text-muted">
               {currentQuery || activeTag
                 ? "Nichts gefunden. Gesucht wird in Titeln und Zutaten — vielleicht heißt die Zutat im Rezept anders."
                 : "Noch kein Rezept. Am schnellsten geht es über „Importieren“: die Adresse einer Rezeptseite einfügen, oder ein Kochbuch-Foto in claude.ai digitalisieren und das Ergebnis hier einsetzen."}
             </p>
           </Card>
         ) : (
-          <ul className="space-y-3">
+          /* Karten statt Zeilen — so steht es im Entwurf, und es ist auch der
+             ehrlichere Auftritt: was ein Rezept ausmacht, sieht man am Essen,
+             nicht an seinem Namen. Eine Spalte, 24 px Abstand; die Inhalts-
+             breite bleibt `max-w-md` (Design-System, Abschnitt 6). */
+          <ul className="space-y-6">
             {visible.map((recipe) => {
               const servings = planned[recipe.id];
               const image = recipe.imagePath
@@ -172,49 +176,55 @@ export function RecipeBrowser({
                   <Link
                     href={`/rezepte/${recipe.id}`}
                     prefetch
-                    className="flex items-center gap-4 rounded-card border border-border bg-surface p-3 press tap-target"
+                    className="block overflow-hidden rounded-card bg-surface shadow-card press tap-target"
                   >
-                    {/* Foto zuerst — das ist der Kern des Auftritts. Wo keins
-                        ist, steht eine ruhige Fläche mit dem Anfangsbuchstaben
-                        statt eines leeren Kastens: die Zeilen bleiben so alle
-                        gleich hoch, und die Liste franst nicht aus. */}
-                    {image ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
-                        src={image}
-                        alt=""
-                        loading="lazy"
-                        className="h-16 w-16 shrink-0 rounded-2xl object-cover"
-                      />
-                    ) : (
-                      <span
+                    {/* Dieselbe Form wie die Rezeptkarte selbst: 9:10, Foto
+                        über die ganze Fläche, Titel als weiße Serife darauf.
+                        Fehlt das Foto, bleibt das dunkle Bett stehen — die
+                        Reihe franst so nicht aus, und der Titel ist in beiden
+                        Fällen gleich gut zu lesen. */}
+                    <div className="relative aspect-[9/10] w-full bg-photo">
+                      {image && (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={image}
+                          alt=""
+                          loading="lazy"
+                          className="absolute inset-0 h-full w-full object-cover"
+                        />
+                      )}
+                      <div
                         aria-hidden
-                        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-panel font-display text-xl text-panel-text"
-                      >
-                        {recipe.title.slice(0, 1).toUpperCase()}
-                      </span>
-                    )}
+                        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-scrim via-scrim/45 to-transparent"
+                      />
 
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate font-medium">
-                        {recipe.title}
-                      </span>
-                      <span className="mt-1 block text-[13px] text-muted">
-                        {recipe.baseServings} {recipe.servingsLabel}
-                        {recipe.totalTimeMin
-                          ? ` · ${recipe.totalTimeMin} min`
-                          : ""}
-                      </span>
                       {servings ? (
-                        <span className="mt-2 inline-block rounded-pill bg-brand px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-brand-text">
+                        /* Dieselbe Milchglasfläche wie die Knöpfe auf dem
+                           Rezeptfoto, damit auf dem Foto nur eine Sprache
+                           gesprochen wird. */
+                        <span className="absolute left-4 top-4 rounded-pill bg-white/70 px-3 py-1 text-[13px] font-medium text-text backdrop-blur-[8px]">
                           Auf der Liste · {servings}
                         </span>
                       ) : null}
-                    </span>
 
-                    <span aria-hidden className="shrink-0 text-brand">
-                      ›
-                    </span>
+                      <div className="absolute inset-x-0 bottom-0 px-5 pb-5">
+                        <h2 className="font-display text-[32px] font-normal leading-[1.15] text-white [text-wrap:balance]">
+                          {recipe.title}
+                        </h2>
+                      </div>
+                    </div>
+
+                    {/* Portionen und Zeit stehen unter dem Foto auf der warmen
+                        Fläche, nicht darauf: 13 px Weiß kommt auch mit
+                        Schleier nicht über 4,5:1, und die Karte bekommt so
+                        denselben Aufbau wie die Rezeptseite — Foto oben,
+                        Inhalt darunter. */}
+                    <p className="px-5 py-4 text-[13px] text-muted">
+                      {recipe.baseServings} {recipe.servingsLabel}
+                      {recipe.totalTimeMin
+                        ? ` · ${recipe.totalTimeMin} min`
+                        : ""}
+                    </p>
                   </Link>
                 </li>
               );

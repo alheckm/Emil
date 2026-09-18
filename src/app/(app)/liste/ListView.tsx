@@ -350,7 +350,7 @@ export function ListView({
       )}
 
       <Card>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Etwas ergänzen
         </h2>
         <div className="mt-3 flex gap-2">
@@ -360,7 +360,7 @@ export function ListView({
             onChange={(event) => setName(event.target.value)}
             placeholder="Zahnpasta"
             autoCapitalize="sentences"
-            className="h-12 min-w-0 flex-1 rounded-2xl border border-border bg-bg px-3 text-base outline-none focus:border-accent"
+            className="h-12 min-w-0 flex-1 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
           />
           <input
             aria-label="Menge"
@@ -368,13 +368,13 @@ export function ListView({
             onChange={(event) => setAmount(event.target.value)}
             placeholder="Menge"
             inputMode="decimal"
-            className="h-12 w-20 shrink-0 rounded-2xl border border-border bg-bg px-3 text-base outline-none focus:border-accent"
+            className="h-12 w-20 shrink-0 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
           />
           <select
             aria-label="Einheit"
             value={unitCode}
             onChange={(event) => setUnitCode(event.target.value)}
-            className="h-12 w-24 shrink-0 appearance-none rounded-2xl border border-border bg-bg px-2 text-base outline-none focus:border-accent"
+            className="h-12 w-24 shrink-0 appearance-none rounded-soft border border-border bg-soft px-2 text-base outline-none focus:border-text"
           >
             <option value="">ohne</option>
             {UNITS.map((unit) => (
@@ -402,7 +402,7 @@ export function ListView({
           </p>
         </Card>
       ) : (
-        <p className="text-[13px] text-muted">
+        <p className="text-[13px]">
           {openCount + adding.length === 0
             ? "Alles abgehakt."
             : `Noch ${openCount + adding.length} von ${
@@ -419,7 +419,7 @@ export function ListView({
           <ul className="grid grid-cols-3 gap-x-3 gap-y-5">
             {adding.map((item) => (
               <li key={item.id} className="flex flex-col items-center gap-2 opacity-50">
-                <span className="aspect-square w-full rounded-pill bg-surface" />
+                <span className="aspect-square w-full rounded-pill bg-chip" />
                 <span className="w-full text-center text-[13px] font-medium leading-tight">
                   {item.label}
                 </span>
@@ -466,7 +466,7 @@ export function ListView({
                         <span
                           className={
                             "flex h-full w-full items-center justify-center " +
-                            "overflow-hidden rounded-pill bg-surface " +
+                            "overflow-hidden rounded-pill bg-chip " +
                             // Abgehakt wird das Bild blass, das Häkchen
                             // darüber bleibt kräftig — sonst verschwindet
                             // genau die Rückmeldung mit, auf die man wartet.
@@ -501,7 +501,7 @@ export function ListView({
                           <span className="absolute inset-0 flex items-center justify-center">
                             <span
                               aria-hidden
-                              className="flex h-9 w-9 items-center justify-center rounded-pill bg-text text-[17px] text-bg"
+                              className="flex h-9 w-9 items-center justify-center rounded-pill bg-panel text-[17px] text-panel-text"
                             >
                               ✓
                             </span>
@@ -519,7 +519,7 @@ export function ListView({
                           {entry.name}
                         </span>
                         {menge && (
-                          <span className="mt-0.5 block text-[12px] leading-tight text-muted">
+                          <span className="mt-0.5 block text-[13px] leading-tight">
                             {menge}
                           </span>
                         )}
@@ -533,7 +533,7 @@ export function ListView({
                       onClick={() => setOpen(isOpen ? null : entry.id)}
                       className={
                         "absolute right-0 top-0 flex h-8 w-8 items-center justify-center " +
-                        "rounded-pill border border-border bg-surface text-[15px] leading-none press-flat " +
+                        "rounded-pill bg-surface text-[15px] leading-none shadow-card press-flat " +
                         (isOpen ? "text-text" : "text-muted")
                       }
                     >
@@ -545,7 +545,7 @@ export function ListView({
             </ul>
 
             {openEntry && (
-              <div className="space-y-3 rounded-card border border-border bg-surface p-4">
+              <div className="space-y-3 rounded-card bg-surface p-4 shadow-card">
                 <p className="text-[15px] font-medium">{openEntry.name}</p>
 
                 {openEntry.note && (
@@ -589,7 +589,7 @@ export function ListView({
                           );
                         })
                       }
-                      className="mt-1 h-11 w-full appearance-none rounded-2xl border border-border bg-bg px-3 text-base outline-none focus:border-accent"
+                      className="mt-1 h-11 w-full appearance-none rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
                     >
                       {categories.map((category) => (
                         <option key={category.id} value={category.id}>

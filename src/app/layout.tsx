@@ -13,14 +13,19 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
  * - **Playfair Display** für Überschriften — eine Serife mit starkem
  *   Strichkontrast. Vorher stand hier Roboto Slab; eine Slab-Serife hat
  *   gleichmäßige Striche und wirkt technisch, der Entwurf will das Elegante.
+ *   Drei Schnitte statt zwei: der Rezepttitel auf dem Foto steht im Entwurf im
+ *   **regulären** Schnitt, nicht im fetten — bei dieser Schriftgröße trägt der
+ *   Strichkontrast allein, und 600 wirkte daneben plump. Die kleinen
+ *   Abschnittsüberschriften („Zutaten", „Zubereitung") brauchen umgekehrt 600,
+ *   sonst verschwinden sie.
  * - **Poppins** für alles andere. Das ist der Bruch mit der bisherigen Regel,
  *   die Systemschrift zu nehmen — die kostet null Bytes und ist auf dem iPhone
  *   hervorragend. Poppins kostet zwei Schnitte, aber die geometrischen,
  *   kreisrunden Buchstaben sind im Entwurf deutlich zu erkennen, und mit
  *   San Francisco sieht der Screen schlicht anders aus als das JPEG.
  *
- * Nur die wirklich benutzten Schnitte: zwei je Familie. Jeder weitere ist eine
- * Datei, die im Supermarkt über Mobilfunk geladen werden will.
+ * Nur die wirklich benutzten Schnitte. Jeder weitere ist eine Datei, die im
+ * Supermarkt über Mobilfunk geladen werden will.
  *
  * `next/font` lädt zur Bauzeit herunter und liefert von der eigenen Domain —
  * kein Aufruf zu Google zur Laufzeit, und datenschutzseitig die einzige
@@ -28,7 +33,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
  */
 const serif = Playfair_Display({
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["400", "600", "700"],
   style: ["normal", "italic"],
   display: "swap",
   variable: "--font-serif",
@@ -64,8 +69,9 @@ export const viewport: Viewport = {
   // die *-safe-Utilities Abstand. Zoom bleibt bewusst erlaubt.
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f1ee" },
-    { media: "(prefers-color-scheme: dark)", color: "#1a1815" },
+    // Der Ton der Fläche ganz oben am Bildschirm, also der Canvas.
+    { media: "(prefers-color-scheme: light)", color: "#d7d5d6" },
+    { media: "(prefers-color-scheme: dark)", color: "#121110" },
   ],
 };
 

@@ -1,60 +1,97 @@
 @import "tailwindcss";
 
-/* Palette aus app_design.jpg gemessen, nicht geschaetzt: die Inhaltsflaeche
-   dort ist #f5f1ee (56 % aller Pixel im Inhaltsbereich), die Karten und
-   Zutaten-Kreise reines Weiss.
+/* ---------------------------------------------------------------------------
+   Die Farben stammen aus app_design.jpg — gemessen, nicht geschaetzt.
 
-   Der auffaelligste Unterschied zu vorher: **es gibt keine Akzentfarbe mehr.**
-   Im Entwurf traegt die Farbe das Essen — Foto und Zutaten-Kreise — und alles
-   andere ist warmes Off-White, Weiss und Schwarz. Die Schritt-Ziffern stehen
-   in schwarzen Kaesten, und das ist die einzige kraeftige Flaeche im ganzen
-   Screen. Genau das uebernimmt `--brand`: Schwarz statt Koralle.
+   Der Entwurf arbeitet mit **zwei** Flaechen, nicht mit einer: die Rezeptkarte
+   ist warmes Off-White (#f5f1ee, 56 % aller Pixel im Inhaltsbereich) und liegt
+   auf einem neutral-grauen Canvas (#d7d5d6, exakt der Ton links und rechts der
+   Handys). Vorher war das Cremeweiss der Seitenhintergrund und die Karten
+   waren weiss — also genau andersherum. Der Unterschied ist der ganze
+   Auftritt: so schwebt die Karte, vorher lag sie flach auf.
 
-   Die Koralle bleibt als `--accent` und nur noch dort, wo eine Warnung noetig
-   ist — Loeschen, Fehler. Sie als Markenfarbe zu behalten und gleichzeitig den
+   Reines Weiss bleibt einer einzigen Sache vorbehalten: den Kreisen unter den
+   Zutaten. Das ist im Entwurf die hellste Flaeche ueberhaupt, und sie traegt
+   die freigestellten Zutatenfotos — die haben selbst weissen Grund, jeder
+   andere Ton gaebe einen sichtbaren Ring.
+
+   **Es gibt keine Akzentfarbe.** Im Entwurf traegt die Farbe das Essen; alles
+   andere ist Grau, Off-White, Weiss und Schwarz. Die Schritt-Ziffern stehen in
+   schwarzen Kaesten (#000 im JPEG), und das ist die einzige kraeftige Flaeche
+   im ganzen Screen. Genau das ist `--brand`.
+
+   Die Koralle bleibt als `--accent` und nur noch dort, wo gewarnt wird —
+   Loeschen, Fehler. Sie als Markenfarbe zu behalten und gleichzeitig den
    Entwurf zu uebernehmen ginge nicht: zwei kraeftige Farben auf Creme ergeben
-   den unruhigen Auftritt, den der Entwurf gerade vermeidet. */
+   den unruhigen Auftritt, den der Entwurf gerade vermeidet.
+--------------------------------------------------------------------------- */
 :root {
-  --bg: #f5f1ee;
-  --surface: #ffffff;
-  --panel: #1b1917;
-  --panel-text: #f5f1ee;
-  --text: #1b1917;
-  --muted: #837b74;
+  --bg: #d7d5d6;
+  --surface: #f5f1ee;
+  --chip: #ffffff;
+  --soft: #ece7e3;
+  --panel: #080808;
+  --panel-text: #ffffff;
+  --text: #242321;
+  --muted: #756d66;
   --accent: #b5442c;
-  --brand: #1b1917;
+  --brand: #080808;
   --brand-text: #ffffff;
   --accent-text: #ffffff;
-  --border: #e7e0d9;
+  --border: #d8d1cc;
   --ok: #3f6f52;
   --warn: #b5762a;
+  --scrim: rgba(12, 10, 9, 0.72);
+  /* Das Bett, auf dem das Rezeptfoto liegt. Es steht schon, bevor die
+     signierte Bildadresse da ist, und bleibt sichtbar, wenn ein Rezept gar
+     kein Foto hat — der weisse Titel darauf ist in beiden Faellen lesbar, und
+     nichts springt, wenn das Foto nachkommt. Deshalb in beiden Modi derselbe
+     Ton: er ist kein Hintergrund, sondern Teil des Fotos. */
+  --photo: #2b2622;
+  /* Kleine runde Bedienflaechen — die Kreise im Portionswaehler. Im Entwurf
+     sind sie weiss auf dem gedaempften Off-White. Im Dunkeln kann das nicht
+     weiss bleiben: das Symbol darin ist cremefarben und waere schlicht weg.
+     Deshalb ein eigener Token statt `--chip`, der wegen der freigestellten
+     Fotos in beiden Modi weiss bleiben muss. */
+  --control: #ffffff;
 }
 
 /* Dunkel gedreht statt weggelassen: gekocht wird abends, und im
-   Supermarkt-Halbdunkel blendet eine cremefarbene Flaeche. Aus dem warmen
-   Off-White wird ein warmes Fast-Schwarz, aus dem Schwarz der Knoepfe wird
-   Creme — die Rollen tauschen, der Kontrast bleibt. */
+   Supermarkt-Halbdunkel blendet eine cremefarbene Flaeche. Die Rollen tauschen,
+   der Kontrast bleibt — aus dem Canvas wird ein kuehles Fast-Schwarz, aus der
+   Karte ein warmes Dunkelbraun, und der schwarze Ziffernkasten wird cremefarben
+   mit dunkler Ziffer. Ein schwarzes Quadrat auf dunkler Karte waere sonst
+   schlicht nicht mehr da.
+
+   `--chip` bleibt weiss: darin liegen freigestellte Fotos auf weissem Grund. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1a1815;
-    --surface: #23201c;
-    --panel: #0f0e0c;
-    --panel-text: #f2ede7;
+    --bg: #121110;
+    --surface: #1f1c19;
+    --chip: #ffffff;
+    --soft: #2a2622;
+    --panel: #f2ede7;
+    --panel-text: #17150f;
     --text: #f2ede7;
     --muted: #a29a92;
     --accent: #e8735a;
     --brand: #f2ede7;
-    --brand-text: #1a1815;
-    --accent-text: #1a1815;
+    --brand-text: #17150f;
+    --accent-text: #17150f;
     --border: #332e29;
     --ok: #7dc39c;
     --warn: #e0b45f;
+    --scrim: rgba(0, 0, 0, 0.72);
+    --photo: #2b2622;
+    --control: #3b352f;
   }
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-chip: var(--chip);
+  --color-soft: var(--soft);
   --color-panel: var(--panel);
   --color-panel-text: var(--panel-text);
   --color-text: var(--text);
@@ -66,10 +103,21 @@
   --color-border: var(--border);
   --color-ok: var(--ok);
   --color-warn: var(--warn);
+  --color-photo: var(--photo);
+  --color-control: var(--control);
+  --color-scrim: var(--scrim);
   --font-display: var(--font-serif), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --radius-pill: 999px;
-  --radius-card: 20px;
+  /* Im Entwurf gemessen: die Karte ist deutlich, aber nicht uebertrieben
+     gerundet. Kleinere Flaechen — Knoepfe, Felder — bekommen `radius-soft`,
+     sonst wirkt ein 28er Radius an einem 34 px hohen Knopf wie eine Pille. */
+  --radius-card: 28px;
+  --radius-soft: 11px;
+  /* Kein harter Drop Shadow. Die Karte soll sich vom Canvas loesen, nicht
+     darueber schweben. */
+  --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.06);
+  --shadow-float: 0 2px 10px rgba(0, 0, 0, 0.12);
 }
 
 html {
@@ -203,6 +251,74 @@ select,
 
 @media (prefers-reduced-motion: reduce) {
   .placeholder-box {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Zutatenreihe: waagerecht scrollbar, ohne sichtbaren Balken.
+
+   Im Entwurf stehen vier Kreise nebeneinander und der vierte ist angeschnitten
+   — das ist kein Zufall, sondern die Einladung zu wischen. Ein Rezept mit
+   fuenfzehn Zutaten darf die Karte trotzdem nicht sprengen. `scroll-snap`
+   sorgt dafuer, dass die Reihe nach dem Wischen nicht zwischen zwei Kreisen
+   stehen bleibt. */
+@utility ingredient-rail {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  & > * {
+    scroll-snap-align: start;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Fokus.
+
+   Der Standard-Ring des Browsers ist ein blaues Rechteck und passt zu nichts
+   hier. Weglassen ist trotzdem keine Option — die Portionswahl und die
+   Einkaufsliste muessen mit der Tastatur bedienbar bleiben, und man muss
+   sehen, wo man ist. Also ein eigener Ring: die Textfarbe selbst, duenn, mit
+   etwas Abstand, damit er auch auf einem Foto steht.
+
+   `:focus-visible` statt `:focus`: beim Antippen mit dem Daumen erscheint er
+   nicht, beim Tabben schon. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+  border-radius: var(--radius-soft);
+}
+
+/* Auf dem Hero-Foto ist die Textfarbe unsichtbar — dort der helle Gegenpart. */
+@utility focus-on-photo {
+  &:focus-visible {
+    outline-color: #ffffff;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Die Zahl im Portionswaehler.
+
+   Beim Wechsel von 2 auf 3 soll die neue Ziffer nicht einfach umspringen,
+   sondern kurz erscheinen. 150 ms, ease-out — mehr wuerde man als Animation
+   wahrnehmen, und genau das soll es nicht sein. */
+@keyframes ziffer-wechsel {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
+}
+
+@utility count-swap {
+  animation: ziffer-wechsel 150ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .count-swap {
     animation: none;
   }
 }

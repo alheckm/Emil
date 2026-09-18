@@ -373,7 +373,7 @@ export function RecipeForm({
       </Card>
 
       <Card>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Zutaten
         </h2>
 
@@ -385,7 +385,7 @@ export function RecipeForm({
                 key={row.key}
                 className={
                   "rounded-card border p-3 " +
-                  (unsure ? "border-warn bg-warn/10" : "border-border bg-bg")
+                  (unsure ? "border-warn bg-warn/10" : "border-border bg-soft")
                 }
               >
                 {row.groupLabel && (
@@ -402,7 +402,7 @@ export function RecipeForm({
                     }
                     placeholder="Zutat"
                     autoCapitalize="sentences"
-                    className="h-11 min-w-0 flex-1 rounded-2xl border border-border bg-surface px-3 text-base outline-none focus:border-accent"
+                    className="h-11 min-w-0 flex-1 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-accent"
                   />
                   <button
                     type="button"
@@ -426,7 +426,7 @@ export function RecipeForm({
                     }
                     placeholder="Menge"
                     inputMode="decimal"
-                    className="h-11 w-24 shrink-0 rounded-2xl border border-border bg-surface px-3 text-base outline-none focus:border-accent"
+                    className="h-11 w-24 shrink-0 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-accent"
                   />
                   <select
                     aria-label="Einheit"
@@ -434,7 +434,7 @@ export function RecipeForm({
                     onChange={(event) =>
                       updateRow(row.key, { unitCode: event.target.value })
                     }
-                    className="h-11 w-28 shrink-0 appearance-none rounded-2xl border border-border bg-surface px-2 text-base outline-none focus:border-accent"
+                    className="h-11 w-28 shrink-0 appearance-none rounded-soft border border-border bg-soft px-2 text-base outline-none focus:border-accent"
                   >
                     <option value="">ohne</option>
                     {UNITS.map((unit) => (
@@ -450,7 +450,7 @@ export function RecipeForm({
                       updateRow(row.key, { note: event.target.value })
                     }
                     placeholder="Notiz"
-                    className="h-11 min-w-0 flex-1 rounded-2xl border border-border bg-surface px-3 text-base outline-none focus:border-accent"
+                    className="h-11 min-w-0 flex-1 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-accent"
                   />
                 </div>
                 {unsure && (

@@ -72,7 +72,7 @@ export function InviteSection({
           {invites.map((invite) => (
             <li
               key={invite.code}
-              className="rounded-xl border border-border bg-bg p-4"
+              className="rounded-soft border border-border bg-soft p-4"
             >
               <p className="font-mono text-2xl tracking-[0.2em]">{invite.code}</p>
               <p className="mt-1 text-[13px] text-muted">

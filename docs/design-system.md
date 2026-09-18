@@ -101,8 +101,23 @@ umgekehrt. Genau daher kommt der Eindruck, dass die Karte schwebt.
 | `--border` | `#d8d1cc` | Haarlinie. Sparsam. |
 | `--accent` | `#b5442c` | **Keine Markenfarbe.** Nur Warnung: Löschen, Fehler. |
 | `--photo` | `#2b2622` | Bett unter dem Rezeptfoto, in beiden Modi gleich. |
-| `--scrim` | `rgba(12,10,9,.34)` | Verlauf unter dem Titel auf dem Foto. |
+| `--scrim` | `rgba(12,10,9,.72)` | Verlauf unter dem Titel auf dem Foto. |
+| `--control` | `#ffffff` | Kleine runde Bedienfläche: die Kreise im Stepper. |
 | `--ok` / `--warn` | `#3f6f52` / `#b5762a` | Statusmeldungen, sonst nichts. |
+
+**Zum Scrim-Wert.** Hier stand `rgba(12,10,9,.34)`, gemessen am Entwurf. Auf
+dem Foto der Referenz geht das auf — es ist mitteldunkles Teal. Ein Rezeptfoto
+in Emil kommt vom Nutzer und kann ein weißer Teller vor weißer Tischdecke sein;
+bei .34 liegt der weiße Titel dann bei 1,45:1 und ist schlicht weg. .72 an der
+Unterkante ergibt gegen Weiß 3,2:1 und damit die AA-Grenze für große Schrift
+(≥ 24 px). Der Verlauf trägt oben weiterhin nichts (`via-scrim/30` bei halber
+Höhe, dann `transparent`), der Eindruck des Entwurfs bleibt also erhalten —
+dunkel wird nur das Band, in dem der Titel steht.
+
+`--control` ist im Dunkeln `#3b352f` und nicht weiß: das Symbol darin ist
+cremefarben und wäre auf Weiß nicht da. `--chip` kann diese Rolle nicht
+mitübernehmen, weil es wegen der freigestellten Fotos in beiden Modi weiß
+bleiben muss.
 
 Reines Weiß ist den Zutatenkreisen vorbehalten. Es ist die hellste Fläche im
 Entwurf und trägt freigestellte Fotos, die selbst weißen Grund haben — jeder
@@ -249,16 +264,51 @@ Rezepttitel, weiß, Display 32/1,15, bis zu zwei Zeilen. Darunter ein
 Scrim-Verlauf von `transparent` nach `--scrim`, sonst ist der Titel auf einem
 hellen Foto weg.
 
+**Auf dem Foto steht nur der Titel.** Die Kochzeit stand hier zwischendurch als
+zweite Zeile darunter; 13 px Weiß kommt auch über dem Scrim nicht auf die
+4,5:1, die kleine Schrift braucht. Sie steht jetzt unten in der Karte bei den
+Schlagwörtern, auf `--surface`. Die Referenz zeigt an dieser Stelle ebenfalls
+nichts außer dem Titel.
+
 Oben links und oben rechts je ein Kreis, 36 px sichtbar / 44 px Trefferfläche:
-`rgba(255,255,255,.72)` mit `backdrop-filter: blur(8px)`, Symbol als dünne
-weiße Kontur. Links zurück (Chevron), rechts Favorit (Herz-Kontur).
-Fokusring auf dem Foto in Weiß (`focus-on-photo`).
+`rgba(255,255,255,.7)` mit `backdrop-filter: blur(8px)`. Das Symbol darin ist
+**dunkel** (`--text`), nicht weiß: der Entwurf zeigt eine weiße Kontur, und auf
+seinem mitteldunklen Foto geht das auf — auf 70 % Weiß über einem hellen
+Rezeptfoto ist Weiß auf Weiß. Die Milchglasfläche des Entwurfs bleibt, der
+Strich darauf dreht sich um. Fokusring auf dem Foto in Weiß
+(`focus-on-photo`).
+
+Links zurück (Chevron), rechts **der Weg zum Bearbeiten** (Stift-Kontur).
+Im Entwurf sitzt dort ein Herz; Emil kennt keine Favoriten, und ein Herz ohne
+Wirkung ist keine Option (Abschnitt 13). Der Platz leer zu lassen war die
+Alternative — dann hätte das Rezept aber gar keinen Weg mehr zum Bearbeiten,
+seit der Knopf dafür aus der Karte verschwunden ist. Der Stift bekommt exakt
+dieselbe Behandlung wie der Chevron, damit oben eine Sprache gesprochen wird.
+Kommen Favoriten, rückt der Stift und das Herz nimmt seinen Platz.
+
+### RecipeBrowserCard
+Die Rezeptübersicht ist ein Stapel derselben Karten, eine Spalte, 24 px
+Abstand — keine Zeilenliste mit Miniaturbild. Was ein Rezept ausmacht, sieht
+man am Essen, nicht an seinem Namen.
+
+Aufbau wie die Rezeptkarte im Kleinen: Foto im selben Verhältnis, derselbe
+Scrim, Titel weiß in Display 32/1,15 darauf, darunter auf `--surface` eine
+Zeile in 13 px mit Portionen und Zeit. Liegt das Rezept auf der Einkaufsliste,
+sitzt oben links dieselbe Milchglasfläche wie die Knöpfe auf dem Rezeptfoto,
+mit dunkler Schrift: „Auf der Liste · 4".
+
+Auf dem Canvas trägt `--border` nicht — der Ton liegt zu dicht am Canvas-Grau.
+Flächen, die dort eine Kante brauchen (die Schlagwort-Chips, „Von Hand"),
+bekommen sie über `--surface` plus `--shadow-card`, nicht über eine Haarlinie.
 
 ### IngredientRail
 Waagerechte Reihe aus Zutatenkreisen unter der Überschrift „Zutaten". Kreis
 72 px, `rounded-pill bg-chip`, darin das freigestellte Foto aus
 `public/zutaten/<slug>.webp` (Zuordnung: `src/lib/core/ingredientImages.ts`),
-darunter der Name in 13 px.
+darunter der Name in 13 px. Deutsche Zutatennamen sind oft ein einziges langes
+Wort — die Beschriftung braucht `hyphens-auto` und zwei Zeilen Deckel, sonst
+steht „Champignons" breiter da als sein Kreis und schiebt sich unter den
+Nachbarn.
 
 Der vierte Kreis ist angeschnitten — das ist keine Panne, sondern die
 Einladung zu wischen. Waagerecht scrollbar ohne sichtbaren Balken, mit
@@ -291,7 +341,12 @@ Plus.
 
 Zustandswechsel ohne Ampelfarbe — `＋ Einkaufsliste` wird zu
 `✓ Auf der Liste`, Hintergrund wechselt auf `--soft`, Schrift auf `--text`,
-150 ms. Kein Grün. Der Zustand kommt sofort (`useOptimistic`) und fällt bei
+150 ms. Kein Grün.
+
+**Ein dritter Zustand**, den der Master-Prompt nicht kennt: steht das Rezept
+mit einer *anderen* Portionszahl auf der Liste, geht der Knopf wieder auf und
+heißt „Liste aktualisieren". Ohne ihn sähe die Liste bestätigt aus, während sie
+andere Mengen enthält als die, die gerade auf dem Schirm stehen. Der Zustand kommt sofort (`useOptimistic`) und fällt bei
 einem Fehler von selbst zurück; kein „Einen Moment …".
 
 Übernommen wird immer die **eingestellte** Portionszahl, nicht die
@@ -339,7 +394,12 @@ wird nach Lucides Regeln, damit sie zusammengehören:
 gefüllte Glyphen, und eine Kontur in 11 px Umgebung wirkt daneben zerbrechlich.
 Die Ausnahme gilt für die Tab-Leiste und sonst nirgends.
 
-Bestand: Chevron links/rechts, Herz, Plus, Minus, Häkchen, Korb, Buch.
+Bestand: `src/components/icons.tsx` — Chevron links, Stift, Plus, Minus,
+Häkchen. Dazu die beiden gefüllten Tab-Glyphen (Korb, Buch) in
+`src/app/(app)/TabBar.tsx` und der Chevron in `RowLink`.
+
+Ein Herz gibt es bewusst noch nicht: es käme mit der Favoriten-Funktion, nicht
+vorher.
 
 ---
 
@@ -403,16 +463,17 @@ dem Daumen nicht erscheint.
 | Paar | Verhältnis | Urteil |
 |---|---|---|
 | `--text` `#242321` auf `--surface` | 13,98 : 1 | gut |
-| `--muted` `#8a827b` auf `--surface` | **3,36 : 1** | **fällt durch** (nötig: 4,5) |
+| `--muted` `#756d66` auf `--surface` | 4,52 : 1 | gut (war `#8a827b` mit 3,36 : 1) |
 | `--muted` dunkel `#a29a92` auf `#1f1c19` | 6,12 : 1 | gut |
 
-`--muted` trägt heute 13-px-Nebentext (Feldbeschriftungen, Mengen,
-Zutatenzeilen) und ist im hellen Modus zu blass. **Festlegung: `--muted` wird
-im hellen Modus auf `#756d66` gezogen** — 4,52 : 1 auf `--surface`, optisch
-kaum dunkler, aber über der Grenze. Der dunkle Modus bleibt.
+`--muted` ist im hellen Modus auf `#756d66` gezogen — 4,52 : 1 auf
+`--surface`, optisch kaum dunkler, aber über der Grenze. Der dunkle Modus
+bleibt.
 
-Bis das umgesetzt ist, gilt: `--muted` nicht für Text verwenden, der gelesen
-werden muss.
+**Achtung, das gilt nur auf `--surface`.** Auf dem Canvas (`#d7d5d6`) kommt
+derselbe Ton nur auf 3,5 : 1. Text auf dem Canvas steht deshalb in `--text` —
+leise wird er dort über Größe und Position, nicht über Blässe. Das betrifft in
+der Praxis genau eine Stelle: „Rezept löschen" unter der Rezeptkarte.
 
 ---
 
@@ -436,21 +497,23 @@ Bewusst und begründet. Alles andere im Prompt gilt unverändert.
 
 Stand 18.09.2026 — Arbeitsliste, keine Beschreibung des Ist-Zustands.
 
-1. **Die Rezeptseite hat noch keinen Hero.** `src/app/(app)/rezepte/[id]/page.tsx`
-   setzt Überschrift und Foto getrennt untereinander; Titel auf dem Foto,
-   Scrim, Zurück- und Favoritenkreis fehlen.
-2. **Keine Zutatenkreise auf der Rezeptseite.** Die Bilder liegen
-   (`public/zutaten/`, 109 Stück), genutzt werden sie bisher nur im Einkauf.
-   Die `IngredientRail` fehlt.
-3. **Der Portionswähler ist noch eine Formularzeile** in eigener Karte mit
-   48-px-Kreisen, statt der Pille neben „Zutaten".
-4. **„Auf die Einkaufsliste" ist ein bildschirmbreiter Pillen-Knopf** statt der
-   leisen Fläche aus Abschnitt 7.
-5. **Schritte sind mit „1." ausgezeichnet**, nicht mit dem Ziffernkasten.
-6. **`--muted` ist zu blass** (Abschnitt 11).
-7. **Es gibt keinen Favoriten** — im Entwurf sitzt oben rechts ein Herz. Die
-   Funktion existiert in Emil nicht. Entweder sie kommt, oder der Platz bleibt
-   leer; ein Herz ohne Wirkung ist keine Option.
+Die Punkte 1 bis 6 der vorigen Fassung sind umgesetzt: Hero mit Titel auf dem
+Foto, Zutatenkreise auf der Rezeptseite, Portionswähler als Pille neben
+„Zutaten", leise Einkaufslisten-Fläche, Ziffernkästen, `--muted` korrigiert.
+Offen bleibt:
+
+1. **Es gibt keine Favoriten.** Im Entwurf sitzt oben rechts ein Herz; in Emil
+   sitzt dort vorläufig der Stift zum Bearbeiten (Abschnitt 7). Kommt die
+   Funktion, braucht sie eine Spalte in `recipes`, einen Weg in
+   `src/lib/data/recipes.ts` und einen Filter in der Übersicht — dann rückt der
+   Stift und das Herz nimmt seinen Platz.
+2. **Die Zutatenfotos decken die Zutaten nur teilweise ab.** 109 Rohbilder
+   liegen in `scripts/ingredient-images/raw/`, die Stammdatenliste kennt aber
+   rund 350 Zutaten; für den Rest steht der Anfangsbuchstabe im Kreis. Eine
+   Reihe aus vier Buchstaben ist deutlich schwächer als eine aus vier Fotos —
+   `scripts/ingredient-images/generate.py` füllt nach.
+3. **`--accent` ist im dunklen Modus ungeprüft.** `#e8735a` auf `#1f1c19`
+   müsste gemessen werden, bevor Fehlermeldungen darauf verlassen werden.
 
 ---
 
@@ -475,7 +538,9 @@ Stand 18.09.2026 — Arbeitsliste, keine Beschreibung des Ist-Zustands.
 - [ ] erneutes Auflegen korrigiert, statt zu verdoppeln
 - [ ] gleiche Zutat wird zusammengeführt, wenn die Einheit passt
 - [ ] alles per Tastatur bedienbar, Fokus sichtbar
-- [ ] dunkler Modus geprüft
+- [ ] dunkler Modus geprüft (Medienabfrage umdrehen, nicht CSS-Variablen von
+      Hand setzen — `body { color }` löst am `:root` auf und folgt einer
+      Inline-Überschreibung nicht)
 - [ ] `prefers-reduced-motion` geprüft
 
 **Qualität:** Sieht ein Element nach Bootstrap, Material, Tailwind-Vorgabe,

@@ -5,7 +5,7 @@ import { getListState } from "@/lib/server/listState";
 import { listHouseholdTags, searchRecipes } from "@/lib/data/recipes";
 import { getRecipeImageUrls } from "@/lib/data/recipeImages";
 import { Notice, Screen } from "@/components/ui";
-import { RowsSkeleton } from "@/components/skeletons";
+import { RecipeGridSkeleton } from "@/components/skeletons";
 import { SettingsButton } from "../SettingsButton";
 import { RecipeBrowser } from "./RecipeBrowser";
 
@@ -22,22 +22,28 @@ export const metadata = { title: "Rezepte" };
 export default function RecipesPage(props: PageProps<"/rezepte">) {
   return (
     <Screen title="Rezepte" action={<SettingsButton />}>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="flex flex-wrap gap-2">
+        {/* Klein und zurückhaltend: im Entwurf gibt es keine großen
+            CTA-Flächen, und diese beiden Wege sind Werkzeuge, nicht der Inhalt
+            des Screens. Der Inhalt sind die Rezepte darunter. */}
         <Link
           href="/rezepte/importieren"
-          className="flex h-12 items-center justify-center rounded-pill bg-brand px-5 text-base font-medium text-brand-text press tap-target"
+          className="inline-flex min-h-11 items-center rounded-soft bg-brand px-4 text-[13px] font-medium text-brand-text press tap-target"
         >
           Importieren
         </Link>
         <Link
           href="/rezepte/neu"
-          className="flex h-12 items-center justify-center rounded-card border border-border bg-surface px-4 text-base font-medium press tap-target"
+          className=// Warme Fläche statt Haarlinie: `--border` ist ein Ton für Linien auf
+            // der Karte. Auf dem grauen Canvas liegt er so dicht daneben, dass
+            // der Knopf schlicht keine Kante hätte.
+            "inline-flex min-h-11 items-center rounded-soft bg-surface px-4 text-[13px] font-medium shadow-card press tap-target"
         >
           Von Hand
         </Link>
       </div>
 
-      <Suspense fallback={<RowsSkeleton />}>
+      <Suspense fallback={<RecipeGridSkeleton />}>
         <Results searchParams={props.searchParams} />
       </Suspense>
     </Screen>

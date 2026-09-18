@@ -71,7 +71,7 @@ export function AccountActions() {
         {busy === "out" ? "Einen Moment …" : "Abmelden"}
       </Button>
 
-      <div className="space-y-3 rounded-2xl border border-border p-5">
+      <div className="space-y-3 rounded-soft border border-border p-5">
         <h2 className="text-lg font-semibold">Konto löschen</h2>
         <p className="text-[15px] leading-relaxed text-muted">
           Entfernt dein Konto und deine Mitgliedschaft. Bist du die letzte

@@ -26,7 +26,7 @@ export default function HouseholdPage() {
       </Suspense>
 
       <Card>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Mitglieder
         </h2>
         <div className="mt-3">
@@ -37,7 +37,7 @@ export default function HouseholdPage() {
       </Card>
 
       <Card>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
           Einladen
         </h2>
         <p className="mt-1 text-[15px] leading-relaxed text-muted">

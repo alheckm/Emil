@@ -14,9 +14,34 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 
-export function Card({ children }: { children: ReactNode }) {
+/**
+ * Die Grundform des ganzen Auftritts: eine warme Fläche auf grauem Canvas.
+ *
+ * Keine Umrandung. Im Entwurf hat die Karte keine — sie löst sich allein über
+ * einen sehr weichen Schatten vom Hintergrund. Eine Linie darum herum wäre das
+ * Material-Design-Kärtchen, das der Entwurf gerade vermeidet.
+ */
+export function Card({
+  bleed,
+  children,
+}: {
+  /**
+   * Nimmt der Karte ihren Innenabstand.
+   *
+   * Für Karten, die ihr Inneres selbst aufteilen — beim Rezept muss das Foto
+   * bis an die Kante laufen, und die Abschnitte darunter setzen ihren Abstand
+   * dann selbst.
+   */
+  bleed?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <div className="rounded-card border border-border bg-surface p-5">
+    <div
+      className={
+        "overflow-hidden rounded-card bg-surface shadow-card " +
+        (bleed ? "" : "p-5")
+      }
+    >
       {children}
     </div>
   );
@@ -34,9 +59,9 @@ export function Field({
       <input
         {...props}
         className={
-          "mt-1 block h-12 w-full rounded-2xl border border-border bg-bg px-4 text-base " +
+          "mt-1 block h-12 w-full rounded-soft border border-border bg-soft px-4 text-base " +
           "text-text outline-none placeholder:text-muted/60 " +
-          "focus:border-accent focus:ring-2 focus:ring-accent/30 " +
+          "focus:border-text " +
           className
         }
       />
@@ -87,13 +112,13 @@ export function Notice({
   const look = {
     error: "border-accent/40 bg-accent/10 text-text",
     ok: "border-ok/40 bg-ok/10 text-text",
-    info: "border-border bg-bg text-muted",
+    info: "border-border bg-soft text-muted",
   }[tone];
 
   return (
     <p
       role={tone === "error" ? "alert" : "status"}
-      className={"rounded-card border px-4 py-3 text-[15px] leading-relaxed " + look}
+      className={"rounded-soft border px-4 py-3 text-[15px] leading-relaxed " + look}
     >
       {children}
     </p>
@@ -128,7 +153,10 @@ export function ScreenHeader({
   return (
     <header>
       <div className="flex items-start justify-between gap-4">
-        <h1 className="font-display text-[32px] font-semibold leading-[1.15] tracking-tight">
+        {/* Regulärer Schnitt, nicht fett: so steht der Rezepttitel im Entwurf
+            auf dem Foto, und eine Überschrift, die anders gewichtet ist als
+            die Titel darunter, fällt sofort als zweite Handschrift auf. */}
+        <h1 className="font-display text-[32px] font-normal leading-[1.2]">
           {title}
         </h1>
         {action && <div className="shrink-0 pt-1">{action}</div>}
@@ -183,9 +211,9 @@ export function Select({
       <select
         {...props}
         className={
-          "mt-1 block h-12 w-full appearance-none rounded-2xl border border-border " +
-          "bg-bg px-4 text-base text-text outline-none " +
-          "focus:border-accent focus:ring-2 focus:ring-accent/30 " +
+          "mt-1 block h-12 w-full appearance-none rounded-soft border border-border " +
+          "bg-soft px-4 text-base text-text outline-none " +
+          "focus:border-text " +
           className
         }
       >
@@ -207,9 +235,9 @@ export function Textarea({
       <textarea
         {...props}
         className={
-          "mt-1 block w-full rounded-2xl border border-border bg-bg p-4 text-base " +
+          "mt-1 block w-full rounded-soft border border-border bg-soft p-4 text-base " +
           "text-text outline-none placeholder:text-muted/60 " +
-          "focus:border-accent focus:ring-2 focus:ring-accent/30 " +
+          "focus:border-text " +
           className
         }
       />
@@ -245,7 +273,7 @@ export function RowLink({
     <Link
       href={href}
       prefetch={prefetch}
-      className="flex min-h-14 items-center justify-between gap-3 rounded-card border border-border bg-surface px-4 py-3 text-[15px] press tap-target"
+      className="flex min-h-14 items-center justify-between gap-3 rounded-soft bg-surface px-4 py-3 text-[15px] shadow-card press tap-target"
     >
       <span className="min-w-0">{children}</span>
       <span aria-hidden className="shrink-0 text-brand">

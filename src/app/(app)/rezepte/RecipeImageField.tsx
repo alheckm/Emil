@@ -107,7 +107,7 @@ export function RecipeImageField({
         <img
           src={shown}
           alt=""
-          className="aspect-[4/3] w-full rounded-card border border-border object-cover"
+          className="aspect-[4/3] w-full rounded-soft object-cover"
         />
       )}
 

@@ -47,9 +47,9 @@ export function RowsSkeleton({ rows = 4 }: { rows?: number }) {
         {Array.from({ length: rows }, (_, index) => (
           <li
             key={index}
-            className="flex items-center gap-4 rounded-card border border-border bg-surface p-3"
+            className="flex items-center gap-4 rounded-soft bg-surface p-3 shadow-card"
           >
-            <Box className="h-16 w-16 shrink-0 rounded-2xl" />
+            <Box className="h-16 w-16 shrink-0 rounded-soft" />
             <span className="min-w-0 flex-1">
               <Box className="h-4 w-1/2" />
               <Box className="mt-2 h-3 w-1/3" />
@@ -70,7 +70,7 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
         {Array.from({ length: rows }, (_, index) => (
           <li
             key={index}
-            className="flex min-h-14 items-center gap-3 rounded-card border border-border bg-surface px-4 py-3"
+            className="flex min-h-14 items-center gap-3 rounded-soft bg-surface px-4 py-3 shadow-card"
           >
             <Box className="h-7 w-7 shrink-0 rounded-lg" />
             <Box className="h-4 w-1/2" />
@@ -82,16 +82,64 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
 }
 
 /**
- * Rezeptbild.
+ * Die Rezeptkarte, solange das Rezept noch unterwegs ist.
  *
- * Hält exakt dasselbe Seitenverhältnis wie das echte Bild. Ohne diesen
- * Platzhalter würde der ganze Screen nach unten rutschen, sobald die signierte
- * Adresse eintrifft — und zwar genau dann, wenn der Daumen schon unterwegs ist.
+ * Maßgleich mit der echten Karte: dieselbe Rundung, dasselbe Seitenverhältnis
+ * des Fotos, derselbe Innenabstand. Das Foto-Bett ist hier keine getönte
+ * Fläche, sondern schon der dunkle Ton, den die fertige Karte trägt — beim
+ * Eintreffen der Daten wechselt also nur der Inhalt, nicht die Farbe.
  */
-export function ImageSkeleton() {
+export function RecipeCardSkeleton() {
   return (
     <Frame>
-      <Box className="aspect-[4/3] w-full rounded-card" />
+      <div className="overflow-hidden rounded-card bg-surface shadow-card">
+        <div aria-hidden className="aspect-[9/10] w-full bg-photo" />
+        <div className="px-5 pb-6 pt-5">
+          <div className="flex items-center justify-between gap-4">
+            <Box className="h-5 w-24" />
+            <Box className="h-10 w-32 rounded-pill" />
+          </div>
+          <div className="mt-5 flex gap-4">
+            {Array.from({ length: 4 }, (_, index) => (
+              <Box key={index} className="size-18 shrink-0 rounded-pill" />
+            ))}
+          </div>
+          <ul className="mt-6 space-y-3">
+            {Array.from({ length: 6 }, (_, index) => (
+              <li key={index} className="flex gap-3">
+                <Box className="h-4 w-20 shrink-0" />
+                <Box className="h-4 w-full" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </Frame>
+  );
+}
+
+/**
+ * Die Karten der Rezeptübersicht.
+ *
+ * Zwei reichen: mehr Platzhalter als sichtbare Karten zu zeigen füllt den
+ * Bildschirm mit einem Versprechen, das die Daten vielleicht nicht halten.
+ */
+export function RecipeGridSkeleton({ cards = 2 }: { cards?: number }) {
+  return (
+    <Frame>
+      <ul className="space-y-6">
+        {Array.from({ length: cards }, (_, index) => (
+          <li
+            key={index}
+            className="overflow-hidden rounded-card bg-surface shadow-card"
+          >
+            <div aria-hidden className="aspect-[9/10] w-full bg-photo" />
+            <div className="px-5 py-4">
+              <Box className="h-4 w-28" />
+            </div>
+          </li>
+        ))}
+      </ul>
     </Frame>
   );
 }
@@ -100,7 +148,7 @@ export function ImageSkeleton() {
 export function RecipeBodySkeleton() {
   return (
     <Frame>
-      <div className="rounded-card border border-border bg-surface p-5">
+      <div className="rounded-card bg-surface p-5 shadow-card">
         <div className="flex items-center justify-between gap-4">
           <Box className="h-5 w-24" />
           <Box className="h-12 w-32 rounded-pill" />
