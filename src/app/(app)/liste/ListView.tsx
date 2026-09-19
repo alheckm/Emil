@@ -465,7 +465,7 @@ export function ListView({
         </section>
       )}
 
-      <ul className="grid grid-cols-3 gap-x-2 gap-y-3">
+      <ul className="grid grid-cols-3 items-start gap-x-2 gap-y-3">
         {visibleEntries.map((entry, index) => {
           const checked = checkedNow[entry.id] ?? entry.checked;
           const { text } = formatAmount(entry.amount, entry.mergeUnit);
@@ -495,159 +495,171 @@ export function ListView({
                 </li>
               )}
 
-              <li className="relative">
-                <button
-                  type="button"
-                  aria-pressed={checked}
-                  aria-expanded={isOpen}
-                  onPointerDown={() => startPress(entry.id)}
-                  onPointerUp={cancelPress}
-                  onPointerLeave={cancelPress}
-                  onPointerCancel={cancelPress}
-                  onContextMenu={(event) => event.preventDefault()}
-                  onClick={() => tap(entry)}
-                  className="flex w-full select-none flex-col items-center gap-2 press-flat tap-target touch-manipulation"
-                >
-                  <span className="relative block aspect-square w-full">
-                    <span
-                      className={
-                        "flex h-full w-full items-center justify-center " +
-                        "overflow-hidden rounded-tile bg-chip " +
-                        // Abgehakt wird das Bild blass, das Häkchen
-                        // darüber bleibt kräftig — sonst verschwindet
-                        // genau die Rückmeldung mit, auf die man wartet.
-                        (checked ? "opacity-40" : "")
-                      }
-                    >
-                      {src ? (
-                        /* Kein next/image: die Datei liegt schon in genau
-                           der Größe im public-Ordner, in der sie gebraucht
-                           wird. Der Optimierer hätte hier nichts zu tun
-                           und käme nur als zusätzliche Runde dazu. */
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                          src={src}
-                          alt=""
-                          width={192}
-                          height={192}
-                          loading="lazy"
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <span
-                          aria-hidden
-                          className="text-[24px] font-medium text-muted"
-                        >
-                          {entry.name.slice(0, 1).toUpperCase()}
+              {/* Offen wächst nur diese eine Spalte nach unten (row-span-2)
+                  — die Nachbarn in derselben Reihe bleiben stehen, wo sie
+                  sind. Foto, Name/Menge und die Zusatzinfos teilen sich eine
+                  einzige `bg-chip`-Fläche, damit es wie eine aufklappende
+                  Kachel wirkt statt wie zwei verbundene Kästen. */}
+              <li className={"relative" + (isOpen ? " row-span-2" : "")}>
+                <div className="flex h-full flex-col overflow-hidden rounded-tile bg-chip">
+                  <button
+                    type="button"
+                    aria-pressed={checked}
+                    aria-expanded={isOpen}
+                    onPointerDown={() => startPress(entry.id)}
+                    onPointerUp={cancelPress}
+                    onPointerLeave={cancelPress}
+                    onPointerCancel={cancelPress}
+                    onContextMenu={(event) => event.preventDefault()}
+                    onClick={() => tap(entry)}
+                    className="flex select-none flex-col press-flat tap-target touch-manipulation"
+                  >
+                    <span className="relative block aspect-square w-full">
+                      <span
+                        className={
+                          "flex h-full w-full items-center justify-center " +
+                          // Abgehakt wird das Bild blass, das Häkchen
+                          // darüber bleibt kräftig — sonst verschwindet
+                          // genau die Rückmeldung mit, auf die man wartet.
+                          (checked ? "opacity-40" : "")
+                        }
+                      >
+                        {src ? (
+                          /* Kein next/image: die Datei liegt schon in genau
+                             der Größe im public-Ordner, in der sie gebraucht
+                             wird. Der Optimierer hätte hier nichts zu tun
+                             und käme nur als zusätzliche Runde dazu. */
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={src}
+                            alt=""
+                            width={192}
+                            height={192}
+                            loading="lazy"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span
+                            aria-hidden
+                            className="text-[24px] font-medium text-muted"
+                          >
+                            {entry.name.slice(0, 1).toUpperCase()}
+                          </span>
+                        )}
+                      </span>
+
+                      {checked && (
+                        <span className="absolute inset-0 flex items-center justify-center">
+                          <span
+                            aria-hidden
+                            className="flex h-9 w-9 items-center justify-center rounded-pill bg-accent text-[17px] text-accent-ink"
+                          >
+                            ✓
+                          </span>
                         </span>
                       )}
                     </span>
 
-                    {checked && (
-                      <span className="absolute inset-0 flex items-center justify-center">
-                        <span
-                          aria-hidden
-                          className="flex h-9 w-9 items-center justify-center rounded-pill bg-accent text-[17px] text-accent-ink"
-                        >
-                          ✓
-                        </span>
+                    <span className="w-full px-2 pb-2 pt-1 text-center">
+                      <span
+                        className={
+                          "block text-[13px] font-medium leading-tight " +
+                          (checked ? "text-muted line-through" : "")
+                        }
+                      >
+                        {entry.name}
                       </span>
-                    )}
-                  </span>
-
-                  <span className="w-full text-center">
-                    <span
-                      className={
-                        "block text-[13px] font-medium leading-tight " +
-                        (checked ? "text-muted line-through" : "")
-                      }
-                    >
-                      {entry.name}
+                      {/* Immer gerendert, notfalls unsichtbar: sonst wird
+                          eine Kachel ohne Menge einen Zeile kürzer als ihre
+                          Nachbarn in derselben Reihe. */}
+                      <span
+                        className={
+                          "mt-0.5 block text-[13px] leading-tight " +
+                          (menge ? "" : "invisible")
+                        }
+                      >
+                        {menge || " "}
+                      </span>
                     </span>
-                    {menge && (
-                      <span className="mt-0.5 block text-[13px] leading-tight">
-                        {menge}
-                      </span>
-                    )}
-                  </span>
-                </button>
-              </li>
+                  </button>
 
-              {isOpen && (
-                <li className="col-span-3">
-                  <div className="space-y-3 rounded-soft bg-soft p-4">
-                    <p className="text-[15px] font-medium">{entry.name}</p>
+                  {isOpen && (
+                    <div className="flex-1 space-y-3 border-t border-border p-3 text-left">
+                      {entry.note && (
+                        <p className="text-[13px] text-muted">{entry.note}</p>
+                      )}
 
-                    {entry.note && (
-                      <p className="text-[13px] text-muted">{entry.note}</p>
-                    )}
-
-                    {entry.sources.length > 0 ? (
-                      <ul className="space-y-1 text-[13px] text-muted">
-                        {entry.sources.map((source, sourceIndex) => (
-                          <li key={`${source.recipeId}-${sourceIndex}`}>
-                            {source.recipeTitle ?? "Rezept"}
-                            {source.servings ? ` (${source.servings})` : ""}
-                            {source.amount
-                              ? `: ${formatAmount(source.amount, entry.mergeUnit).text}`
-                              : ": ohne Menge"}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-[13px] text-muted">Von Hand ergänzt.</p>
-                    )}
-
-                    {entry.categoryEditable ? (
-                      <label className="block">
-                        <span className="text-[13px] text-muted">Abteilung</span>
-                        <select
-                          value={entry.categoryId ?? "sonstiges"}
-                          onChange={(event) =>
-                            run(() => {
-                              const supabase = getBrowserSupabase();
-                              if (!supabase) {
-                                return Promise.resolve({
-                                  ok: false,
-                                  error: "Supabase ist nicht konfiguriert.",
-                                });
-                              }
-                              return setIngredientCategory(
-                                supabase,
-                                entry.ingredientId,
-                                event.target.value,
-                              );
-                            })
-                          }
-                          className="mt-1 h-11 w-full appearance-none rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
-                        >
-                          {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                              {category.name}
-                            </option>
+                      {entry.sources.length > 0 ? (
+                        <ul className="space-y-1 text-[13px] text-muted">
+                          {entry.sources.map((source, sourceIndex) => (
+                            <li key={`${source.recipeId}-${sourceIndex}`}>
+                              {source.recipeTitle ?? "Rezept"}
+                              {source.servings ? ` (${source.servings})` : ""}
+                              {source.amount
+                                ? `: ${formatAmount(source.amount, entry.mergeUnit).text}`
+                                : ": ohne Menge"}
+                            </li>
                           ))}
-                        </select>
-                        <span className="mt-1 block text-[13px] text-muted">
-                          Bleibt für diese Zutat gespeichert.
-                        </span>
-                      </label>
-                    ) : (
-                      <p className="text-[13px] text-muted">
-                        Abteilung „{entry.categoryName}“ — aus der Zutatenliste,
-                        für alle Haushalte gleich.
-                      </p>
-                    )}
+                        </ul>
+                      ) : (
+                        <p className="text-[13px] text-muted">
+                          Von Hand ergänzt.
+                        </p>
+                      )}
 
-                    <button
-                      type="button"
-                      onClick={() => removeEntry(entry)}
-                      className="h-11 w-full rounded-pill border border-danger text-[15px] text-danger press"
-                    >
-                      Von der Liste nehmen
-                    </button>
-                  </div>
-                </li>
-              )}
+                      {entry.categoryEditable ? (
+                        <label className="block">
+                          <span className="text-[13px] text-muted">
+                            Abteilung
+                          </span>
+                          <select
+                            value={entry.categoryId ?? "sonstiges"}
+                            onChange={(event) =>
+                              run(() => {
+                                const supabase = getBrowserSupabase();
+                                if (!supabase) {
+                                  return Promise.resolve({
+                                    ok: false,
+                                    error: "Supabase ist nicht konfiguriert.",
+                                  });
+                                }
+                                return setIngredientCategory(
+                                  supabase,
+                                  entry.ingredientId,
+                                  event.target.value,
+                                );
+                              })
+                            }
+                            className="mt-1 h-11 w-full appearance-none rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
+                          >
+                            {categories.map((category) => (
+                              <option key={category.id} value={category.id}>
+                                {category.name}
+                              </option>
+                            ))}
+                          </select>
+                          <span className="mt-1 block text-[13px] text-muted">
+                            Bleibt für diese Zutat gespeichert.
+                          </span>
+                        </label>
+                      ) : (
+                        <p className="text-[13px] text-muted">
+                          Abteilung „{entry.categoryName}“ — aus der
+                          Zutatenliste, für alle Haushalte gleich.
+                        </p>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => removeEntry(entry)}
+                        className="h-11 w-full rounded-pill border border-danger text-[15px] text-danger press"
+                      >
+                        Von der Liste nehmen
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </li>
             </Fragment>
           );
         })}

@@ -346,6 +346,11 @@ steht der Anfangsbuchstabe in `--muted`. Abgehakt: Foto `opacity-40`, ein
 Häkchen-Badge in `--accent`/`--accent-ink` bleibt kräftig darüber, Name
 `line-through`.
 
+**Die Mengenzeile steht immer, notfalls unsichtbar** (`invisible`, mit einem
+geschützten Leerzeichen als Inhalt). Ohne sie wäre eine Zutat ohne Menge
+(„Brot" ohne Zahl) eine Zeile kürzer als ihre Nachbarn in derselben Reihe —
+alle Kacheln einer Reihe bleiben gleich hoch, unabhängig vom Inhalt.
+
 **Ein Raster, nach Abteilung geordnet — keine Box je Abteilung.** Ein erster
 Durchgang hatte jede Abteilung als eigenen Abschnitt mit eigenem Drei-Spalten-
 Raster gebaut; eine unvollständige letzte Reihe ließ die Abteilung wie einen
