@@ -126,6 +126,7 @@ JPEG-Kompressionsgründen angepasst werden musste, steht das explizit dabei.
 | `--photo` | `#bcc4d6` (= `--soft`) | Das Bett unter einem Rezeptfoto, solange die signierte Adresse noch unterwegs ist, oder wenn ein Rezept keins hat. |
 | `--shadow-card` | `0 16px 32px -14px rgba(23,25,40,.28)` | Der einzige Schatten im System, exklusiv für `--card`. |
 | `--well` | `#f3f4f9` | Die Kapsel um den aktiven Tab in der Tab-Leiste — sitzt auf `--card` (Weiß), braucht deshalb nur einen Hauch Abhebung, nicht das Blaugrau von `--soft`. Exakt gemessen, nicht abgeleitet. |
+| `--icon-muted` | `#98a0ad` | Symbolfarbe der inaktiven Tab-Einträge — heller als `--muted`, aus demselben Grund: sitzt auf `--card`, nicht auf `--bg`. Exakt gemessen, nicht von `--muted` abgeleitet. |
 
 **Ein Vorbehalt zu `--accent` auf `--bg`:** Gold auf dem Fliederblau hat nur
 **1,02 : 1** Kontrast — praktisch unsichtbar als dünne Kontur oder kleines
@@ -255,12 +256,13 @@ nicht über mehr Durchmesser.
 ### Screen-Kopfzeile
 `src/components/ui.tsx`, `ScreenHeader`/`Screen`. Schlichte Überschrift
 („Rezepte", „Einkaufsliste", „Einstellungen" …) in der Skala aus Abschnitt 5,
-rechts optional eine runde Icon-Fläche (`--soft`, 44 px Trefferfläche) —
-`SettingsButton` auf der Rezeptübersicht. **Keine Begrüßung mit Namen:** ein
-erster Durchgang hatte „Hallo, *Haushaltsname*" nach dem Vorbild der
-Referenz-Begrüßung eingeführt — das war nicht verlangt, brauchte Kursiv ohne
-sonstigen Zweck in der App und wurde wieder auf die schlichte Überschrift
-zurückgenommen.
+ohne Aktion rechts — der runde Icon-Knopf zu Konto/Haushalt, der hier zuerst
+saß (`SettingsButton`), ist auf Wunsch in die Tab-Leiste gewandert (siehe
+TabBar unten); die Kopfzeile trägt jetzt nur noch den Titel. **Keine
+Begrüßung mit Namen:** ein erster Durchgang hatte „Hallo, *Haushaltsname*"
+nach dem Vorbild der Referenz-Begrüßung eingeführt — das war nicht verlangt,
+brauchte Kursiv ohne sonstigen Zweck in der App und wurde wieder auf die
+schlichte Überschrift zurückgenommen.
 
 ### FilterRow
 Die bestehende Schlagwort-Filterung aus den Rezept-Tags, im neuen Farbschema:
@@ -364,7 +366,10 @@ Schritten 16 px.
 ### TabBar
 `src/app/(app)/TabBar.tsx`. Freistehende, vollgerundete Leiste (`--card` mit
 `--shadow-card`), mit sichtbarem `--bg`-Rand ringsum — keine bildschirmbreite,
-sticky Leiste mit Haarlinie mehr. Zwei Einträge (Einkauf, Rezepte).
+sticky Leiste mit Haarlinie mehr. **Drei Einträge:** Einkauf, Rezepte und
+Konto/Haushalt — der runde Knopf, der zuerst oben rechts auf der Kopfzeile
+saß, ist auf Wunsch hierher gewandert, damit Navigation an einer Stelle
+steht statt an zweien.
 
 Der aktive Eintrag ist **nicht** vollflächig schwarz — das war ein erster,
 zu grober Durchgang. Die Referenz zeigt eine helle Kapsel in `--well`
@@ -372,13 +377,16 @@ zu grober Durchgang. Die Referenz zeigt eine helle Kapsel in `--well`
 Bedienflächen auf `--bg` reserviert ist und dort deutlich mehr Blaugrau
 braucht, um sich abzusetzen), und nur das Symbol darin sitzt in einem
 eigenen kleinen schwarzen Kreis (`bg-text text-card`, 32 px); das Label steht
-direkt auf der Kapsel, in `--text`. Der inaktive Eintrag zeigt nur das Symbol
-in `--muted`, ohne Fläche, ohne Label.
+direkt auf der Kapsel, in `--text`. Der aktive Eintrag nimmt sich dafür die
+überschüssige Breite der Leiste (`flex-1`).
 
-Beide Einträge sind **gleich breit** (`flex-1` an jedem `<li>`, Inhalt
-zentriert) — ein Zwischenstand hatte dem aktiven Eintrag die überschüssige
-Breite zugeschlagen und den inaktiven auf Icongröße schrumpfen lassen, was
-die Leiste beim Wechseln seitlich verschob. Wechsel im selben Frame
+Der inaktive Eintrag zeigt nur das Symbol, auf Icongröße geschrumpft
+(`shrink-0`), in `--icon-muted` (`#98a0ad`) — heller als `--muted`, weil er
+auf `--card` (Weiß) steht statt auf `--bg`; `--muted` ist für den Kontrast
+auf der Grundfläche abgestimmt und wirkt auf Weiß zu dunkel/kräftig. Ein
+Zwischenstand hatte testweise alle Einträge gleich breit gemacht
+(`flex-1` überall) — auf Wunsch wieder zurückgenommen zugunsten der
+ursprünglichen, asymmetrischen Aufteilung. Wechsel im selben Frame
 (`useOptimistic`), `data-pending` dimmt den Inhalt darüber.
 
 ### RowLink / Field / Select / Textarea / Button / Notice
@@ -523,7 +531,10 @@ gegengeprüft:
 - [x] Tab-Leiste freistehend, gerundet, mit Schatten — aktiver Eintrag als
       helle `--well`-Kapsel mit schwarzem Icon-Kreis, nicht vollflächig
       schwarz und nicht `--soft`
-- [x] Beide Tab-Einträge gleich breit
+- [x] Aktiver Tab nimmt sich die überschüssige Breite, inaktive bleiben auf
+      Icongröße (asymmetrisch, auf Wunsch so zurückgenommen)
+- [x] Inaktive Tab-Symbole in `--icon-muted`, nicht `--muted`
+- [x] Konto/Haushalt als dritter Tab-Eintrag statt Knopf in der Kopfzeile
 - [x] Titelgröße nah an der gemessenen Umrechnung (32 px), nicht grob
       abgerundet
 - [x] `--accent` nie als dünne Linie oder Text direkt auf `--bg`

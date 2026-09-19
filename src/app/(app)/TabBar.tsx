@@ -17,9 +17,11 @@ import { startTransition, useOptimistic } from "react";
  * freistehende, vollgerundete Fläche (`--card` mit `--shadow-card`), mit
  * sichtbarem `--bg`-Rand ringsum. Der aktive Eintrag bekommt ein eigenes,
  * dunkles Icon-Badge plus Label auf einer `--well`-Kapsel (heller Ton auf
- * `--card`, nicht `--soft` — das ist für Bedienflächen auf `--bg` reserviert);
- * der inaktive zeigt nur das Symbol in `--muted`, ohne Badge, ohne Label.
- * Beide Einträge bleiben gleich breit.
+ * `--card`, nicht `--soft` — das ist für Bedienflächen auf `--bg` reserviert)
+ * und nimmt sich dafür die überschüssige Breite der Leiste (`flex-1`); die
+ * inaktiven Einträge bleiben auf Icongröße (`shrink-0`), Symbolfarbe
+ * `--icon-muted` — heller als `--muted`, weil sie auf `--card` stehen, nicht
+ * auf `--bg`.
  *
  * Der Kern gegen die gefühlte Trägheit ist `useOptimistic`: der angetippte Tab
  * wird im selben Frame aktiv, statt erst wenn der Server geantwortet hat.
@@ -28,20 +30,22 @@ import { startTransition, useOptimistic } from "react";
  * Skelett aus. Ein Tab-Wechsel, bei dem der halbe Bildschirm verschwindet,
  * fühlt sich langsamer an als einer, bei dem der alte Inhalt kurz blass wird.
  *
- * Nur zwei Einträge: Konto und Haushalt sind in die Einstellungen gewandert.
- * Tabs sind für Orte, an denen gearbeitet wird — nicht für Konfiguration, die
- * man dreimal im Jahr anfasst.
+ * Drei Einträge: Einkauf, Rezepte — und jetzt auch Konto/Haushalt, das vorher
+ * als runder Knopf oben rechts auf den beiden Haupt-Tabs saß. Zusammengelegt
+ * in die Tab-Leiste, auf Wunsch, statt an zwei Stellen (Kopfzeile und Leiste)
+ * nach Navigation zu suchen.
  */
 
 /**
  * Die Symbole.
  *
- * Bewusst inline und nicht aus einer Bibliothek: es sind zwei Stück, und ein
- * Paket dafür wären ein paar hundert Kilobyte für zwei Pfade. Einfarbig über
+ * Bewusst inline und nicht aus einer Bibliothek: es sind drei Stück, und ein
+ * Paket dafür wären ein paar hundert Kilobyte für drei Pfade. Einfarbig über
  * `currentColor`, damit der aktive Zustand allein über die Textfarbe läuft und
  * das Symbol nie gegen sein Label verrutscht.
  *
- * 24er-Raster wie bei iOS-Symbolen, damit beide optisch gleich schwer wirken.
+ * 24er-Raster wie bei iOS-Symbolen, damit alle drei optisch gleich schwer
+ * wirken.
  */
 function BasketIcon() {
   return (
@@ -79,9 +83,26 @@ function BookIcon() {
   );
 }
 
+/** Kopf und Schultern — derselbe Weg wie vorher im Knopf oben rechts. */
+function PersonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden>
+      <path
+        fill="currentColor"
+        d="M12 12.4a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Z"
+      />
+      <path
+        fill="currentColor"
+        d="M12 14.1c-3.9 0-7.1 2.2-7.1 4.9 0 .6.5 1 1.1 1h12c.6 0 1.1-.4 1.1-1 0-2.7-3.2-4.9-7.1-4.9Z"
+      />
+    </svg>
+  );
+}
+
 const TABS = [
   { href: "/liste", label: "Einkauf", Icon: BasketIcon },
   { href: "/rezepte", label: "Rezepte", Icon: BookIcon },
+  { href: "/einstellungen", label: "Konto", Icon: PersonIcon },
 ] as const;
 
 type TabHref = (typeof TABS)[number]["href"];
@@ -105,24 +126,22 @@ function Frame({
         {TABS.map((tab) => {
           const current = active === tab.href;
           return (
-            <li key={tab.href} className="flex flex-1 justify-center">
+            <li key={tab.href} className={current ? "flex-1" : "shrink-0"}>
               <Link
                 href={tab.href}
                 aria-current={current ? "page" : undefined}
                 onClick={() => onSelect?.(tab.href)}
                 className={
                   "flex min-h-11 items-center press-flat tap-target " +
-                  // Aktiv: eine helle Kapsel (`--well`, gemessen auf der
-                  // weissen Tab-Leiste — deutlich heller als `--soft`, das
-                  // auf `--bg` sitzt), darin ein eigenes schwarzes
-                  // Kreis-Badge nur ums Symbol — genau das Muster aus der
-                  // Referenz, nicht die ganze Fläche schwarz. Inaktiv: nur
-                  // das Symbol, ohne Fläche, ohne Label. Beide Tabs bleiben
-                  // gleich breit (`flex-1` am `<li>`), nur der Inhalt
-                  // unterscheidet sich.
+                  // Aktiv: eine helle Kapsel (`--well`), darin ein eigenes
+                  // schwarzes Kreis-Badge nur ums Symbol — genau das Muster
+                  // aus der Referenz, nicht die ganze Fläche schwarz. Nimmt
+                  // sich die überschüssige Breite der Leiste. Inaktiv: nur
+                  // das Symbol in `--icon-muted`, auf Icongröße geschrumpft,
+                  // ohne Fläche, ohne Label.
                   (current
                     ? "gap-2 rounded-pill bg-well py-1 pl-1 pr-4 text-[12px] font-semibold text-text"
-                    : "h-11 w-11 items-center justify-center text-muted")
+                    : "h-11 w-11 items-center justify-center text-icon-muted")
                 }
               >
                 <span
@@ -160,7 +179,8 @@ export function TabBar() {
   const pathname = usePathname();
 
   // Welcher Tab gehört zur aktuellen Adresse? `/rezepte/17/bearbeiten` zählt
-  // noch zu „Rezepte“, sonst wäre beim Blättern in ein Rezept kein Tab aktiv.
+  // noch zu „Rezepte“, `/einstellungen/konto` noch zu „Konto“ — sonst wäre
+  // beim Blättern in eine Unterseite kein Tab aktiv.
   const current =
     TABS.find(
       (tab) => pathname === tab.href || pathname.startsWith(`${tab.href}/`),

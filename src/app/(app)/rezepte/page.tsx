@@ -6,7 +6,6 @@ import { listHouseholdTags, searchRecipes } from "@/lib/data/recipes";
 import { getRecipeImageUrls } from "@/lib/data/recipeImages";
 import { Notice, Screen } from "@/components/ui";
 import { RecipeGridSkeleton } from "@/components/skeletons";
-import { SettingsButton } from "../SettingsButton";
 import { RecipeBrowser } from "./RecipeBrowser";
 
 export const metadata = { title: "Rezepte" };
@@ -21,7 +20,7 @@ export const metadata = { title: "Rezepte" };
  */
 export default function RecipesPage(props: PageProps<"/rezepte">) {
   return (
-    <Screen title="Rezepte" action={<SettingsButton />}>
+    <Screen title="Rezepte">
       <div className="flex flex-wrap gap-2">
         {/* „Importieren" ist der Haupteinstieg zu neuen Rezepten und trägt
             deshalb die Markenfarbe — „Von Hand" bleibt die leise

@@ -45,6 +45,11 @@
      Tab sitzt auf der weissen Tab-Leiste (`--card`), nicht auf `--bg` — dort
      braucht es nur einen Hauch Abhebung, kein Blaugrau. Exakt gemessen. */
   --well: #f3f4f9;
+  /* Inaktive Symbole in der Tab-Leiste: heller als `--muted`, weil sie auf
+     `--card` (Weiss) stehen statt auf `--bg` — `--muted` ist fuer den
+     Kontrast auf der Grundflaeche abgestimmt und waere hier zu dunkel/kraeftig.
+     Exakt gemessen, nicht von `--muted` abgeleitet. */
+  --icon-muted: #98a0ad;
 }
 
 @theme inline {
@@ -62,6 +67,7 @@
   --color-warn: var(--warn);
   --color-photo: var(--photo);
   --color-well: var(--well);
+  --color-icon-muted: var(--icon-muted);
   --shadow-card: var(--shadow-card);
   --font-display: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-sans: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;

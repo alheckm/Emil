@@ -5,7 +5,6 @@ import { getListState } from "@/lib/server/listState";
 import { listCategories, listEntries } from "@/lib/data/shoppingList";
 import { Notice, Screen } from "@/components/ui";
 import { ListSkeleton } from "@/components/skeletons";
-import { SettingsButton } from "../SettingsButton";
 import { ListView } from "./ListView";
 
 export const metadata = { title: "Einkaufsliste" };
@@ -30,7 +29,7 @@ export const metadata = { title: "Einkaufsliste" };
  */
 export default function ListPage() {
   return (
-    <Screen title="Einkaufsliste" action={<SettingsButton />}>
+    <Screen title="Einkaufsliste">
       <Suspense fallback={<ListSkeleton />}>
         <List />
       </Suspense>
