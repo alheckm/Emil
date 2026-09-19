@@ -1,47 +1,38 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Poppins } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "./ServiceWorkerRegistration";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 /**
- * Die beiden Schriften aus app_design.jpg.
+ * Die eine Schrift aus docs/app_redesign.jpg.
  *
- * Der Entwurf setzt zwei Familien gegeneinander, und der Gegensatz ist der
- * ganze Auftritt:
+ * Der Entwurf setzt an keiner Stelle eine Serife — Titel, Abschnitte,
+ * Fließtext und Kleinschrift laufen alle in derselben geometrisch-
+ * humanistischen Grotesk, nur in unterschiedlichem Schnitt und Gewicht. Das
+ * ist der Bruch mit der vorigen Fassung, die zwei Familien gegeneinander
+ * setzte (Playfair Display + Poppins) — design-system.md, Abschnitt 5 und 12.
  *
- * - **Playfair Display** für Überschriften — eine Serife mit starkem
- *   Strichkontrast. Vorher stand hier Roboto Slab; eine Slab-Serife hat
- *   gleichmäßige Striche und wirkt technisch, der Entwurf will das Elegante.
- *   Drei Schnitte statt zwei: der Rezepttitel auf dem Foto steht im Entwurf im
- *   **regulären** Schnitt, nicht im fetten — bei dieser Schriftgröße trägt der
- *   Strichkontrast allein, und 600 wirkte daneben plump. Die kleinen
- *   Abschnittsüberschriften („Zutaten", „Zubereitung") brauchen umgekehrt 600,
- *   sonst verschwinden sie.
- * - **Poppins** für alles andere. Das ist der Bruch mit der bisherigen Regel,
- *   die Systemschrift zu nehmen — die kostet null Bytes und ist auf dem iPhone
- *   hervorragend. Poppins kostet zwei Schnitte, aber die geometrischen,
- *   kreisrunden Buchstaben sind im Entwurf deutlich zu erkennen, und mit
- *   San Francisco sieht der Screen schlicht anders aus als das JPEG.
+ * **Plus Jakarta Sans**: geometrisches Grundgerüst mit leicht humanistischer
+ * Abrundung, ein enges, niedriges „a" und eine kräftige, nicht überzogene
+ * Kursive für die Namens-Betonung in der Begrüßung — das trifft den Entwurf
+ * deutlich näher als etwa Inter (zu neo-grotesk) oder Manrope (zu rund im
+ * Auge).
  *
- * Nur die wirklich benutzten Schnitte. Jeder weitere ist eine Datei, die im
- * Supermarkt über Mobilfunk geladen werden will.
+ * Zwei CSS-Variablen für dieselbe Schrift, nicht weil es zwei Familien gäbe,
+ * sondern weil `font-display` im Code an vielen Stellen steht (Rezepttitel,
+ * Abschnittsüberschriften, Ziffernkasten) und ein Massenumbenennen auf
+ * `font-sans` nur Fehlerrisiko ohne Nutzen wäre — beide Tokens zeigen jetzt
+ * auf dieselbe Instanz.
  *
  * `next/font` lädt zur Bauzeit herunter und liefert von der eigenen Domain —
  * kein Aufruf zu Google zur Laufzeit, und datenschutzseitig die einzige
  * saubere Variante.
  */
-const serif = Playfair_Display({
+const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-  display: "swap",
-  variable: "--font-serif",
-});
-
-const sans = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500"],
   display: "swap",
   variable: "--font-sans-ui",
 });
@@ -68,12 +59,10 @@ export const viewport: Viewport = {
   // Randlos bis unter Notch und Home-Indikator; die Screens halten über
   // die *-safe-Utilities Abstand. Zoom bleibt bewusst erlaubt.
   viewportFit: "cover",
-  themeColor: [
-    // Der Ton der Fläche ganz oben am Bildschirm — und das ist seit dem
-    // Wegfall des Canvas überall derselbe: das warme Off-White.
-    { media: "(prefers-color-scheme: light)", color: "#f5f1ee" },
-    { media: "(prefers-color-scheme: dark)", color: "#1f1c19" },
-  ],
+  // Der Ton der Fläche ganz oben am Bildschirm — durchgehend das fliederblaue
+  // `--bg` aus docs/app_redesign.jpg. Kein `dark`-Eintrag mehr: die Referenz
+  // zeigt nur Hell (design-system.md, Abschnitt 4, „Dunkel").
+  themeColor: "#c9d2e3",
 };
 
 export default function RootLayout({
@@ -82,10 +71,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="de"
-      className={`h-full antialiased ${serif.variable} ${sans.variable}`}
-    >
+    <html lang="de" className={`h-full antialiased ${sans.variable}`}>
       <body className="min-h-full flex flex-col">
         <ServiceWorkerRegistration />
         {children}

@@ -5,12 +5,19 @@ import { usePathname } from "next/navigation";
 import { startTransition, useOptimistic } from "react";
 
 /**
- * Die feste Leiste am unteren Rand.
+ * Die freistehende Leiste am unteren Rand.
  *
  * Sie steht unten, weil die App einhändig und in Bewegung bedient wird — oben
  * käme der Daumen nicht hin. Und sie liegt im Layout und nicht in den Seiten,
  * damit sie beim Wechsel stehen bleibt: nur der Bereich darüber wird neu
  * gerendert.
+ *
+ * Bauform nach docs/app_redesign.jpg (design-system.md, Abschnitt 7): keine
+ * bildschirmbreite, sticky Leiste mit Haarlinie mehr, sondern eine
+ * freistehende, vollgerundete Fläche (`--card` mit `--shadow-card`), mit
+ * sichtbarem `--bg`-Rand ringsum. Der aktive Eintrag bekommt ein eigenes,
+ * dunkles Icon-Badge plus Label auf einer `--soft`-Kapsel; der inaktive zeigt
+ * nur das Symbol in `--muted`, ohne Badge, ohne Label.
  *
  * Der Kern gegen die gefühlte Trägheit ist `useOptimistic`: der angetippte Tab
  * wird im selben Frame aktiv, statt erst wenn der Server geantwortet hat.
@@ -19,9 +26,9 @@ import { startTransition, useOptimistic } from "react";
  * Skelett aus. Ein Tab-Wechsel, bei dem der halbe Bildschirm verschwindet,
  * fühlt sich langsamer an als einer, bei dem der alte Inhalt kurz blass wird.
  *
- * Nur noch zwei Einträge: Konto und Haushalt sind in die Einstellungen
- * gewandert. Tabs sind für Orte, an denen gearbeitet wird — nicht für
- * Konfiguration, die man dreimal im Jahr anfasst.
+ * Nur zwei Einträge: Konto und Haushalt sind in die Einstellungen gewandert.
+ * Tabs sind für Orte, an denen gearbeitet wird — nicht für Konfiguration, die
+ * man dreimal im Jahr anfasst.
  */
 
 /**
@@ -90,9 +97,9 @@ function Frame({
     <nav
       aria-label="Hauptbereiche"
       data-pending={pending ? "" : undefined}
-      className="sticky bottom-0 z-10 border-t border-border bg-bg/95 px-safe pb-safe backdrop-blur"
+      className="sticky bottom-0 z-10 px-safe pb-safe"
     >
-      <ul className="mx-auto flex w-full max-w-md">
+      <ul className="mx-auto mb-3 flex w-full max-w-md gap-1 rounded-pill bg-card p-1.5 shadow-card">
         {TABS.map((tab) => {
           const current = active === tab.href;
           return (
@@ -102,16 +109,16 @@ function Frame({
                 aria-current={current ? "page" : undefined}
                 onClick={() => onSelect?.(tab.href)}
                 className={
-                  "flex min-h-14 flex-col items-center justify-center gap-0.5 " +
-                  "pt-1.5 pb-1 text-[11px] font-medium press-flat tap-target " +
-                  // Aktiv trägt allein die Farbe: Symbol und Wort werden
-                  // zusammen dunkel. Vorher lag darunter ein farbiger Punkt —
-                  // mit Symbolen wäre das ein drittes Element in 11 px Höhe.
-                  (current ? "text-text" : "text-muted")
+                  "flex min-h-11 items-center justify-center gap-2 rounded-pill " +
+                  "px-3 text-[12px] font-semibold press-flat tap-target " +
+                  (current ? "bg-text text-card" : "text-muted")
                 }
               >
                 <tab.Icon />
-                {tab.label}
+                {/* Nur der aktive Eintrag trägt ein Label — genau das Muster
+                    aus der Referenz: „Home" beschriftet, die übrigen Symbole
+                    stehen für sich. */}
+                {current && tab.label}
               </Link>
             </li>
           );

@@ -17,16 +17,11 @@ import type { ComponentProps, ReactNode } from "react";
 /**
  * Ein Block, der inhaltlich zusammengehört — mehr nicht.
  *
- * Hier stand bis zuletzt `Card`: warme Fläche, 28 px Radius, weicher Schatten,
- * auf grauem Canvas. Das war ein Lesefehler an `app_design.jpg`. Das Grau
- * darin ist die Fläche, auf der die beiden **Screenshots** liegen, nicht der
- * Hintergrund der App; innerhalb der Geräte gibt es genau eine durchgehende
- * warme Fläche und keine Karte darauf. Übrig blieb ein sichtbarer Rand um
- * alles — genau das, was der Entwurf nicht zeigt.
- *
- * Trennung kommt jetzt aus Weißraum und Überschriften. Deshalb hat dieser
- * Baustein keine eigene Optik mehr: er bleibt als Name für „das gehört
- * zusammen" und als eine Stelle, an der eine spätere Änderung greifen würde.
+ * Keine eigene Optik: kein Hintergrund, keine Rundung, kein Schatten. Auf
+ * `--bg` trägt allein Weißraum die Trennung (design-system.md, Abschnitt 4,
+ * Regel 1). Die einzige Fläche mit eigenem Körper — Karte, Radius, Schatten —
+ * ist `--card`, und die gehört ausschließlich der Rezeptvorschau in der
+ * Übersicht (`RecipeBrowser.tsx`), nicht diesem Baustein.
  */
 export function Section({ children }: { children: ReactNode }) {
   return <div>{children}</div>;
@@ -60,9 +55,9 @@ export function Button({
   ...props
 }: ComponentProps<"button"> & { variant?: "primary" | "quiet" | "danger" }) {
   const look = {
-    primary: "bg-brand text-brand-text",
+    primary: "bg-accent text-accent-ink",
     quiet: "border border-border text-text",
-    danger: "border border-accent text-accent",
+    danger: "border border-danger text-danger",
   }[variant];
 
   return (
@@ -95,7 +90,7 @@ export function Notice({
   children: ReactNode;
 }) {
   const look = {
-    error: "border-accent/40 bg-accent/10 text-text",
+    error: "border-danger/40 bg-danger/10 text-text",
     ok: "border-ok/40 bg-ok/10 text-text",
     info: "border-border bg-soft text-muted",
   }[tone];
@@ -138,10 +133,7 @@ export function ScreenHeader({
   return (
     <header>
       <div className="flex items-start justify-between gap-4">
-        {/* Regulärer Schnitt, nicht fett: so steht der Rezepttitel im Entwurf
-            auf dem Foto, und eine Überschrift, die anders gewichtet ist als
-            die Titel darunter, fällt sofort als zweite Handschrift auf. */}
-        <h1 className="font-display text-[32px] font-normal leading-[1.2]">
+        <h1 className="font-display text-[26px] font-bold leading-[1.2]">
           {title}
         </h1>
         {action && <div className="shrink-0 pt-1">{action}</div>}
@@ -274,7 +266,7 @@ export function RowLink({
       className="flex min-h-14 items-center justify-between gap-3 rounded-soft bg-soft px-4 py-3 text-[15px] press tap-target"
     >
       <span className="min-w-0">{children}</span>
-      <span aria-hidden className="shrink-0 text-brand">
+      <span aria-hidden className="shrink-0 text-muted">
         ›
       </span>
     </Link>

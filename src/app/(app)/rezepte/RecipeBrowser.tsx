@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useId, useMemo, useOptimistic, useState, startTransition } from "react";
 import type { RecipeSummary } from "@/lib/data/recipes";
 import { Section } from "@/components/ui";
+import { ChevronRightIcon } from "@/components/icons";
 
 /**
  * Suche, Schlagwort-Filter und Trefferliste in einem.
@@ -132,7 +133,7 @@ export function RecipeBrowser({
                   className={
                     "min-h-11 rounded-pill px-4 text-[13px] press tap-target " +
                     (active
-                      ? "bg-brand text-brand-text"
+                      ? "bg-text text-card"
                       : "bg-soft text-muted")
                   }
                 >
@@ -157,20 +158,24 @@ export function RecipeBrowser({
             </p>
           </Section>
         ) : (
-          /* Karten statt Zeilen — so steht es im Entwurf, und es ist auch der
-             ehrlichere Auftritt: was ein Rezept ausmacht, sieht man am Essen,
-             nicht an seinem Namen. Eine Spalte, 32 px Abstand; die Inhalts-
-             breite bleibt `max-w-md` (Design-System, Abschnitt 6).
-
-             Die Kachel ist keine Karte: keine Fläche, kein Schatten, keine
-             Umrandung. Was sie zusammenhält, ist das gerundete Foto — auf dem
-             durchgehenden Off-White trennt der Abstand. */
-          <ul className="space-y-8">
+          /* Echte Karten mit Schatten — die Kehrtwende zur Vorgängerfassung
+             (design-system.md, Abschnitt 4 und 7): `docs/app_redesign.jpg`
+             zeigt die Rezeptvorschau innerhalb der Gerätekante als weiße
+             Fläche mit Schatten, keine Fehllesung wie beim alten Bild. Eine
+             Spalte, 20 px Abstand zwischen den Karten; Inhaltsbreite bleibt
+             `max-w-md`. */
+          <ul className="space-y-5">
             {visible.map((recipe) => {
               const servings = planned[recipe.id];
               const image = recipe.imagePath
                 ? images[recipe.imagePath]
                 : undefined;
+              const facts = [
+                `${recipe.baseServings} ${recipe.servingsLabel}`,
+                recipe.totalTimeMin ? `${recipe.totalTimeMin} Min` : null,
+                ...recipe.tags.slice(0, 2),
+              ].filter((fact): fact is string => Boolean(fact));
+
               return (
                 <li key={recipe.id}>
                   {/* `prefetch` holt die Rezeptseite samt ihrer URL-Daten vor
@@ -180,14 +185,30 @@ export function RecipeBrowser({
                   <Link
                     href={`/rezepte/${recipe.id}`}
                     prefetch
-                    className="block overflow-hidden rounded-card press tap-target"
+                    className="block overflow-hidden rounded-card bg-card p-4 shadow-card press tap-target"
                   >
-                    {/* Dieselbe Form wie die Rezeptkarte selbst: 9:10, Foto
-                        über die ganze Fläche, Titel als weiße Serife darauf.
-                        Fehlt das Foto, bleibt das dunkle Bett stehen — die
-                        Reihe franst so nicht aus, und der Titel ist in beiden
-                        Fällen gleich gut zu lesen. */}
-                    <div className="relative aspect-[9/10] w-full bg-photo">
+                    <h2 className="font-display text-[26px] font-bold leading-[1.2] [text-wrap:balance]">
+                      {recipe.title}
+                    </h2>
+
+                    {/* Merkmal-Chips — Pendant zu „1,200 sq ft · 3 Beds …" in
+                        der Referenz. Kontur statt Fläche, wie die
+                        Merkmal-Chips auf dem Rezept-Screen. */}
+                    <ul className="mt-3 flex flex-wrap gap-2">
+                      {facts.map((fact) => (
+                        <li
+                          key={fact}
+                          className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium"
+                        >
+                          {fact}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* 4:3 statt 9:10, kein Titel mehr darauf: die Referenz
+                        legt den Titel immer neben oder unter das Foto.
+                        Fehlt das Foto, bleibt `bg-photo` stehen. */}
+                    <div className="relative mt-4 aspect-[4/3] w-full overflow-hidden rounded-tile bg-photo">
                       {image && (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img
@@ -197,37 +218,26 @@ export function RecipeBrowser({
                           className="absolute inset-0 h-full w-full object-cover"
                         />
                       )}
-                      <div
-                        aria-hidden
-                        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-scrim via-scrim/45 to-transparent"
-                      />
 
                       {servings ? (
                         /* Dieselbe Milchglasfläche wie die Knöpfe auf dem
                            Rezeptfoto, damit auf dem Foto nur eine Sprache
-                           gesprochen wird. */
-                        <span className="absolute left-4 top-4 rounded-pill bg-white/70 px-3 py-1 text-[13px] font-medium text-text backdrop-blur-[8px]">
+                           gesprochen wird — bewusst nicht `--accent`, damit
+                           der Listenstatus nicht mit der CTA-Farbe
+                           verwechselt wird. */
+                        <span className="absolute left-3 top-3 rounded-pill bg-card/70 px-3 py-1 text-[13px] font-medium text-text backdrop-blur-[8px]">
                           Auf der Liste · {servings}
                         </span>
                       ) : null}
 
-                      <div className="absolute inset-x-0 bottom-0 px-5 pb-5">
-                        <h2 className="font-display text-[32px] font-normal leading-[1.15] text-white [text-wrap:balance]">
-                          {recipe.title}
-                        </h2>
-                      </div>
+                      {/* Einzige Stelle, an der eine Gold-Fläche direkt auf
+                          einem Foto sitzt statt auf `--bg` — wie „Details" in
+                          der Referenz. */}
+                      <span className="absolute bottom-3 right-3 inline-flex items-center gap-0.5 rounded-pill bg-accent py-1.5 pl-3 pr-2 text-[13px] font-semibold text-accent-ink">
+                        Ansehen
+                        <ChevronRightIcon className="h-4 w-4" />
+                      </span>
                     </div>
-
-                    {/* Portionen und Zeit stehen unter dem Foto, nicht
-                        darauf: 13 px Weiß kommt auch mit Schleier nicht über
-                        4,5:1. Ohne Seitenrand — der Text fluchtet mit dem
-                        Fotorand, nicht mit einem Karteninneren. */}
-                    <p className="pt-3 text-[13px] text-muted">
-                      {recipe.baseServings} {recipe.servingsLabel}
-                      {recipe.totalTimeMin
-                        ? ` · ${recipe.totalTimeMin} min`
-                        : ""}
-                    </p>
                   </Link>
                 </li>
               );

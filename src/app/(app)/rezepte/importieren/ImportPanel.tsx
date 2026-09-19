@@ -267,9 +267,13 @@ function TabButton({
       aria-selected={active}
       onClick={onClick}
       className={
-        "min-h-11 flex-1 rounded-xl border px-4 text-[15px] font-medium " +
+        // Reine Auswahl-Markierung, kein Fehler: dieselbe Fläche wie die
+        // aktive Schlagwort-Pille in RecipeBrowser.tsx, nicht `--accent` (das
+        // ist jetzt die Markenfarbe für Aktionen, keine allgemeine
+        // Hervorhebung) und nicht `--danger` (kein Fehlerzustand).
+        "min-h-11 flex-1 rounded-soft border px-4 text-[15px] font-medium " +
         (active
-          ? "border-accent bg-accent text-accent-text"
+          ? "border-text bg-text text-card"
           : "border-border text-muted")
       }
     >

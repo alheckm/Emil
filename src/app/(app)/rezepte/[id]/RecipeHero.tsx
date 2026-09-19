@@ -2,26 +2,20 @@ import Link from "next/link";
 import { ChevronLeftIcon, PencilIcon } from "@/components/icons";
 
 /**
- * Der obere Teil des Rezept-Screens: Foto, zwei runde Knöpfe, Titel.
+ * Der obere Teil des Rezept-Screens: Foto und zwei runde Knöpfe — sonst
+ * nichts. Titel und Kenndaten stehen darunter auf `--bg` (`page.tsx`).
  *
- * Drei Dinge, die hier nicht Geschmackssache sind:
+ * Zwei Dinge, die hier nicht Geschmackssache sind:
  *
- * - **Der Titel steht auf dem Foto**, nicht darüber. Das ist der auffälligste
- *   Zug des Entwurfs — er macht aus einem Bild mit Überschrift eine Karte. Die
- *   Kopfzeile, die vorher über dem Bild stand, entfällt damit ersatzlos.
+ * - **Kein Titel auf dem Foto, kein Schleier.** Die Referenz
+ *   (docs/app_redesign.jpg) legt den Titel in beiden Screens unter bzw. neben
+ *   das Foto, nie darüber — design-system.md, Abschnitt 4, Regel 5. Das
+ *   macht den Scrim überflüssig, der vorher nötig war, um weißen Text auf
+ *   einem hellen Nutzerfoto lesbar zu halten.
  * - **Das Bett unter dem Foto ist immer da.** Die signierte Bildadresse ist
  *   eine eigene Netzrunde, und ein Rezept muss auch ganz ohne Foto gut
- *   aussehen. Deshalb liegt unter dem Bild eine dunkle Fläche (`bg-photo`), auf
- *   der der weiße Titel in beiden Fällen lesbar ist — und wenn das Foto
- *   nachkommt, springt nichts.
- * - **Zwei Schleier**, oben und unten. Im Entwurf ist das Foto an beiden Enden
- *   leicht abgedunkelt; hier ist es zusätzlich eine Notwendigkeit, weil das
- *   Foto vom Nutzer kommt und auch strahlend weiß sein kann.
- *
- * Auf dem Foto steht **nur der Titel** — so wie im Entwurf. Die Kochzeit stand
- * hier zwischendurch als zweite Zeile und ist wieder raus: 13-px-Weiß auf
- * einem hellen Foto kommt auch mit Schleier nicht über 4,5:1. Sie steht jetzt
- * unten bei den Schlagwörtern, wo sie auf dem Off-White sitzt.
+ *   aussehen. Deshalb liegt unter dem Bild `bg-photo` (= `--soft`) — und wenn
+ *   das Foto nachkommt, springt nichts.
  *
  * Oben rechts steht bewusst **kein Herz**: Emil kennt keine Favoriten, und ein
  * Knopf, der nichts tut, ist schlimmer als keiner. An derselben Stelle, in
@@ -29,31 +23,20 @@ import { ChevronLeftIcon, PencilIcon } from "@/components/icons";
  * Aktion, die auf diesem Screen sonst nirgends hingehört.
  */
 export function RecipeHero({
-  title,
   recipeId,
   children,
 }: {
-  title: string;
   recipeId: string;
   /** Das Foto selbst — strömt hinter einer eigenen Suspense-Grenze nach. */
   children?: React.ReactNode;
 }) {
   return (
-    /* 9:10 — im Entwurf gemessen: das Foto ist etwas höher als breit und nimmt
-       knapp die Hälfte des Screens ein. Volle Bildschirmbreite, keine Rundung,
-       kein Rahmen: im Entwurf läuft es bis an die Gerätekanten und unter die
-       Statusleiste. */
-    <div className="relative aspect-[9/10] w-full overflow-hidden bg-photo">
+    /* 4:3 statt 9:10 (design-system.md, Abschnitt 7): an beiden Screens der
+       Referenz gemessen, unabhängig von der tatsächlichen Gerätehöhe. Volle
+       Bildschirmbreite, keine Rundung, kein Rahmen: läuft bis an die
+       Gerätekanten und unter die Statusleiste. */
+    <div className="relative aspect-[4/3] w-full overflow-hidden bg-photo">
       {children}
-
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-scrim/45 to-transparent"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-scrim via-scrim/30 to-transparent"
-      />
 
       {/* p-3 statt p-4: die Trefferflaeche ist 44 px, der sichtbare Kreis
           36 px — die 4 px Luft ringsum fehlen dem Abstand, sonst saesse der
@@ -75,16 +58,6 @@ export function RecipeHero({
               wirkt neben dem Pfeil sonst deutlich schwerer. */}
           <PencilIcon className="h-[17px] w-[17px]" />
         </HeroButton>
-      </div>
-
-      <div className="absolute inset-x-0 bottom-0 px-5 pb-5">
-        {/* 32/1,15 im regulären Schnitt (Design-System, Abschnitt 5). Bei
-            dieser Größe trägt der Strichkontrast der Playfair allein; 600
-            wirkte daneben plump. Zwei Zeilen sind vorgesehen und erwünscht —
-            deutsche Rezepttitel sind Komposita. */}
-        <h1 className="font-display text-[32px] font-normal leading-[1.15] text-white [text-wrap:balance]">
-          {title}
-        </h1>
       </div>
     </div>
   );

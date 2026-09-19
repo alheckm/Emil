@@ -5,17 +5,9 @@
 `docs/design-system.md` ist verbindlich. `docs/app_redesign.jpg` ist die
 **Spezifikation, nicht die Inspiration**: Weicht eine Umsetzung ab, wird die
 Umsetzung korrigiert und nicht die Abweichung zur Designentscheidung erklärt.
-(`docs/app_design.jpg` ist die frühere Referenz, nur noch zur historischen
-Einordnung — nicht mehr verbindlich, siehe design-system.md Abschnitt 12.)
 
 Wer etwas unter `src/app/`, `src/components/` oder an `src/app/globals.css`
 anfasst, liest das Dokument vorher — der Skill `design` lädt es.
-**Für die Umsetzung des Referenzwechsels:** design-system.md Abschnitt 14 ist
-eine gegen den Code geprüfte Migrationstabelle — jede Datei, jeder alte
-Token/jede alte Klasse, die verschwinden muss, mit der jeweils richtigen neuen
-Entsprechung. Vor allem `--accent` verdient Aufmerksamkeit: er bedeutet jetzt
-Markenfarbe statt Warnton, und nicht jede alte `accent`-Stelle im Code wird zu
-`--danger` — Abschnitt 14.2 ordnet jede Fundstelle einzeln ein.
 
 Die Regeln, die am schnellsten verloren gehen:
 
@@ -25,23 +17,21 @@ Die Regeln, die am schnellsten verloren gehen:
   Untergrenzen: 16 px Schrift in Eingabefeldern (sonst zoomt iOS hinein),
   44 px Trefferfläche, 15 px Fließtext.
 - **Das Grau im JPEG ist nicht die App.** Es ist die Fläche, auf der die beiden
-  iPhone-Screenshots liegen. Gemessen wird *innerhalb* der Gerätekanten —
-  dort aber gibt es diesmal echt zwei Flächen (`--bg` und `--card`), keine
-  Fehllesung wie beim alten Bild (design-system.md Abschnitt 2).
+  iPhone-Screenshots liegen. Gemessen wird *innerhalb* der Gerätekanten — dort
+  gibt es zwei Flächen: `--bg` (Grund) und `--card` (Rezeptvorschau-Karte).
 - **Karten nur in der Rezeptübersicht.** `--card` mit `--shadow-card` fasst
   dort jede Rezeptvorschau. Überall sonst (Rezept-Screen, Einkauf, Werkzeug)
   läuft `--bg` ohne Karte durch. Was eine Bedienfläche auf `--bg` braucht,
   nimmt `--soft`, nicht `--card`.
-- **`--accent` ist jetzt Markenfarbe**, kein reiner Warnton mehr — CTA-Pillen,
-  Ziffernkasten, Icon-Badges. Fehler/Löschen bleiben `--danger`. `--accent`
-  nie als dünne Linie oder Text direkt auf `--bg` (Kontrast, siehe
-  design-system.md Abschnitt 4).
+- **`--accent` ist Markenfarbe**, kein Warnton — CTA-Pillen, Ziffernkasten,
+  Icon-Badges. Fehler/Löschen laufen über `--danger`. `--accent` nie als
+  dünne Linie oder Text direkt auf `--bg` (Kontrast, siehe design-system.md
+  Abschnitt 4).
 - **Keine bildschirmbreiten CTA-Knöpfe auf Rezept- und Einkaufsscreens.** Dort
   stehen Aktionen leise neben dem Inhalt — auch als gefüllte Gold-Pille erlaubt,
   solange sie nicht bildschirmbreit ist. Breite Knöpfe gehören in Formulare
   (Abschnitt 3, „Zwei Register").
-- **Kein Dark Mode aktuell.** Die neue Referenz zeigt nur Hell; der alte dunkle
-  Modus passt nicht zur neuen Farbfamilie und ist vorläufig entfernt.
+- **Kein Dark Mode.** Die Referenz zeigt nur Hell.
 - **Keine pulsierenden Skelette, keine Emojis als Symbole, keine Systemschrift.**
 
 Bewegung: 120–250 ms, `ease-out`, `prefers-reduced-motion` immer mitbedacht.

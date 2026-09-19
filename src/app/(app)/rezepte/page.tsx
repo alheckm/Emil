@@ -5,7 +5,7 @@ import { getListState } from "@/lib/server/listState";
 import { listHouseholdTags, searchRecipes } from "@/lib/data/recipes";
 import { getRecipeImageUrls } from "@/lib/data/recipeImages";
 import { Notice, Screen } from "@/components/ui";
-import { RecipeGridSkeleton } from "@/components/skeletons";
+import { GreetingSkeleton, RecipeGridSkeleton } from "@/components/skeletons";
 import { SettingsButton } from "../SettingsButton";
 import { RecipeBrowser } from "./RecipeBrowser";
 
@@ -14,36 +14,23 @@ export const metadata = { title: "Rezepte" };
 /**
  * Die Rezeptübersicht.
  *
- * Der Rahmen — Überschrift und die beiden Knöpfe zum Anlegen — ist statisch
- * und landet damit in der App Shell: er steht, sobald der Tab angetippt wird.
- * Nur die Treffer strömen nach, und die hängen am Suchtext in der Adresse,
- * sind also URL-Daten und können gar nicht vorab im Shell liegen.
+ * Kopfzeile und Karten stehen jetzt hinter derselben Suspense-Grenze: die
+ * Begrüßung braucht den Haushaltsnamen (`household.name`), und der ist erst
+ * mit dem Haushalt selbst da — anders als die statische Rezepte-Überschrift
+ * der Vorgängerfassung kann sie nicht vorab in der App Shell stehen
+ * (design-system.md, Abschnitt 7, TopBar/Begrüßung).
  */
 export default function RecipesPage(props: PageProps<"/rezepte">) {
   return (
-    <Screen title="Rezepte" action={<SettingsButton />}>
-      <div className="flex flex-wrap gap-2">
-        {/* Klein und zurückhaltend: im Entwurf gibt es keine großen
-            CTA-Flächen, und diese beiden Wege sind Werkzeuge, nicht der Inhalt
-            des Screens. Der Inhalt sind die Rezepte darunter. */}
-        <Link
-          href="/rezepte/importieren"
-          className="inline-flex min-h-11 items-center rounded-soft bg-brand px-4 text-[13px] font-medium text-brand-text press tap-target"
-        >
-          Importieren
-        </Link>
-        <Link
-          href="/rezepte/neu"
-          className=// Leise Fläche statt Haarlinie: `--soft` ist der Ton für
-            // Bedienflächen, die auf dem durchgehenden Off-White eine Kante
-            // brauchen, ohne eine Linie zu ziehen.
-            "inline-flex min-h-11 items-center rounded-soft bg-soft px-4 text-[13px] font-medium press tap-target"
-        >
-          Von Hand
-        </Link>
-      </div>
-
-      <Suspense fallback={<RecipeGridSkeleton />}>
+    <Screen>
+      <Suspense
+        fallback={
+          <>
+            <GreetingSkeleton />
+            <RecipeGridSkeleton />
+          </>
+        }
+      >
         <Results searchParams={props.searchParams} />
       </Suspense>
     </Screen>
@@ -80,11 +67,42 @@ async function Results({ searchParams }: { searchParams: SearchParams }) {
   );
 
   return (
-    <RecipeBrowser
-      recipes={recipes.value}
-      tags={tags.ok ? tags.value : []}
-      planned={list.planned}
-      images={images}
-    />
+    <>
+      {/* Begrüßung statt der bisherigen „Rezepte"-Überschrift — der
+          Haushaltsname ist der einzige bereits vorhandene „Name", den es
+          dafür gibt; ein Vorname müsste ein eigenes Profilfeld sein, das es
+          nicht gibt. Kursiv ausschließlich am Namen (Abschnitt 5). */}
+      <div className="flex items-start justify-between gap-4">
+        <h1 className="font-display text-[24px] font-bold leading-[1.2]">
+          Hallo, <em className="italic">{household.name}</em>
+        </h1>
+        <SettingsButton />
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {/* Klein und zurückhaltend im Ton, aber „Importieren" ist der
+            Haupteinstieg zu neuen Rezepten und trägt deshalb die Markenfarbe
+            — „Von Hand" bleibt die leise Nebenoption. */}
+        <Link
+          href="/rezepte/importieren"
+          className="inline-flex min-h-11 items-center rounded-pill bg-accent px-4 text-[13px] font-medium text-accent-ink press tap-target"
+        >
+          Importieren
+        </Link>
+        <Link
+          href="/rezepte/neu"
+          className="inline-flex min-h-11 items-center rounded-pill bg-soft px-4 text-[13px] font-medium press tap-target"
+        >
+          Von Hand
+        </Link>
+      </div>
+
+      <RecipeBrowser
+        recipes={recipes.value}
+        tags={tags.ok ? tags.value : []}
+        planned={list.planned}
+        images={images}
+      />
+    </>
   );
 }

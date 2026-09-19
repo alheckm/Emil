@@ -1,124 +1,73 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Die Farben stammen aus app_design.jpg — und zwar von **innerhalb** der
-   Geraete.
+   Die Farben stammen aus docs/app_redesign.jpg — und zwar von **innerhalb**
+   der Geraete (docs/design-system.md, Abschnitt 2).
 
-   Das war der Fehler der vorigen Fassung: app_design.jpg zeigt zwei
-   iPhone-Screenshots, die nebeneinander auf einer hellgrauen Praesentations-
-   flaeche liegen. Dieses Grau (#d7d5d6) ist der Tisch, auf dem die Mockups
-   liegen — nicht der Hintergrund der App. Es wurde trotzdem als `--bg`
-   uebernommen, und damit bekam jeder Screen eine warme Karte auf grauem Grund:
-   ein sichtbarer Rand um alles, den der Entwurf nirgends zeigt.
+   Anders als beim vorigen Bild gibt es diesmal dort tatsaechlich zwei
+   Flaechen, keine Fehllesung: ein fliederblaues `--bg` traegt Kopfzeile,
+   Begruessung, Filterzeile und den kompletten Rezept-Screen; `--card` (Weiss,
+   mit Schatten) ist die Ausnahme und erscheint nur als Rezeptvorschau in der
+   Uebersicht.
 
-   Emil hat **eine** Flaeche. Das warme Off-White #f5f1ee laeuft von der
-   Statusleiste bis zum Home-Indikator durch; das Foto liegt darauf, nicht in
-   einer Karte darauf. Es gibt deshalb kein `--surface` mehr — `--bg` ist der
-   Grund, und alles Gelesene steht darauf.
+   `--accent` ist jetzt die Markenfarbe (ein warmes Gold), keine Warnfarbe
+   mehr — sie traegt CTA-Pillen, Icon-Badges auf Fotos und den Ziffernkasten.
+   Fehler und Loeschen laufen ueber `--danger`, das eigene Token des alten
+   `--accent`-Warntons, nachgedunkelt fuer die neue, kuehlere Flaeche.
 
-   Was sich davon absetzen muss, tut das ueber einen eigenen Ton und nicht
-   ueber einen Schatten: `--soft` (#ece7e3) ist die leise Bedienflaeche —
-   Felder, Portionswaehler, Filter. Schatten gibt es keine mehr; im Entwurf ist
-   innerhalb des Bildschirms keiner zu sehen.
+   Was eine sichtbare Bedienflaeche auf `--bg` braucht, ohne Aktion zu sein,
+   nimmt `--soft` — nicht `--accent`, sonst verliert Gold seine Signalwirkung.
 
-   Reines Weiss bleibt einer einzigen Sache vorbehalten: den Kreisen unter den
-   Zutaten. Das ist im Entwurf die hellste Flaeche ueberhaupt, und sie traegt
-   die freigestellten Zutatenfotos — die haben selbst weissen Grund, jeder
-   andere Ton gaebe einen sichtbaren Ring.
-
-   **Es gibt keine Akzentfarbe.** Im Entwurf traegt die Farbe das Essen; alles
-   andere ist Off-White, Weiss und Schwarz. Die Schritt-Ziffern stehen in
-   schwarzen Kaesten (#000 im JPEG), und das ist die einzige kraeftige Flaeche
-   im ganzen Screen. Genau das ist `--brand`.
-
-   Die Koralle bleibt als `--accent` und nur noch dort, wo gewarnt wird —
-   Loeschen, Fehler.
+   Kein Dark Mode in dieser Fassung: die Referenz zeigt nur Hell, und aus der
+   neuen, kuehlen Farbfamilie laesst sich ohne dunkle Referenz nichts sauber
+   ableiten (design-system.md, Abschnitt 13).
 --------------------------------------------------------------------------- */
 :root {
-  --bg: #f5f1ee;
+  --bg: #c9d2e3;
+  --card: #ffffff;
   --chip: #ffffff;
-  --soft: #ece7e3;
-  --panel: #080808;
-  --panel-text: #ffffff;
-  --text: #242321;
-  --muted: #756d66;
-  --accent: #b5442c;
-  --brand: #080808;
-  --brand-text: #ffffff;
-  --accent-text: #ffffff;
-  --border: #e2dbd5;
-  --ok: #3f6f52;
-  --warn: #b5762a;
-  --scrim: rgba(12, 10, 9, 0.72);
-  /* Das Bett, auf dem das Rezeptfoto liegt. Es steht schon, bevor die
-     signierte Bildadresse da ist, und bleibt sichtbar, wenn ein Rezept gar
-     kein Foto hat — der weisse Titel darauf ist in beiden Faellen lesbar, und
-     nichts springt, wenn das Foto nachkommt. Deshalb in beiden Modi derselbe
-     Ton: er ist kein Hintergrund, sondern Teil des Fotos. */
-  --photo: #2b2622;
-  /* Kleine runde Bedienflaechen — die Kreise im Portionswaehler. Im Entwurf
-     sind sie weiss auf dem gedaempften Off-White. Im Dunkeln kann das nicht
-     weiss bleiben: das Symbol darin ist cremefarben und waere schlicht weg.
-     Deshalb ein eigener Token statt `--chip`, der wegen der freigestellten
-     Fotos in beiden Modi weiss bleiben muss. */
-  --control: #ffffff;
-}
-
-/* Dunkel gedreht statt weggelassen: gekocht wird abends, und im
-   Supermarkt-Halbdunkel blendet eine cremefarbene Flaeche. Aus dem einen
-   warmen Off-White wird ein einziges warmes Dunkelbraun, und der schwarze
-   Ziffernkasten wird cremefarben mit dunkler Ziffer — ein schwarzes Quadrat
-   auf dunklem Grund waere sonst schlicht nicht mehr da.
-
-   `--chip` bleibt weiss: darin liegen freigestellte Fotos auf weissem Grund. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1f1c19;
-    --chip: #ffffff;
-    --soft: #2a2622;
-    --panel: #f2ede7;
-    --panel-text: #17150f;
-    --text: #f2ede7;
-    --muted: #a29a92;
-    --accent: #e8735a;
-    --brand: #f2ede7;
-    --brand-text: #17150f;
-    --accent-text: #17150f;
-    --border: #332e29;
-    --ok: #7dc39c;
-    --warn: #e0b45f;
-    --scrim: rgba(0, 0, 0, 0.72);
-    --photo: #2b2622;
-    --control: #3b352f;
-  }
+  --soft: #bcc4d6;
+  --border: #a8b2c9;
+  --text: #0b0b10;
+  --muted: #4d5770;
+  --accent: #f6ce8f;
+  --accent-ink: #0b0b10;
+  --danger: #93331f;
+  --ok: #28583d;
+  --warn: #7a4f18;
+  /* Das Bett, auf dem ein Rezeptfoto liegt, solange die signierte Adresse
+     noch unterwegs ist, oder wenn ein Rezept keins hat. Kein eigener dunkler
+     Ton mehr: der Titel steht nicht mehr auf dem Foto, es muss also nichts
+     mehr darauf lesbar bleiben — deshalb schlicht `--soft`. */
+  --photo: #bcc4d6;
+  --shadow-card: 0 16px 32px -14px rgba(23, 25, 40, 0.28);
 }
 
 @theme inline {
   --color-bg: var(--bg);
+  --color-card: var(--card);
   --color-chip: var(--chip);
   --color-soft: var(--soft);
-  --color-panel: var(--panel);
-  --color-panel-text: var(--panel-text);
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
-  --color-brand: var(--brand);
-  --color-brand-text: var(--brand-text);
-  --color-accent-text: var(--accent-text);
+  --color-accent-ink: var(--accent-ink);
+  --color-danger: var(--danger);
   --color-border: var(--border);
   --color-ok: var(--ok);
   --color-warn: var(--warn);
   --color-photo: var(--photo);
-  --color-control: var(--control);
-  --color-scrim: var(--scrim);
-  --font-display: var(--font-serif), Georgia, "Times New Roman", serif;
+  --shadow-card: var(--shadow-card);
+  --font-display: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-sans: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --radius-pill: 999px;
-  /* Nur noch fuer Flaechen, die wirklich eine eigene Form haben: das Foto
-     einer Rezeptkachel in der Uebersicht. Die Rezeptseite selbst rundet
-     nichts — dort laeuft das Foto bis an den Bildschirmrand. */
-  --radius-card: 28px;
-  --radius-soft: 11px;
+  /* Die Rezeptvorschau-Karte in der Uebersicht — die einzige Flaeche mit
+     eigenem Schatten (design-system.md, Abschnitt 6). */
+  --radius-card: 24px;
+  /* Zutatenkacheln, Foto in der Karte: abgerundetes Rechteck, keine Kreise
+     mehr. */
+  --radius-tile: 14px;
+  --radius-soft: 12px;
 }
 
 html {
@@ -259,11 +208,10 @@ select,
 /* ---------------------------------------------------------------------------
    Zutatenreihe: waagerecht scrollbar, ohne sichtbaren Balken.
 
-   Im Entwurf stehen vier Kreise nebeneinander und der vierte ist angeschnitten
-   — das ist kein Zufall, sondern die Einladung zu wischen. Ein Rezept mit
-   fuenfzehn Zutaten darf die Karte trotzdem nicht sprengen. `scroll-snap`
-   sorgt dafuer, dass die Reihe nach dem Wischen nicht zwischen zwei Kreisen
-   stehen bleibt. */
+   Im Entwurf steht die vierte Kachel angeschnitten da — das ist kein Zufall,
+   sondern die Einladung zu wischen. Ein Rezept mit fuenfzehn Zutaten darf die
+   Karte trotzdem nicht sprengen. `scroll-snap` sorgt dafuer, dass die Reihe
+   nach dem Wischen nicht zwischen zwei Kacheln stehen bleibt. */
 @utility ingredient-rail {
   scrollbar-width: none;
   -ms-overflow-style: none;

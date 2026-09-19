@@ -373,7 +373,7 @@ export function RecipeForm({
       </Section>
 
       <Section>
-        <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
+        <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
           Zutaten
         </h2>
 
@@ -402,7 +402,7 @@ export function RecipeForm({
                     }
                     placeholder="Zutat"
                     autoCapitalize="sentences"
-                    className="h-11 min-w-0 flex-1 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-accent"
+                    className="h-11 min-w-0 flex-1 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
                   />
                   <button
                     type="button"
@@ -426,7 +426,7 @@ export function RecipeForm({
                     }
                     placeholder="Menge"
                     inputMode="decimal"
-                    className="h-11 w-24 shrink-0 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-accent"
+                    className="h-11 w-24 shrink-0 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
                   />
                   <select
                     aria-label="Einheit"
@@ -434,7 +434,7 @@ export function RecipeForm({
                     onChange={(event) =>
                       updateRow(row.key, { unitCode: event.target.value })
                     }
-                    className="h-11 w-28 shrink-0 appearance-none rounded-soft border border-border bg-soft px-2 text-base outline-none focus:border-accent"
+                    className="h-11 w-28 shrink-0 appearance-none rounded-soft border border-border bg-soft px-2 text-base outline-none focus:border-text"
                   >
                     <option value="">ohne</option>
                     {UNITS.map((unit) => (
@@ -450,7 +450,7 @@ export function RecipeForm({
                       updateRow(row.key, { note: event.target.value })
                     }
                     placeholder="Notiz"
-                    className="h-11 min-w-0 flex-1 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-accent"
+                    className="h-11 min-w-0 flex-1 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
                   />
                 </div>
                 {unsure && (

@@ -140,7 +140,7 @@ export function RecipeImageField({
         onChange={(event) => void pick(event.target.files?.[0])}
       />
 
-      {error && <p className="text-[13px] text-accent">{error}</p>}
+      {error && <p className="text-[13px] text-danger">{error}</p>}
     </div>
   );
 }

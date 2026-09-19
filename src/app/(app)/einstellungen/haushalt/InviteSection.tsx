@@ -87,7 +87,7 @@ export function InviteSection({
                 <button
                   type="button"
                   onClick={() => void copy(invite.code)}
-                  className="h-11 flex-1 rounded-lg border border-border text-[15px] press"
+                  className="h-11 flex-1 rounded-soft border border-border text-[15px] press"
                 >
                   {copied === invite.code ? "Kopiert" : "Kopieren"}
                 </button>
@@ -97,7 +97,7 @@ export function InviteSection({
                   onClick={() =>
                     void withSupabase((supabase) => revokeInvite(supabase, invite.code))
                   }
-                  className="h-11 flex-1 rounded-lg border border-border text-[15px] text-muted press disabled:opacity-50"
+                  className="h-11 flex-1 rounded-soft border border-border text-[15px] text-muted press disabled:opacity-50"
                 >
                   Zurücknehmen
                 </button>

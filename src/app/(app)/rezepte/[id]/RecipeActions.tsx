@@ -18,14 +18,14 @@ import { Notice } from "@/components/ui";
  * Der Aufbau folgt dem Entwurf:
  *
  *     Zutaten                        [−  2  +]
- *     ○ ○ ○ ○ →          (Fotos, waagerecht)
+ *     ▢ ▢ ▢ ▢ →          (Fotos, waagerecht)
  *     200 g   Nudeln     (die genauen Mengen)
  *     ＋ Einkaufsliste
  *
- * Die Reihe mit den Kreisen ist der auffälligste Zug des Entwurfs und
+ * Die Reihe mit den Kacheln ist der auffälligste Zug des Entwurfs und
  * gleichzeitig das, was man im Laden zuerst liest: ein Bild ist schneller
  * erfasst als ein Wort. Sie ersetzt die Liste darunter aber nicht — Emil lebt
- * von den umgerechneten Mengen, und die stehen in keinem Kreis.
+ * von den umgerechneten Mengen, und die stehen in keiner Kachel.
  *
  * Der Portionswähler rechnet bei jedem Tippen **aus der Basismenge** neu, nie
  * aus dem zuletzt angezeigten Wert. Sonst käme ein Weg von 4 auf 6 und zurück
@@ -139,7 +139,7 @@ export function IngredientsSection({
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-        <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
+        <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
           Zutaten
         </h2>
         <ServingStepper
@@ -150,9 +150,9 @@ export function IngredientsSection({
       </div>
 
       {rail.length > 0 && (
-        /* Bis an den Kartenrand und darüber hinaus: der angeschnittene vierte
-           Kreis ist im Entwurf die Einladung zu wischen. Mit Innenabstand
-           innerhalb der Scrollfläche, damit der erste Kreis trotzdem bündig
+        /* Bis an den Kartenrand und darüber hinaus: die angeschnittene vierte
+           Kachel ist im Entwurf die Einladung zu wischen. Mit Innenabstand
+           innerhalb der Scrollfläche, damit die erste Kachel trotzdem bündig
            unter der Überschrift steht. */
         <ul className="ingredient-rail -mx-5 mt-5 flex gap-4 overflow-x-auto px-5">
           {rail.map((item) => (
@@ -175,7 +175,7 @@ export function IngredientsSection({
           return (
             <li key={line.id}>
               {showGroup && (
-                <p className="mb-2 mt-4 font-display text-[17px] font-semibold leading-[1.25]">
+                <p className="mb-2 mt-4 font-display text-[15px] font-semibold leading-[1.3]">
                   {line.groupLabel}
                 </p>
               )}
@@ -218,11 +218,11 @@ export function IngredientsSection({
   );
 }
 
-/** Ein Kreis in der Zutatenreihe: Foto oben, Name darunter. */
+/** Eine Kachel in der Zutatenreihe: Foto oben, Name darunter. */
 function IngredientItem({ name, src }: { name: string; src: string | null }) {
   return (
     <li className="flex w-18 shrink-0 flex-col items-center gap-2">
-      <span className="flex size-18 items-center justify-center overflow-hidden rounded-pill bg-chip">
+      <span className="flex size-18 items-center justify-center overflow-hidden rounded-tile bg-chip">
         {src ? (
           /* Kein next/image: die Datei liegt schon in genau der Größe im
              public-Ordner, in der sie gebraucht wird. Der Optimierer hätte
@@ -246,7 +246,7 @@ function IngredientItem({ name, src }: { name: string; src: string | null }) {
           Reihe muss gleich hoch bleiben, sonst franst sie aus.
           `hyphens-auto` ist hier keine Feinheit: deutsche Zutatennamen sind
           oft ein einziges langes Wort, und ohne Trennung steht „Champignons"
-          breiter da als sein Kreis und schiebt sich unter den Nachbarn. */}
+          breiter da als seine Kachel und schiebt sich unter den Nachbarn. */}
       <span className="line-clamp-2 hyphens-auto break-words text-center text-[13px] font-medium leading-[1.2]">
         {name}
       </span>
@@ -324,7 +324,7 @@ function StepperButton({
       onClick={onClick}
       className="flex h-11 w-11 items-center justify-center press tap-target disabled:opacity-30"
     >
-      <span className="flex h-8 w-8 items-center justify-center rounded-pill bg-control">
+      <span className="flex h-8 w-8 items-center justify-center rounded-pill bg-card">
         {children}
       </span>
     </button>
@@ -332,15 +332,16 @@ function StepperButton({
 }
 
 /**
- * „Auf die Einkaufsliste“ — eine zurückhaltende Aktion, kein großer CTA.
+ * „Auf die Einkaufsliste“ — eine schmale, aber wichtige Sekundäraktion.
  *
- * Der Zustandswechsel läuft nicht über Grün, sondern über einen sehr leisen
- * Flächenwechsel und ein Häkchen. Das ist im Entwurf die einzige Art, in der
- * überhaupt etwas „bestätigt“ aussieht.
+ * Ruhezustand jetzt in `--accent`: die Markenfarbe aus docs/app_redesign.jpg
+ * trägt genau diese Art Aktion dort auch („Details"-Knopf). Sobald das Rezept
+ * auf der Liste liegt, wechselt die Fläche auf `--soft` und der Text auf
+ * `--text` — kein Grün, kein zweites Signal neben Gold.
  *
  * Drei Zustände statt zwei: liegt das Rezept mit einer **anderen**
  * Portionszahl auf der Liste, ist der Knopf wieder offen und beschriftet mit
- * „Liste aktualisieren“ — sonst sähe die Liste bestätigt aus, während sie
+ * „Liste aktualisieren" — sonst sähe die Liste bestätigt aus, während sie
  * andere Mengen enthält als das, was hier gerade auf dem Schirm steht.
  */
 function ShoppingListButton({
@@ -361,12 +362,12 @@ function ShoppingListButton({
       disabled={disabled || on}
       aria-live="polite"
       className={
-        "inline-flex h-9 items-center gap-2 rounded-soft px-3.5 text-[13px] " +
+        "inline-flex h-9 items-center gap-2 rounded-pill px-3.5 text-[13px] " +
         "font-medium transition-colors duration-200 ease-out press tap-target " +
         "disabled:cursor-default " +
         (on
           ? "bg-soft text-text"
-          : "border border-border text-text disabled:opacity-40")
+          : "bg-accent text-accent-ink disabled:opacity-40")
       }
     >
       {on ? <CheckIcon className="h-4 w-4" /> : <PlusIcon className="h-4 w-4" />}
@@ -447,7 +448,7 @@ export function DeleteRecipe({
             // Leise über Größe und Position, nicht über Blässe: `--muted`
             // wäre hier korrekt lesbar, zöge aber die Aufmerksamkeit auf
             // einen Unterschied, der keiner sein soll.
-            (ask ? "border border-accent text-accent" : "text-muted")
+            (ask ? "border border-danger text-danger" : "text-muted")
           }
         >
           {deleting

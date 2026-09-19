@@ -33,10 +33,10 @@ import { Section, Notice } from "@/components/ui";
  * - **Abgehaktes bleibt stehen.** Einträge nach unten wandern zu lassen sieht
  *   aufgeräumt aus, verschiebt aber im selben Moment die Kachel darunter unter
  *   den Daumen, der schon unterwegs ist.
- * - **Drei pro Reihe, Bild oben, Name und Menge darunter** — nach dem Entwurf
- *   in app_design.jpg. Ein Bild ist im Laden schneller erfasst als ein Wort;
- *   man sucht im Regal nach der Sache, nicht nach ihrem Namen. Fehlt das Bild,
- *   steht der Anfangsbuchstabe im Kreis, damit die Reihe nicht ausfranst.
+ * - **Drei pro Reihe, Bild oben, Name und Menge darunter.** Ein Bild ist im
+ *   Laden schneller erfasst als ein Wort; man sucht im Regal nach der Sache,
+ *   nicht nach ihrem Namen. Fehlt das Bild, steht der Anfangsbuchstabe in der
+ *   Kachel, damit die Reihe nicht ausfranst.
  * - **Das Häkchen wirkt sofort**, auch bevor der Server geantwortet hat. Geht
  *   es schief, springt es zurück und die Meldung erklärt warum.
  */
@@ -350,7 +350,7 @@ export function ListView({
       )}
 
       <Section>
-        <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
+        <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
           Etwas ergänzen
         </h2>
         <div className="mt-3 flex gap-2">
@@ -413,13 +413,13 @@ export function ListView({
 
       {adding.length > 0 && (
         <section className="space-y-3">
-          <h2 className="font-display text-[19px] font-semibold tracking-tight">
+          <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
             Wird ergänzt
           </h2>
           <ul className="grid grid-cols-3 gap-x-3 gap-y-5">
             {adding.map((item) => (
               <li key={item.id} className="flex flex-col items-center gap-2 opacity-50">
-                <span className="aspect-square w-full rounded-pill bg-chip" />
+                <span className="aspect-square w-full rounded-tile bg-chip" />
                 <span className="w-full text-center text-[13px] font-medium leading-tight">
                   {item.label}
                 </span>
@@ -437,7 +437,7 @@ export function ListView({
 
         return (
           <section key={group.name} className="space-y-3">
-            <h2 className="font-display text-[19px] font-semibold tracking-tight">
+            <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
               {group.name}
             </h2>
 
@@ -466,7 +466,7 @@ export function ListView({
                         <span
                           className={
                             "flex h-full w-full items-center justify-center " +
-                            "overflow-hidden rounded-pill bg-chip " +
+                            "overflow-hidden rounded-tile bg-chip " +
                             // Abgehakt wird das Bild blass, das Häkchen
                             // darüber bleibt kräftig — sonst verschwindet
                             // genau die Rückmeldung mit, auf die man wartet.
@@ -501,7 +501,7 @@ export function ListView({
                           <span className="absolute inset-0 flex items-center justify-center">
                             <span
                               aria-hidden
-                              className="flex h-9 w-9 items-center justify-center rounded-pill bg-panel text-[17px] text-panel-text"
+                              className="flex h-9 w-9 items-center justify-center rounded-pill bg-accent text-[17px] text-accent-ink"
                             >
                               ✓
                             </span>
@@ -611,7 +611,7 @@ export function ListView({
                 <button
                   type="button"
                   onClick={() => removeEntry(openEntry)}
-                  className="h-11 w-full rounded-pill border border-accent text-[15px] text-accent press"
+                  className="h-11 w-full rounded-pill border border-danger text-[15px] text-danger press"
                 >
                   Von der Liste nehmen
                 </button>

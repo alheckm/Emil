@@ -10,14 +10,14 @@ import { DeleteRecipe, IngredientsSection } from "./RecipeActions";
 import { RecipeHero } from "./RecipeHero";
 
 /**
- * Das Rezept — ein Screen, eine Fläche, wie in app_design.jpg.
+ * Das Rezept — ein Screen, eine Fläche, wie in docs/app_redesign.jpg.
  *
- * Der Aufbau ist der des Entwurfs und nicht der einer Formularseite: oben das
- * Foto über die volle Bildschirmbreite bis unter die Statusleiste, der Titel
- * als weiße Serife darauf, darunter im warmen Off-White die Zutaten und die
- * Zubereitung. Keine Kopfzeile über dem Bild, keine Karte darum: der Screen
- * **ist** die Fläche. Deshalb `bleed` — der Rahmen gibt seinen Seitenrand ab,
- * und die Abschnitte unter dem Foto setzen ihren eigenen (20 px, `px-5`).
+ * Oben das Foto über die volle Bildschirmbreite bis unter die Statusleiste,
+ * ohne Titel darauf; darunter im fliederblauen `--bg` Titel, Merkmal-Chips,
+ * Zutaten und Zubereitung. Keine Kopfzeile über dem Bild, keine Karte darum:
+ * der Screen **ist** die Fläche. Deshalb `bleed` — der Rahmen gibt seinen
+ * Seitenrand ab, und die Abschnitte unter dem Foto setzen ihren eigenen
+ * (20 px, `px-5`).
  *
  * An der Aufteilung fürs Streaming ändert das nichts:
  *
@@ -28,7 +28,7 @@ import { RecipeHero } from "./RecipeHero";
  *   von der Übersicht tragen `prefetch`, damit es meist schon da ist.
  * - **Bild** bekommt eine eigene Grenze. Die signierte Adresse ist eine
  *   weitere Runde zum Storage, und das darf den Titel nie aufhalten — der
- *   steht auf dem dunklen Bett, das ohne das Foto genauso aussieht.
+ *   steht im Text darunter, unabhängig vom Foto.
  * - **Listenstand** kommt aus `getListState()` und liegt damit schon im
  *   Zwischenspeicher, bevor geklickt wurde.
  */
@@ -74,13 +74,31 @@ async function RecipeDetail({ params }: { params: Params }) {
 
   return (
     <>
-      <RecipeHero title={value.title} recipeId={value.id}>
+      <RecipeHero recipeId={value.id}>
         {value.imagePath && (
           <Suspense fallback={null}>
             <RecipeImage imagePath={value.imagePath} />
           </Suspense>
         )}
       </RecipeHero>
+
+      {/* Titel und Kenndaten stehen jetzt unter dem Foto, auf `--bg` — nicht
+          mehr darauf. Design-System, Abschnitt 7, RecipeHero. */}
+      <div className="px-5 pt-5">
+        <h1 className="font-display text-[26px] font-bold leading-[1.2] [text-wrap:balance]">
+          {value.title}
+        </h1>
+        <ul className="mt-3 flex flex-wrap gap-2">
+          <li className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium">
+            {value.baseServings} {value.servingsLabel}
+          </li>
+          {value.totalTimeMin && (
+            <li className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium">
+              {value.totalTimeMin} Min
+            </li>
+          )}
+        </ul>
+      </div>
 
       <ListAwareIngredients recipe={value} />
 
@@ -90,7 +108,7 @@ async function RecipeDetail({ params }: { params: Params }) {
 
       {value.notes && (
         <section className="px-5 pb-6">
-          <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
+          <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
             Notizen
           </h2>
           <p className="mt-3 whitespace-pre-line text-[15px] leading-[1.55]">
@@ -99,21 +117,9 @@ async function RecipeDetail({ params }: { params: Params }) {
         </section>
       )}
 
-      {(value.tags.length > 0 || value.sourceUrl || value.totalTimeMin) && (
+      {(value.tags.length > 0 || value.sourceUrl) && (
         <div className="space-y-1 px-5 pb-6 text-[13px] text-muted">
-          {/* Kochzeit und Schlagwörter in einer Zeile: beides ist Beiwerk,
-              beides wird selten gelesen, und beides gehört unter den Text und
-              nicht auf das Foto. */}
-          {(value.totalTimeMin || value.tags.length > 0) && (
-            <p>
-              {[
-                value.totalTimeMin ? `${value.totalTimeMin} Minuten` : null,
-                ...value.tags,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-            </p>
-          )}
+          {value.tags.length > 0 && <p>{value.tags.join(" · ")}</p>}
           {value.sourceUrl && (
             <p className="truncate">
               <a
@@ -137,16 +143,18 @@ async function RecipeDetail({ params }: { params: Params }) {
 /**
  * Die Zubereitung.
  *
- * Die Ziffer steht in einem kleinen schwarzen Quadrat — im Entwurf die einzige
- * kräftige Fläche des ganzen Screens, und der Grund, warum die Schritte sich
- * lesen wie ein Kochbuch und nicht wie eine Aufzählung. Kursive Serife darin,
- * wie im JPEG; `aria-hidden`, weil eine geordnete Liste die Nummer ohnehin
- * ansagt und sie sonst doppelt käme.
+ * Die Ziffer steht in einem Quadrat in `--accent` — die Markenfarbe aus
+ * docs/app_redesign.jpg, nicht mehr der schwarze Ziffernkasten (Nutzer-
+ * entscheidung, design-system.md Abschnitt 7 und 14.3). **Nicht kursiv**:
+ * Kursiv ist jetzt ausschließlich dem Namen in der Begrüßung vorbehalten
+ * (Abschnitt 5) — das ist genau die Stelle, an der ein bloßes `bg-panel` →
+ * `bg-accent` das alte `italic` übersehen hätte. `aria-hidden`, weil eine
+ * geordnete Liste die Nummer ohnehin ansagt und sie sonst doppelt käme.
  */
 function RecipeSteps({ steps }: { steps: string[] }) {
   return (
     <section className="px-5 pb-6">
-      <h2 className="font-display text-[19px] font-semibold leading-[1.25]">
+      <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
         Zubereitung
       </h2>
       <ol className="mt-4 space-y-4">
@@ -154,7 +162,7 @@ function RecipeSteps({ steps }: { steps: string[] }) {
           <li key={index} className="flex gap-4">
             <span
               aria-hidden
-              className="flex size-6 shrink-0 items-center justify-center rounded-[6px] bg-panel font-display text-[13px] italic text-panel-text"
+              className="flex size-6 shrink-0 items-center justify-center rounded-soft bg-accent font-display text-[13px] font-bold text-accent-ink"
             >
               {index + 1}
             </span>
