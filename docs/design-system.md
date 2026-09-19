@@ -335,11 +335,34 @@ keine Entsprechung in der Referenz, und die genaue Menge steht ohnehin nur im
 Text.
 
 Fotos bleiben der Einkaufsliste vorbehalten, wo sie beim Einsortieren im
-Regal tatsächlich helfen: Raster, drei Spalten, `gap-x-3 gap-y-5`, Kachel
-`--radius-tile`, `bg-chip`, freigestelltes Foto `object-fit: cover`, Name
-darunter in 13 px mit `hyphens-auto` und Zwei-Zeilen-Deckel. Fehlt ein Foto,
-steht der Anfangsbuchstabe in `--muted`. Abgehakt: Bild `opacity-40`, ein
-Häkchen-Badge in `--accent`/`--accent-ink` bleibt kräftig darüber.
+Regal tatsächlich helfen: Raster, drei Spalten, `gap-x-2 gap-y-3`, Kachel
+`--radius-tile`, `bg-chip`, freigestelltes Foto `object-fit: cover`. Unter dem
+Foto stehen **Name und Menge**, je 13 px mit `hyphens-auto` und
+Zwei-Zeilen-Deckel — beides gehört zur Kachel, nicht nur der Name, weil im
+Laden die Menge genauso zählt wie die Zutat selbst. Fehlt ein Foto, steht der
+Anfangsbuchstabe in `--muted`. Abgehakt: Bild `opacity-40`, ein Häkchen-Badge
+in `--accent`/`--accent-ink` bleibt kräftig darüber.
+
+**Ein Raster, nach Abteilung geordnet — keine Box je Abteilung.** Ein erster
+Durchgang hatte jede Abteilung als eigenen Abschnitt mit eigenem Drei-Spalten-
+Raster gebaut; eine unvollständige letzte Reihe ließ die Abteilung wie einen
+eigenen Kasten mit Restplatz wirken, obwohl die Abteilung nur die Reihenfolge
+bestimmt. Jetzt liegt die ganze Liste in **einem** Raster, die Abteilung
+steht als schmale, volle Zeile über der ersten Kachel, die zu ihr gehört, und
+die Kacheln danach laufen normal weiter — auch über eine unvollständige Reihe
+hinweg.
+
+**Details per Longpress, nicht über ein „⋯"-Menü.** Ein erster Durchgang
+hatte oben rechts auf jeder Kachel einen kleinen `⋯`-Knopf, der die
+Zusatzinfos (Rezeptquellen, Abteilung ändern, „von der Liste nehmen") *unter
+der ganzen Abteilung* aufklappte — das war zweimal indirekt: ein Zusatzknopf
+neben der eigentlichen Trefferfläche, und ein Aufklapp-Ort, der nicht bei der
+gehaltenen Kachel lag. Jetzt hält man die Kachel selbst (500 ms), das öffnet
+die Details **direkt unter dieser einen Kachel**, als eigene volle Zeile im
+selben Raster. Ein kurzer Antipper hakt weiterhin ab, wie zuvor — die ganze
+Kachel bleibt die einzige Trefferfläche. Bekannte Lücke: die Details sind
+damit nur per Touch/Maus-Halten erreichbar, ohne Tastatur-Entsprechung (siehe
+Abschnitt 12).
 
 ### ServingStepper
 `RecipeActions.tsx`. Pille rechts neben „Zutaten" (`bg-soft` auf `--bg`),
@@ -511,6 +534,12 @@ Arbeitsliste, kein Ist-Zustand. Stand 19.09.2026:
    (`scripts/ingredient-images/`), sichtbar in der Einkaufsliste — dem
    einzigen Ort, an dem sie noch erscheinen (siehe „Zutatenkacheln — nur in
    der Einkaufsliste", Abschnitt 7).
+6. **Die Zusatzinfos einer Einkaufslisten-Zutat (Longpress) haben keine
+   Tastatur-Entsprechung.** Kurzes Antippen hakt weiter über Enter/Leertaste
+   ab, aber Rezeptquellen, Abteilung ändern und „von der Liste nehmen" sind
+   nur per Halten (Touch/Maus) erreichbar. Braucht noch einen Weg ohne
+   Zeigegerät — etwa eine Kontextmenü-Taste oder eine zweite, per Tastatur
+   fokussierbare Aktion.
 
 ---
 
