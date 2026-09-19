@@ -15,13 +15,17 @@ import { startTransition, useOptimistic } from "react";
  * Bauform nach docs/app_redesign.jpg (design-system.md, Abschnitt 7): keine
  * bildschirmbreite, sticky Leiste mit Haarlinie mehr, sondern eine
  * freistehende, vollgerundete Fläche (`--card` mit `--shadow-card`), mit
- * sichtbarem `--bg`-Rand ringsum. Der aktive Eintrag bekommt ein eigenes,
- * dunkles Icon-Badge plus Label auf einer `--well`-Kapsel (heller Ton auf
- * `--card`, nicht `--soft` — das ist für Bedienflächen auf `--bg` reserviert)
- * und nimmt sich dafür die überschüssige Breite der Leiste (`flex-1`); die
- * inaktiven Einträge bleiben auf Icongröße (`shrink-0`), Symbolfarbe
- * `--icon-muted` — heller als `--muted`, weil sie auf `--card` stehen, nicht
- * auf `--bg`.
+ * sichtbarem `--bg`-Rand ringsum. Alle drei Einträge sind gleich breit
+ * (`flex-1`) und zeigen ihr Label dauerhaft — nur die Farbe/Kapsel wechselt
+ * mit dem aktiven Zustand, nicht die Größe. So bleibt jedes Symbol an seinem
+ * Platz, statt beim Tab-Wechsel zur Seite zu springen. Der aktive Eintrag
+ * bekommt ein eigenes, dunkles Icon-Badge plus Label auf einer `--well`-Kapsel
+ * (heller Ton auf `--card`, nicht `--soft` — das ist für Bedienflächen auf
+ * `--bg` reserviert), die die volle Breite ihrer Spalte ausfüllt — beim
+ * ersten Eintrag reicht sie damit bis an die linke Rundung der Leiste heran,
+ * genau wie zuvor bei der asymmetrischen Aufteilung. Der inaktive Eintrag
+ * zeigt Symbol und Label in `--icon-muted` — heller als `--muted`, weil er
+ * auf `--card` steht, nicht auf `--bg`.
  *
  * Der Kern gegen die gefühlte Trägheit ist `useOptimistic`: der angetippte Tab
  * wird im selben Frame aktiv, statt erst wenn der Server geantwortet hat.
@@ -126,33 +130,32 @@ function Frame({
         {TABS.map((tab) => {
           const current = active === tab.href;
           return (
-            <li key={tab.href} className={current ? "flex-1" : "shrink-0"}>
+            <li key={tab.href} className="flex-1">
               <Link
                 href={tab.href}
                 aria-current={current ? "page" : undefined}
                 onClick={() => onSelect?.(tab.href)}
                 className={
-                  "flex min-h-11 items-center press-flat tap-target " +
-                  // Aktiv: eine helle Kapsel (`--well`), darin ein eigenes
-                  // schwarzes Kreis-Badge nur ums Symbol — genau das Muster
-                  // aus der Referenz, nicht die ganze Fläche schwarz. Nimmt
-                  // sich die überschüssige Breite der Leiste. Inaktiv: nur
-                  // das Symbol in `--icon-muted`, auf Icongröße geschrumpft,
-                  // ohne Fläche, ohne Label.
+                  // Jede Spalte gleich breit und immer mit Label — nur Farbe
+                  // und Kapsel wechseln mit dem aktiven Zustand, nie die
+                  // Größe, sonst springt das Symbol beim Tab-Wechsel zur
+                  // Seite. Die Kapsel füllt dafür ihre ganze Spalte aus, beim
+                  // ersten Eintrag also bis an die linke Rundung der Leiste.
+                  "flex min-h-11 w-full items-center gap-2 rounded-pill pl-1 pr-3 text-[12px] press-flat tap-target " +
                   (current
-                    ? "gap-2 rounded-pill bg-well py-1 pl-1 pr-4 text-[12px] font-semibold text-text"
-                    : "h-11 w-11 items-center justify-center text-icon-muted")
+                    ? "bg-well font-semibold text-text"
+                    : "font-medium text-icon-muted")
                 }
               >
                 <span
                   className={
-                    "flex h-8 w-8 items-center justify-center rounded-pill " +
+                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-pill " +
                     (current ? "bg-text text-card" : "")
                   }
                 >
                   <tab.Icon />
                 </span>
-                {current && tab.label}
+                {tab.label}
               </Link>
             </li>
           );
