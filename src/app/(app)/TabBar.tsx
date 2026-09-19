@@ -16,8 +16,10 @@ import { startTransition, useOptimistic } from "react";
  * bildschirmbreite, sticky Leiste mit Haarlinie mehr, sondern eine
  * freistehende, vollgerundete Fläche (`--card` mit `--shadow-card`), mit
  * sichtbarem `--bg`-Rand ringsum. Der aktive Eintrag bekommt ein eigenes,
- * dunkles Icon-Badge plus Label auf einer `--soft`-Kapsel; der inaktive zeigt
- * nur das Symbol in `--muted`, ohne Badge, ohne Label.
+ * dunkles Icon-Badge plus Label auf einer `--well`-Kapsel (heller Ton auf
+ * `--card`, nicht `--soft` — das ist für Bedienflächen auf `--bg` reserviert);
+ * der inaktive zeigt nur das Symbol in `--muted`, ohne Badge, ohne Label.
+ * Beide Einträge bleiben gleich breit.
  *
  * Der Kern gegen die gefühlte Trägheit ist `useOptimistic`: der angetippte Tab
  * wird im selben Frame aktiv, statt erst wenn der Server geantwortet hat.
@@ -103,19 +105,23 @@ function Frame({
         {TABS.map((tab) => {
           const current = active === tab.href;
           return (
-            <li key={tab.href} className={current ? "flex-1" : "shrink-0"}>
+            <li key={tab.href} className="flex flex-1 justify-center">
               <Link
                 href={tab.href}
                 aria-current={current ? "page" : undefined}
                 onClick={() => onSelect?.(tab.href)}
                 className={
                   "flex min-h-11 items-center press-flat tap-target " +
-                  // Aktiv: eine helle Grau-Kapsel (`--soft`), darin ein
-                  // eigenes schwarzes Kreis-Badge nur ums Symbol — genau das
-                  // Muster aus der Referenz, nicht die ganze Fläche schwarz.
-                  // Inaktiv: nur das Symbol, ohne Fläche, ohne Label.
+                  // Aktiv: eine helle Kapsel (`--well`, gemessen auf der
+                  // weissen Tab-Leiste — deutlich heller als `--soft`, das
+                  // auf `--bg` sitzt), darin ein eigenes schwarzes
+                  // Kreis-Badge nur ums Symbol — genau das Muster aus der
+                  // Referenz, nicht die ganze Fläche schwarz. Inaktiv: nur
+                  // das Symbol, ohne Fläche, ohne Label. Beide Tabs bleiben
+                  // gleich breit (`flex-1` am `<li>`), nur der Inhalt
+                  // unterscheidet sich.
                   (current
-                    ? "gap-2 rounded-pill bg-soft py-1 pl-1 pr-4 text-[12px] font-semibold text-text"
+                    ? "gap-2 rounded-pill bg-well py-1 pl-1 pr-4 text-[12px] font-semibold text-text"
                     : "h-11 w-11 items-center justify-center text-muted")
                 }
               >

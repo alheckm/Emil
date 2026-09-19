@@ -125,6 +125,7 @@ JPEG-Kompressionsgründen angepasst werden musste, steht das explizit dabei.
 | `--warn` | `#7a4f18` | 4,7 : 1 auf `--bg`. Bewusst dunkler Bronzeton, nicht Gold — sonst ist eine Warnmeldung von einer CTA-Pille nicht zu unterscheiden. |
 | `--photo` | `#bcc4d6` (= `--soft`) | Das Bett unter einem Rezeptfoto, solange die signierte Adresse noch unterwegs ist, oder wenn ein Rezept keins hat. |
 | `--shadow-card` | `0 16px 32px -14px rgba(23,25,40,.28)` | Der einzige Schatten im System, exklusiv für `--card`. |
+| `--well` | `#f3f4f9` | Die Kapsel um den aktiven Tab in der Tab-Leiste — sitzt auf `--card` (Weiß), braucht deshalb nur einen Hauch Abhebung, nicht das Blaugrau von `--soft`. Exakt gemessen, nicht abgeleitet. |
 
 **Ein Vorbehalt zu `--accent` auf `--bg`:** Gold auf dem Fliederblau hat nur
 **1,02 : 1** Kontrast — praktisch unsichtbar als dünne Kontur oder kleines
@@ -366,12 +367,19 @@ Schritten 16 px.
 sticky Leiste mit Haarlinie mehr. Zwei Einträge (Einkauf, Rezepte).
 
 Der aktive Eintrag ist **nicht** vollflächig schwarz — das war ein erster,
-zu grober Durchgang. Die Referenz zeigt eine helle Grau-Kapsel (`--soft`),
-und nur das Symbol darin sitzt in einem eigenen kleinen schwarzen Kreis
-(`bg-text text-card`, 32 px); das Label steht direkt auf der Kapsel, in
-`--text`. Der inaktive Eintrag zeigt nur das Symbol in `--muted`, ohne
-Fläche, ohne Label. Wechsel im selben Frame (`useOptimistic`), `data-pending`
-dimmt den Inhalt darüber.
+zu grober Durchgang. Die Referenz zeigt eine helle Kapsel in `--well`
+(`#f3f4f9`, exakt auf der Leiste gemessen — **nicht** `--soft`, das für
+Bedienflächen auf `--bg` reserviert ist und dort deutlich mehr Blaugrau
+braucht, um sich abzusetzen), und nur das Symbol darin sitzt in einem
+eigenen kleinen schwarzen Kreis (`bg-text text-card`, 32 px); das Label steht
+direkt auf der Kapsel, in `--text`. Der inaktive Eintrag zeigt nur das Symbol
+in `--muted`, ohne Fläche, ohne Label.
+
+Beide Einträge sind **gleich breit** (`flex-1` an jedem `<li>`, Inhalt
+zentriert) — ein Zwischenstand hatte dem aktiven Eintrag die überschüssige
+Breite zugeschlagen und den inaktiven auf Icongröße schrumpfen lassen, was
+die Leiste beim Wechseln seitlich verschob. Wechsel im selben Frame
+(`useOptimistic`), `data-pending` dimmt den Inhalt darüber.
 
 ### RowLink / Field / Select / Textarea / Button / Notice
 `src/components/ui.tsx`. `RowLink`: mindestens 56 px hoch, `bg-soft` mit
@@ -513,7 +521,9 @@ gegengeprüft:
       in der Einkaufsliste
 - [x] Ziffernkasten in `--accent`
 - [x] Tab-Leiste freistehend, gerundet, mit Schatten — aktiver Eintrag als
-      helle Kapsel mit schwarzem Icon-Kreis, nicht vollflächig schwarz
+      helle `--well`-Kapsel mit schwarzem Icon-Kreis, nicht vollflächig
+      schwarz und nicht `--soft`
+- [x] Beide Tab-Einträge gleich breit
 - [x] Titelgröße nah an der gemessenen Umrechnung (32 px), nicht grob
       abgerundet
 - [x] `--accent` nie als dünne Linie oder Text direkt auf `--bg`
