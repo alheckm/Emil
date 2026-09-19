@@ -152,9 +152,10 @@ def to_chip(im: Image.Image) -> Image.Image:
 
 
 def ingredient_names() -> list[str]:
+    """Jede Zutat mit definiertem Bildmotiv — siehe generate.py."""
     script = (
-        "import('%s/scripts/ingredient-seed-data.mjs').then(m => "
-        "console.log(JSON.stringify(Object.values(m.INGREDIENTS).flat())))" % ROOT
+        "import('%s/scripts/ingredient-images/subjects.mjs').then(m => "
+        "console.log(JSON.stringify(Object.keys(m.SUBJECTS))))" % ROOT
     )
     res = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True)
     return json.loads(res.stdout)

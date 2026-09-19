@@ -99,25 +99,34 @@ function Frame({
       data-pending={pending ? "" : undefined}
       className="sticky bottom-0 z-10 px-safe pb-safe"
     >
-      <ul className="mx-auto mb-3 flex w-full max-w-md gap-1 rounded-pill bg-card p-1.5 shadow-card">
+      <ul className="mx-auto mb-3 flex w-full max-w-md items-center gap-1 rounded-pill bg-card p-1.5 shadow-card">
         {TABS.map((tab) => {
           const current = active === tab.href;
           return (
-            <li key={tab.href} className="flex-1">
+            <li key={tab.href} className={current ? "flex-1" : "shrink-0"}>
               <Link
                 href={tab.href}
                 aria-current={current ? "page" : undefined}
                 onClick={() => onSelect?.(tab.href)}
                 className={
-                  "flex min-h-11 items-center justify-center gap-2 rounded-pill " +
-                  "px-3 text-[12px] font-semibold press-flat tap-target " +
-                  (current ? "bg-text text-card" : "text-muted")
+                  "flex min-h-11 items-center press-flat tap-target " +
+                  // Aktiv: eine helle Grau-Kapsel (`--soft`), darin ein
+                  // eigenes schwarzes Kreis-Badge nur ums Symbol — genau das
+                  // Muster aus der Referenz, nicht die ganze Fläche schwarz.
+                  // Inaktiv: nur das Symbol, ohne Fläche, ohne Label.
+                  (current
+                    ? "gap-2 rounded-pill bg-soft py-1 pl-1 pr-4 text-[12px] font-semibold text-text"
+                    : "h-11 w-11 items-center justify-center text-muted")
                 }
               >
-                <tab.Icon />
-                {/* Nur der aktive Eintrag trägt ein Label — genau das Muster
-                    aus der Referenz: „Home" beschriftet, die übrigen Symbole
-                    stehen für sich. */}
+                <span
+                  className={
+                    "flex h-8 w-8 items-center justify-center rounded-pill " +
+                    (current ? "bg-text text-card" : "")
+                  }
+                >
+                  <tab.Icon />
+                </span>
                 {current && tab.label}
               </Link>
             </li>

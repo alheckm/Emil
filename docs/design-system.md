@@ -10,8 +10,12 @@ Die Tokens stehen in `src/app/globals.css`, die Bausteine in
 `src/components/ui.tsx` und den jeweiligen Screen-Komponenten — alle setzen
 um, was hier steht. Ändert sich eine Regel, ändert sie sich hier zuerst.
 
-Stand 19.09.2026: umgesetzt und gegen den Code geprüft (`npm run typecheck`,
-`npm run lint`, `npm run build`, alle grün).
+Stand 19.09.2026: umgesetzt, im Browser gegen `docs/app_redesign.jpg`
+kontrolliert und an mehreren Stellen nachgeschärft, wo der erste Durchgang zu
+grob war (Kartenradius, Foto-Rand, „Details"-Knopf, Tab-Leiste, Titelgröße)
+oder Dinge erfunden hatte, die die Referenz gar nicht zeigt (Begrüßung mit
+Namen, Zutatenkacheln auf dem Rezept-Screen). `npm run typecheck`, `npm run
+lint`, `npm run build` sind grün.
 
 ---
 
@@ -53,9 +57,8 @@ abliest, liest **innerhalb** der Gerätekante ab.
 Innerhalb der Gerätekante gibt es in dieser Referenz **zwei** Flächen, beide
 echt, keine Fehllesung:
 
-1. Eine fliederblaue Grundfläche (`#c9d2e3`), die Statusleiste, Kopfzeile,
-   Begrüßung, Filterzeile und auf dem Detail-Screen den gesamten Inhalt unter
-   dem Foto trägt.
+1. Eine fliederblaue Grundfläche (`#c9d2e3`), die Kopfzeile, Filterzeile und
+   auf dem Detail-Screen den gesamten Inhalt unter dem Foto trägt.
 2. Eine weiße Karte mit Schatten, die **nur** auf dem Übersichts-Screen
    erscheint — als Behälter für eine Rezeptvorschau.
 
@@ -108,7 +111,7 @@ JPEG-Kompressionsgründen angepasst werden musste, steht das explizit dabei.
 
 | Token | Wert | Rolle |
 |---|---|---|
-| `--bg` | `#c9d2e3` | Die Grundfläche. Kopfzeile, Begrüßung, Filterzeile, gesamter Detail-Screen unter dem Foto. |
+| `--bg` | `#c9d2e3` | Die Grundfläche. Kopfzeile, Filterzeile, gesamter Detail-Screen unter dem Foto. |
 | `--card` | `#ffffff` | Die Rezeptvorschau-Karte in der Übersicht — die **einzige** Fläche mit eigenem Schatten. Nirgends sonst. |
 | `--chip` | `#ffffff` | Untergrund der Zutatenkacheln (Abschnitt 7), wie `--card`. |
 | `--soft` | `#bcc4d6` | Sichtbare Bedienfläche auf `--bg`: inaktive Filter-/Schlagwort-Pille, Suchfeld, Formularfeld. |
@@ -166,18 +169,16 @@ Stelle eine Serife zeigt.
 
 **Plus Jakarta Sans** (`--font-sans`, `--font-display` — beide CSS-Variablen
 zeigen auf dieselbe Instanz), geladen über `next/font/google` (400, 500, 600,
-700, kursiv 500). Begründung der Wahl: Die Referenz zeigt ein geometrisches
-Grundgerüst mit leicht humanistischer Abrundung, ein enges, niedriges „a" und
-eine kräftige, nicht überzogene Kursive für die Namens-Betonung in der
-Begrüßung — das trifft Plus Jakarta Sans näher als etwa Inter (zu
-neo-grotesk) oder Manrope (zu rund im Auge).
+700). Begründung der Wahl: Die Referenz zeigt ein geometrisches Grundgerüst
+mit leicht humanistischer Abrundung und ein enges, niedriges „a" — das trifft
+Plus Jakarta Sans näher als etwa Inter (zu neo-grotesk) oder Manrope (zu rund
+im Auge).
 
-### Kursive Betonung
-
-Die Referenz setzt in der Begrüßung genau ein Wort kursiv (den Namen: „Hey
-*Ratul*,"). **Kursiv markiert ausschließlich den Namen** in der Begrüßung auf
-der Rezeptübersicht (bei Emil: der Haushaltsname), nirgends sonst — nicht in
-Rezepttiteln, nicht in Abschnittsüberschriften, nicht im Ziffernkasten.
+Kein Kursiv-Schnitt im Einsatz: Die Referenz setzt in der Begrüßung ein Wort
+kursiv (den Namen: „Hey *Ratul*,"), aber Emils Rezeptübersicht trägt eine
+schlichte „Rezepte"-Überschrift ohne Namen — dafür gibt es keine passende
+Entsprechung, also bleibt Kursiv ungenutzt statt an einer Stelle ohne Vorbild
+erfunden zu werden.
 
 ### Skala
 
@@ -185,22 +186,26 @@ Ergebnis der Umrechnung aus Abschnitt 2 (Faktor ≈ 1,34), mit Untergrenzen.
 
 | Rolle | Größe / Zeile | Schnitt |
 |---|---|---|
-| Rezepttitel (Kachel **und** Detail-Screen) | 26 / 1,2 | 700 |
-| Screen-Überschrift (Einkauf, Einstellungen, Konto, Werkzeug-Screens) | 26 / 1,2 | 700 |
-| Begrüßung „Hallo, *Haushaltsname*" (nur Rezeptübersicht) | 24 / 1,2 | 700, Name kursiv |
+| Rezepttitel (Kachel **und** Detail-Screen) | 32 / 1,15 | 700 |
+| Screen-Überschrift (Rezepte, Einkauf, Einstellungen, Konto, Werkzeug-Screens) | 32 / 1,15 | 700 |
 | Abschnitt („Zutaten", „Zubereitung", „Etwas ergänzen" …) | 15 / 1,3 | 600 |
 | Fließtext, Beschreibung, Zubereitungsschritte | 15 / 1,5 | 400 |
 | Formularfeld-Inhalt | 16 / 1,4 | 400 |
 | Merkmal-Chip (Portionen, Zeit, Schlagwort) | 13 / 1,2 | 500 |
-| Zutatenname unter der Kachel | 13 / 1,2 | 500 |
+| Zutatenname unter der Einkaufslisten-Kachel | 13 / 1,2 | 500 |
 | Nebentext, Feldbeschriftung | 13 / 1,4 | 400 |
 | Filter-/Schlagwort-Pillen-Text | 13 / 1,2 | — |
 | Tab-Beschriftung | 12 / 1,1 | 600 |
-| Schritt-Ziffer im Kasten | 13 | 700, **nicht kursiv** |
+| Schritt-Ziffer im Kasten | 13 | 700 |
 
-Der Rezepttitel bleibt bei 26 px, obwohl die reine Umrechnung deutlich mehr
-ergäbe: deutsche Rezeptnamen sind länger als „Omny Puerto" und brauchen mehr
-Zeilenraum, nicht mehr Größe.
+Der Rezepttitel liegt bei 32 px — näher an der reinen Umrechnung (Abschnitt 2)
+als der erste Durchgang, der ihn auf 26 px gesetzt hatte. Die Umrechnung
+selbst ergäbe rund 42–48 px (aus einer gemessenen Glyphenspanne von 49 px im
+Mockup); 32 px ist der bewusste Kompromiss, weil deutsche Rezeptnamen länger
+sind als „Omny Puerto" und beim reinen Umrechnungswert zu häufig dreizeilig
+würden. Ein zu starker Abschlag von der Messung — wie im ersten Durchgang —
+ist aber selbst ein Fehler, keine Vorsicht: **im Zweifel näher an der
+Umrechnung bleiben, nicht großzügig abrunden.**
 
 Kein Versalsatz mit Sperrsatz (`uppercase tracking-wide`). Die Referenz zeigt
 Groß-/Kleinschreibung durchgehend, auch bei Pillen und Tabs.
@@ -211,21 +216,26 @@ Groß-/Kleinschreibung durchgehend, auch bei Pillen und Tabs.
 
 **Abstände** auf 4er-Raster: 4, 8, 12, 16, 20, 24, 32.
 
-- Screen-Seitenrand: **20 px**, über `px-safe` mit der Safe Area.
+- Screen-Seitenrand: **20 px**, über `px-safe`/`px-5` mit der Safe Area.
 - Kartenabstand in der Übersicht: 20 px zwischen zwei Karten.
-- Karten-Innenabstand: durchgehend 16 px — Text, Chips und Foto teilen sich
-  denselben Rand, keine engere Sonderbehandlung fürs Foto.
+- **Karten-Innenabstand ist zweigeteilt, nicht einheitlich** — das war im
+  ersten Durchgang falsch (durchgehend 16 px angenommen). Gemessen an der
+  Referenz sitzt der Text (Titel, Chips) mit dem vollen Seitenrand von 20 px
+  (`px-5`), das Foto darunter dagegen fast randlos, nur **8 px** zur Karte
+  (`px-2 pb-2`) — es bleibt sichtbar innerhalb der Karte, aber mit deutlich
+  weniger Luft als der Text darüber.
 - Inhaltsbreite: `max-w-md` (448 px), zentriert.
-- **Ausnahme Rezept-Screen:** das Foto läuft über die volle Breite bis unter
-  die Statusleiste; Titel und Abschnitte darunter setzen ihren eigenen
-  Seitenrand.
+- **Rezept-Screen:** das Foto trägt denselben 20-px-Seitenrand wie der Rest
+  der Seite (`px-5`) und läuft **nicht** mehr unter die Statusleiste — es ist
+  eingerückt und gerundet, wie im zweiten Screenshot der Referenz, nicht
+  randlos wie im ersten Durchgang.
 
 **Radien**
 
 | Token | Wert | Wofür |
 |---|---|---|
-| `--radius-card` | 24 px | Die Rezeptvorschau-Karte in der Übersicht, außen. |
-| `--radius-tile` | 14 px | Foto in der Karte, Zutatenkacheln — abgerundetes Rechteck, keine Kreise. |
+| `--radius-card` | 32 px | Die Rezeptvorschau-Karte in der Übersicht (außen), ihr Foto und das Foto auf dem Rezept-Screen — alle drei teilen sich den großen Radius, weil sie mit sehr kleinem Rand nah an ihrer jeweiligen Außenkante sitzen. War 24 px im ersten Durchgang, deutlich zu klein gegen die Referenz. |
+| `--radius-tile` | 14 px | Zutatenkacheln in der Einkaufsliste — abgerundetes Rechteck, keine Kreise. |
 | `--radius-soft` | 12 px | Felder, kleine Knöpfe, Meldungen, Ziffernkasten. |
 | `--radius-pill` | 999 px | Filter-Pillen, CTA-Pillen, Icon-Badges, Tab-Leiste, Suchfeld. |
 
@@ -241,16 +251,15 @@ nicht über mehr Durchmesser.
 
 ## 7. Bausteine
 
-### TopBar / Begrüßung
-Nur auf der Rezeptübersicht, `src/app/(app)/rezepte/page.tsx`. Links die
-Begrüßung „Hallo, *Haushaltsname*" (zwei Zeilen möglich, Name kursiv), rechts
-eine runde Icon-Fläche (`--soft`, 44 px Trefferfläche) zu Konto/Haushalt
-(`SettingsButton`). Kein zweites Icon links — die Referenz zeigt dort einen
-Standort-Dropdown, für den es bei Emil kein Konzept gibt.
-
-Begrüßung und Rezeptkarten hängen an derselben Suspense-Grenze (beide
-brauchen den Haushalt) — `GreetingSkeleton` reserviert den Platz, damit beim
-Nachladen nichts springt.
+### Screen-Kopfzeile
+`src/components/ui.tsx`, `ScreenHeader`/`Screen`. Schlichte Überschrift
+(„Rezepte", „Einkaufsliste", „Einstellungen" …) in der Skala aus Abschnitt 5,
+rechts optional eine runde Icon-Fläche (`--soft`, 44 px Trefferfläche) —
+`SettingsButton` auf der Rezeptübersicht. **Keine Begrüßung mit Namen:** ein
+erster Durchgang hatte „Hallo, *Haushaltsname*" nach dem Vorbild der
+Referenz-Begrüßung eingeführt — das war nicht verlangt, brauchte Kursiv ohne
+sonstigen Zweck in der App und wurde wieder auf die schlichte Überschrift
+zurückgenommen.
 
 ### FilterRow
 Die bestehende Schlagwort-Filterung aus den Rezept-Tags, im neuen Farbschema:
@@ -260,29 +269,46 @@ Rahmen auf beiden Zuständen — die Fläche allein trägt den Zustand.
 
 ### RecipeBrowserCard
 `src/app/(app)/rezepte/RecipeBrowser.tsx`. Eine echte Karte: `--card`-Fläche,
-`--radius-card`, `--shadow-card`, 16 px Innenabstand rundum. Aufbau von oben:
+`--radius-card`, `--shadow-card`. Der Innenabstand ist **zweigeteilt**
+(Abschnitt 6) — Text mit vollem 20-px-Rand, Foto mit nur 8 px. Aufbau von
+oben:
 
-1. Rezepttitel (26/1,2, 700).
-2. Merkmal-Chips: Portionen, Zeit (falls vorhanden), bis zu zwei Schlagwörter
-   — Kontur-Chips in `--border`, Text 13/500. Pendant zu „1,200 sq ft · 3
-   Beds …" in der Referenz; anders als dort erfunden sind es echte
-   Rezeptdaten, keine Platzhalter-Kategorie ohne Entsprechung im Datenmodell.
-3. Das Rezeptfoto, `--radius-tile`, Seitenverhältnis 4:3.
-4. Eine `--accent`-Pille „Ansehen" mit Pfeil-Icon, unten rechts **auf dem
-   Foto** (wie „Details" in der Referenz) — die einzige Stelle, an der eine
-   Gold-Fläche direkt auf einem Foto sitzt statt auf `--bg`.
+1. In einem `px-5 pt-5`-Block: Rezepttitel (32/1,15, 700), darunter
+   Merkmal-Chips (Portionen, Zeit falls vorhanden, bis zu zwei Schlagwörter)
+   als Kontur-Chips in `--border`, Text 13/500 — Pendant zu „1,200 sq ft · 3
+   Beds …" in der Referenz, aber mit echten Rezeptdaten statt einer
+   erfundenen Kategorie ohne Entsprechung im Datenmodell.
+2. In einem `px-2 pb-2 pt-4`-Block: das Rezeptfoto, `--radius-card`,
+   Seitenverhältnis 4:3 — fast bündig mit der Karte, deutlich knapper
+   umrandet als der Text darüber.
+
+Auf dem Foto sitzt unten rechts eine `--accent`-Pille „Ansehen" — die einzige
+Stelle, an der eine Gold-Fläche direkt auf einem Foto liegt statt auf `--bg`.
+Wie „Details" in der Referenz trägt sie **kein loses Pfeil-Icon**, sondern
+einen eigenen kleinen schwarzen Kreis (`bg-text text-card`, 24 px) mit dem
+Pfeil darin, am rechten Ende der Pille — nicht nur eine Chevron-Kontur in
+Akzent-Tinte neben dem Text.
 
 Liegt das Rezept auf der Einkaufsliste, sitzt oben links auf dem Foto ein
 Milchglas-Badge (`--card`/70 % + Blur), bewusst nicht in `--accent` — sonst
 wäre der Listenstatus von der CTA-Farbe nicht zu unterscheiden.
 
 ### RecipeHero (Rezept-Screen)
-`src/app/(app)/rezepte/[id]/RecipeHero.tsx`. Das Foto füllt die volle
-Bildschirmbreite, oben, bis unter die Statusleiste, ohne Rundung,
-Seitenverhältnis **4:3** (nicht mehr 9:10 — an beiden Screens der Referenz
-gemessen). Auf dem Foto liegen ausschließlich zwei runde Icon-Badges oben
-links/rechts (`rgba(255,255,255,.7)` + `backdrop-filter: blur(8px)`, dunkles
-Symbol): links Zurück, rechts der Weg zum Bearbeiten. **Kein Titel, kein
+`src/app/(app)/rezepte/[id]/RecipeHero.tsx`. Seitenverhältnis **4:3** (nicht
+9:10 — an beiden Screens der Referenz gemessen). **Eingerückt und gerundet,
+nicht randlos**: das Foto trägt denselben 20-px-Seitenrand wie der Rest der
+Seite (`px-5`) plus `pt-safe` nach oben, mit `--radius-card`. Läuft nicht
+mehr unter die Statusleiste — ein erster Durchgang hatte das Foto voller
+Bildschirmbreite ohne Rundung gebaut (vom alten, randlosen System
+übernommen), aber der zweite Screenshot der Referenz zeigt eindeutig ein
+eingerücktes, gerundetes Foto mit sichtbarem Rand zur Bildschirmkante.
+
+Auf dem Foto liegen zwei runde Icon-Badges oben links/rechts, beide 44 px
+Trefferfläche: links **Zurück**, Milchglas
+(`rgba(255,255,255,.7)` + `backdrop-filter: blur(8px)`, dunkles Symbol) — reine
+Navigation, bleibt neutral. Rechts **Bearbeiten**, `bg-accent text-accent-ink`
+gefüllt — eine Aktion, und Aktionen tragen die Markenfarbe, genau wie die
+gold gefüllten Kontakt-Icons auf dem Foto der Referenz. **Kein Titel, kein
 Scrim** — die Referenz legt Text nie über ein Foto.
 
 Titel und Merkmal-Chips (dieselbe Chip-Reihe wie `RecipeBrowserCard`) stehen
@@ -296,17 +322,20 @@ Referenz.
 Oben rechts steht bewusst **kein Herz**: Emil kennt keine Favoriten
 (Abschnitt 12), und ein Knopf ohne Wirkung ist keine Option.
 
-### IngredientTile
-`src/app/(app)/rezepte/[id]/RecipeActions.tsx`. Kachel statt Kreis: 72 × 72 px
-(`size-18`), `--radius-tile`, `bg-chip`, freigestelltes Zutatenfoto darin
-`object-fit: cover`, Name darunter in 13 px mit `hyphens-auto` und
-Zwei-Zeilen-Deckel — deutsche Zutatennamen sind oft ein einziges langes Wort.
-Waagerecht scrollbar, `scroll-snap-type: x proximity`, vierte Kachel
-angeschnitten als Wisch-Einladung. Fehlt ein Foto, steht der Anfangsbuchstabe
-in `--muted`.
+### Zutatenkacheln — nur in der Einkaufsliste
+`src/app/(app)/liste/ListView.tsx`. Ein erster Durchgang hatte auf dem
+Rezept-Screen zusätzlich zur Zutatenliste eine waagerechte Reihe aus
+Foto-Kacheln gezeigt (`IngredientTile`, angelehnt an die „Gallery"-Kacheln
+der Referenz) — das gibt es nicht mehr. Auf dem Rezept-Screen stehen Zutaten
+ausschließlich als Textliste (Menge, Name, Notiz); für Fotos gibt es dort
+keine Entsprechung in der Referenz, und die genaue Menge steht ohnehin nur im
+Text.
 
-Im Einkauf (`src/app/(app)/liste/ListView.tsx`) als Raster: drei Spalten,
-`gap-x-3 gap-y-5`, dieselbe Kachelform. Abgehakt: Bild `opacity-40`, ein
+Fotos bleiben der Einkaufsliste vorbehalten, wo sie beim Einsortieren im
+Regal tatsächlich helfen: Raster, drei Spalten, `gap-x-3 gap-y-5`, Kachel
+`--radius-tile`, `bg-chip`, freigestelltes Foto `object-fit: cover`, Name
+darunter in 13 px mit `hyphens-auto` und Zwei-Zeilen-Deckel. Fehlt ein Foto,
+steht der Anfangsbuchstabe in `--muted`. Abgehakt: Bild `opacity-40`, ein
 Häkchen-Badge in `--accent`/`--accent-ink` bleibt kräftig darüber.
 
 ### ServingStepper
@@ -327,18 +356,22 @@ greift, wenn das Rezept mit einer *anderen* Portionszahl auf der Liste liegt;
 
 ### RecipeSteps
 `src/app/(app)/rezepte/[id]/page.tsx`. Die Ziffer steht in einem Quadrat
-(24 × 24 px, `--radius-soft`), `bg-accent text-accent-ink`, 13 px, **700, nicht
-kursiv** — Kursiv ist dem Namen in der Begrüßung vorbehalten (Abschnitt 5).
-Text daneben 15/1,5, Abstand zwischen Schritten 16 px.
+(24 × 24 px, `--radius-soft`), `bg-accent text-accent-ink`, 13 px, 700 — kein
+Kursiv-Schnitt im System (Abschnitt 5). Text daneben 15/1,5, Abstand zwischen
+Schritten 16 px.
 
 ### TabBar
 `src/app/(app)/TabBar.tsx`. Freistehende, vollgerundete Leiste (`--card` mit
 `--shadow-card`), mit sichtbarem `--bg`-Rand ringsum — keine bildschirmbreite,
-sticky Leiste mit Haarlinie mehr. Zwei Einträge (Einkauf, Rezepte). Der aktive
-Eintrag füllt seine Hälfte der Leiste komplett in `--text`, Symbol und Label
-in `--card`-Weiß; der inaktive zeigt nur das Symbol in `--muted`, ohne Label.
-Wechsel im selben Frame (`useOptimistic`), `data-pending` dimmt den Inhalt
-darüber.
+sticky Leiste mit Haarlinie mehr. Zwei Einträge (Einkauf, Rezepte).
+
+Der aktive Eintrag ist **nicht** vollflächig schwarz — das war ein erster,
+zu grober Durchgang. Die Referenz zeigt eine helle Grau-Kapsel (`--soft`),
+und nur das Symbol darin sitzt in einem eigenen kleinen schwarzen Kreis
+(`bg-text text-card`, 32 px); das Label steht direkt auf der Kapsel, in
+`--text`. Der inaktive Eintrag zeigt nur das Symbol in `--muted`, ohne
+Fläche, ohne Label. Wechsel im selben Frame (`useOptimistic`), `data-pending`
+dimmt den Inhalt darüber.
 
 ### RowLink / Field / Select / Textarea / Button / Notice
 `src/components/ui.tsx`. `RowLink`: mindestens 56 px hoch, `bg-soft` mit
@@ -442,43 +475,48 @@ Arbeitsliste, kein Ist-Zustand. Stand 19.09.2026:
 1. **Kein Dark Mode.** Siehe Abschnitt 4. Sobald eine dunkle Referenz
    vorliegt, wird sie abgeleitet (Flächenrollen tauschen, Kontraste neu
    prüfen) statt geraten.
-2. **Rechtes TopBar-Icon ist der einzige Zugang zu Konto/Haushalt**, nicht
-   die Notifications-Glocke der Referenz — Emil hat kein
-   Benachrichtigungskonzept. Passt so; nur vermerkt, falls sich das ändert.
-3. **`--shadow-card`-Werte sind nach Augenmaß gesetzt**, nicht pixelgenau
+2. **`--shadow-card`-Werte sind nach Augenmaß gesetzt**, nicht pixelgenau
    gemessen — an einer JPEG-komprimierten Schattenkante lässt sich Blur/Spread
    nicht zuverlässig ablesen.
-4. **`--warn` und `--accent` liegen in derselben Farbfamilie** (beide
+3. **`--warn` und `--accent` liegen in derselben Farbfamilie** (beide
    Gold/Bronze-Ton). Im UI beobachten, ob eine Warnmeldung neben einer
    CTA-Pille als solche erkennbar bleibt.
-5. **Es gibt keine Favoriten.** Der Stift zum Bearbeiten sitzt, wo die
+4. **Es gibt keine Favoriten.** Der Stift zum Bearbeiten sitzt, wo die
    Referenz ein Herz zeigt (RecipeHero). Kommt die Funktion, braucht sie eine
    Spalte in `recipes`, einen Weg in `src/lib/data/recipes.ts` und einen
    Filter in der Übersicht — dann rückt der Stift und das Herz nimmt seinen
    Platz.
-6. **Die Zutatenfotos decken die Zutaten nur teilweise ab**
-   (`scripts/ingredient-images/`). Für die Kachelform (statt Kreis) müssen
-   Rohbilder ggf. neu zugeschnitten werden.
+5. **Die Zutatenfotos decken die Zutaten nur teilweise ab**
+   (`scripts/ingredient-images/`), sichtbar in der Einkaufsliste — dem
+   einzigen Ort, an dem sie noch erscheinen (siehe „Zutatenkacheln — nur in
+   der Einkaufsliste", Abschnitt 7).
 
 ---
 
 ## 13. Prüfliste
 
-**Optisch** — im direkten Vergleich mit `docs/app_redesign.jpg`:
+**Optisch** — im direkten Vergleich mit `docs/app_redesign.jpg`, im Browser
+gegengeprüft:
 
 - [x] Zwei Flächen sauber getrennt: `--bg` überall, `--card` nur in der
       Übersicht
-- [x] Karten mit Schatten, Radius 24 px, nur dort
+- [x] Karten mit Schatten, großzügiger Radius (32 px), nur dort
+- [x] Kartenfoto und Rezept-Screen-Foto knapp und gerundet, nicht randlos
+      voll ausgereizt — Text trägt vollen Seitenrand, Foto nur 8 px
 - [x] Kein Scrim, kein Titel auf dem Foto — Titel steht daneben/darunter
 - [x] Foto querformatig 4:3 auf Hero und Kachel
-- [x] Zutaten als Kacheln, nicht als Kreise, vierte Kachel angeschnitten
-- [x] Ziffernkasten in `--accent`, Ziffer nicht kursiv
-- [x] Kursiv ausschließlich am Namen in der Begrüßung
-- [x] Tab-Leiste freistehend, gerundet, mit Schatten — nicht bildschirmbreit
+- [x] „Ansehen"/„Details"-Pille mit eigenem schwarzem Kreis-Badge, nicht nur
+      loses Icon
+- [x] Bearbeiten-Knopf auf dem Rezeptfoto in `--accent`, Zurück bleibt
+      Milchglas
+- [x] Keine Zutatenkacheln auf dem Rezept-Screen — nur Textliste; Kacheln nur
+      in der Einkaufsliste
+- [x] Ziffernkasten in `--accent`
+- [x] Tab-Leiste freistehend, gerundet, mit Schatten — aktiver Eintrag als
+      helle Kapsel mit schwarzem Icon-Kreis, nicht vollflächig schwarz
+- [x] Titelgröße nah an der gemessenen Umrechnung (32 px), nicht grob
+      abgerundet
 - [x] `--accent` nie als dünne Linie oder Text direkt auf `--bg`
-- [ ] Im Browser gegenkontrolliert (Chrome-Erweiterung war bei der Umsetzung
-      nicht verbunden — visuell noch nicht am Gerät geprüft, nur `typecheck`
-      / `lint` / `build` / Dev-Server-Smoke-Test)
 
 **Funktional:**
 

@@ -7,6 +7,7 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Schalotte": "schalotte",
   "Frühlingszwiebel": "fruehlingszwiebel",
   "Knoblauch": "knoblauch",
+  "Knoblauchzehe": "knoblauchzehe",
   "Karotte": "karotte",
   "Möhre": "moehre",
   "Kartoffel": "kartoffel",
@@ -148,6 +149,7 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Butter": "butter",
   "Margarine": "margarine",
   "Butterschmalz": "butterschmalz",
+  "Schweineschmalz": "schweineschmalz",
   "Eier": "eier",
   "Gouda": "gouda",
   "Emmentaler": "emmentaler",
@@ -191,7 +193,17 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Kichererbsen (Dose)": "kichererbsen-dose",
   "Weiße Bohnen": "weisse-bohnen",
   "Mais": "mais",
+  "Kalbsfond": "kalbsfond",
+  "Berglinsen": "berglinsen",
+  "getrocknete Aprikosen": "getrocknete-aprikosen",
+  "schwarzer Pfeffer": "schwarzer-pfeffer",
+  "scharfes Currypulver": "scharfes-currypulver",
   "Kurkuma": "kurkuma",
+  "Gewürznelke": "gewuerznelke",
+  "Lorbeerblätter": "lorbeerblaetter",
+  "Wacholderbeere": "wacholderbeere",
+  "Bratöl": "bratoel",
+  "Wasser": "wasser",
 };
 
 export function ingredientImage(name: string): string | null {

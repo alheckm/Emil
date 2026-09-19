@@ -133,7 +133,7 @@ export function ScreenHeader({
   return (
     <header>
       <div className="flex items-start justify-between gap-4">
-        <h1 className="font-display text-[26px] font-bold leading-[1.2]">
+        <h1 className="font-display text-[32px] font-bold leading-[1.15]">
           {title}
         </h1>
         {action && <div className="shrink-0 pt-1">{action}</div>}

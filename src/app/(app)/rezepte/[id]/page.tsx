@@ -85,7 +85,7 @@ async function RecipeDetail({ params }: { params: Params }) {
       {/* Titel und Kenndaten stehen jetzt unter dem Foto, auf `--bg` — nicht
           mehr darauf. Design-System, Abschnitt 7, RecipeHero. */}
       <div className="px-5 pt-5">
-        <h1 className="font-display text-[26px] font-bold leading-[1.2] [text-wrap:balance]">
+        <h1 className="font-display text-[32px] font-bold leading-[1.15] [text-wrap:balance]">
           {value.title}
         </h1>
         <ul className="mt-3 flex flex-wrap gap-2">

@@ -4,7 +4,6 @@ import { startTransition, useOptimistic, useState } from "react";
 import { useRouter } from "next/navigation";
 import { buildListItems } from "@/lib/core/mergeList";
 import { formatAmount } from "@/lib/core/format";
-import { ingredientImage } from "@/lib/core/ingredientImages";
 import { scaleAmount } from "@/lib/core/scale";
 import { getBrowserSupabase } from "@/lib/client/supabase";
 import { deleteRecipe, type Recipe } from "@/lib/data/recipes";
@@ -15,17 +14,16 @@ import { Notice } from "@/components/ui";
 /**
  * Der Zutaten-Abschnitt der Rezeptkarte: Portionen, Zutaten, Einkaufsliste.
  *
- * Der Aufbau folgt dem Entwurf:
+ * Der Aufbau:
  *
  *     Zutaten                        [−  2  +]
- *     ▢ ▢ ▢ ▢ →          (Fotos, waagerecht)
  *     200 g   Nudeln     (die genauen Mengen)
  *     ＋ Einkaufsliste
  *
- * Die Reihe mit den Kacheln ist der auffälligste Zug des Entwurfs und
- * gleichzeitig das, was man im Laden zuerst liest: ein Bild ist schneller
- * erfasst als ein Wort. Sie ersetzt die Liste darunter aber nicht — Emil lebt
- * von den umgerechneten Mengen, und die stehen in keiner Kachel.
+ * Keine Foto-Kacheln hier — die Referenz kennt für Zutaten keine
+ * Entsprechung, und die genauen Mengen stehen ohnehin nur in der Liste, nie
+ * in einer Kachel. Zutatenfotos bleiben der Einkaufsliste vorbehalten
+ * (`ListView.tsx`), wo sie beim Einsortieren im Regal tatsächlich helfen.
  *
  * Der Portionswähler rechnet bei jedem Tippen **aus der Basismenge** neu, nie
  * aus dem zuletzt angezeigten Wert. Sonst käme ein Weg von 4 auf 6 und zurück
@@ -113,20 +111,6 @@ export function IngredientsSection({
     });
   }
 
-  // Alle benannten Zutaten kommen in die Reihe, auch die ohne Foto: dort
-  // steht der Anfangsbuchstabe. Ein leerer Kasten wäre keine Option, und eine
-  // Reihe, die stillschweigend die Hälfte der Zutaten wegließe, auch nicht.
-  const rail = recipe.ingredients
-    .map((line) => ({
-      id: line.id,
-      name: line.ingredientName,
-      src: line.ingredientName ? ingredientImage(line.ingredientName) : null,
-    }))
-    .filter(
-      (item): item is { id: string; name: string; src: string | null } =>
-        item.name !== null,
-    );
-
   const onList = planned !== null;
   const changed = onList && planned !== servings;
 
@@ -148,18 +132,6 @@ export function IngredientsSection({
           onChange={setServings}
         />
       </div>
-
-      {rail.length > 0 && (
-        /* Bis an den Kartenrand und darüber hinaus: die angeschnittene vierte
-           Kachel ist im Entwurf die Einladung zu wischen. Mit Innenabstand
-           innerhalb der Scrollfläche, damit die erste Kachel trotzdem bündig
-           unter der Überschrift steht. */
-        <ul className="ingredient-rail -mx-5 mt-5 flex gap-4 overflow-x-auto px-5">
-          {rail.map((item) => (
-            <IngredientItem key={item.id} name={item.name} src={item.src} />
-          ))}
-        </ul>
-      )}
 
       <ul className="mt-6 space-y-2">
         {recipe.ingredients.map((line, index) => {
@@ -215,42 +187,6 @@ export function IngredientsSection({
         )}
       </div>
     </section>
-  );
-}
-
-/** Eine Kachel in der Zutatenreihe: Foto oben, Name darunter. */
-function IngredientItem({ name, src }: { name: string; src: string | null }) {
-  return (
-    <li className="flex w-18 shrink-0 flex-col items-center gap-2">
-      <span className="flex size-18 items-center justify-center overflow-hidden rounded-tile bg-chip">
-        {src ? (
-          /* Kein next/image: die Datei liegt schon in genau der Größe im
-             public-Ordner, in der sie gebraucht wird. Der Optimierer hätte
-             hier nichts zu tun und käme nur als zusätzliche Runde dazu. */
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={src}
-            alt=""
-            width={192}
-            height={192}
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <span aria-hidden className="font-display text-[26px] text-muted">
-            {name.slice(0, 1).toUpperCase()}
-          </span>
-        )}
-      </span>
-      {/* Zwei Zeilen, dann Schluss: „Gemüsebrühe" darf umbrechen, aber die
-          Reihe muss gleich hoch bleiben, sonst franst sie aus.
-          `hyphens-auto` ist hier keine Feinheit: deutsche Zutatennamen sind
-          oft ein einziges langes Wort, und ohne Trennung steht „Champignons"
-          breiter da als seine Kachel und schiebt sich unter den Nachbarn. */}
-      <span className="line-clamp-2 hyphens-auto break-words text-center text-[13px] font-medium leading-[1.2]">
-        {name}
-      </span>
-    </li>
   );
 }
 

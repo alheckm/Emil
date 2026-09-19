@@ -62,8 +62,10 @@
   --font-sans: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --radius-pill: 999px;
   /* Die Rezeptvorschau-Karte in der Uebersicht — die einzige Flaeche mit
-     eigenem Schatten (design-system.md, Abschnitt 6). */
-  --radius-card: 24px;
+     eigenem Schatten (design-system.md, Abschnitt 6). Auch das Rezeptfoto auf
+     der Detailseite und in der Karte selbst teilen sich diesen Radius: beide
+     sitzen mit sehr kleinem Rand nah an ihrer jeweiligen Aussenkante. */
+  --radius-card: 32px;
   /* Zutatenkacheln, Foto in der Karte: abgerundetes Rechteck, keine Kreise
      mehr. */
   --radius-tile: 14px;
@@ -202,28 +204,6 @@ select,
 @media (prefers-reduced-motion: reduce) {
   .placeholder-box {
     animation: none;
-  }
-}
-
-/* ---------------------------------------------------------------------------
-   Zutatenreihe: waagerecht scrollbar, ohne sichtbaren Balken.
-
-   Im Entwurf steht die vierte Kachel angeschnitten da — das ist kein Zufall,
-   sondern die Einladung zu wischen. Ein Rezept mit fuenfzehn Zutaten darf die
-   Karte trotzdem nicht sprengen. `scroll-snap` sorgt dafuer, dass die Reihe
-   nach dem Wischen nicht zwischen zwei Kacheln stehen bleibt. */
-@utility ingredient-rail {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  scroll-snap-type: x proximity;
-  overscroll-behavior-x: contain;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  & > * {
-    scroll-snap-align: start;
   }
 }
 

@@ -37,18 +37,17 @@ def slugify(name: str) -> str:
 
 
 def load_ingredients() -> list[tuple[str, str]]:
-    """Zutaten + Motive aus den JS-Dateien holen — eine Quelle der Wahrheit."""
+    """Zutaten + Motive aus subjects.mjs holen — jede Zutat mit definiertem
+    Bildmotiv, nicht nur die feste Stammdaten-Liste. Zutaten, die erst beim
+    Rezept-Import entstanden sind (z. B. "Berglinsen"), stehen nur hier."""
     script = """
-    Promise.all([
-      import('%s/scripts/ingredient-seed-data.mjs'),
-      import('%s/scripts/ingredient-images/subjects.mjs'),
-    ]).then(([seed, subj]) => {
-      const out = [];
-      for (const list of Object.values(seed.INGREDIENTS))
-        for (const name of list) out.push([name, subj.buildPrompt(subj.SUBJECTS[name])]);
+    import('%s/scripts/ingredient-images/subjects.mjs').then((subj) => {
+      const out = Object.entries(subj.SUBJECTS).map(
+        ([name, subject]) => [name, subj.buildPrompt(subject)],
+      );
       console.log(JSON.stringify(out));
     });
-    """ % (ROOT, ROOT)
+    """ % ROOT
     raw = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True)
     return [tuple(x) for x in json.loads(raw.stdout)]
 

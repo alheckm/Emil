@@ -185,58 +185,70 @@ export function RecipeBrowser({
                   <Link
                     href={`/rezepte/${recipe.id}`}
                     prefetch
-                    className="block overflow-hidden rounded-card bg-card p-4 shadow-card press tap-target"
+                    className="block overflow-hidden rounded-card bg-card shadow-card press tap-target"
                   >
-                    <h2 className="font-display text-[26px] font-bold leading-[1.2] [text-wrap:balance]">
-                      {recipe.title}
-                    </h2>
+                    {/* Textinhalt trägt den vollen Seitenrand (20 px) — das
+                        Foto darunter dagegen fast keinen, siehe unten. */}
+                    <div className="px-5 pt-5">
+                      <h2 className="font-display text-[32px] font-bold leading-[1.15] [text-wrap:balance]">
+                        {recipe.title}
+                      </h2>
 
-                    {/* Merkmal-Chips — Pendant zu „1,200 sq ft · 3 Beds …" in
-                        der Referenz. Kontur statt Fläche, wie die
-                        Merkmal-Chips auf dem Rezept-Screen. */}
-                    <ul className="mt-3 flex flex-wrap gap-2">
-                      {facts.map((fact) => (
-                        <li
-                          key={fact}
-                          className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium"
-                        >
-                          {fact}
-                        </li>
-                      ))}
-                    </ul>
+                      {/* Merkmal-Chips — Pendant zu „1,200 sq ft · 3 Beds …"
+                          in der Referenz. Kontur statt Fläche. */}
+                      <ul className="mt-3 flex flex-wrap gap-2">
+                        {facts.map((fact) => (
+                          <li
+                            key={fact}
+                            className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium"
+                          >
+                            {fact}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
-                    {/* 4:3 statt 9:10, kein Titel mehr darauf: die Referenz
-                        legt den Titel immer neben oder unter das Foto.
-                        Fehlt das Foto, bleibt `bg-photo` stehen. */}
-                    <div className="relative mt-4 aspect-[4/3] w-full overflow-hidden rounded-tile bg-photo">
-                      {image && (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                          src={image}
-                          alt=""
-                          loading="lazy"
-                          className="absolute inset-0 h-full w-full object-cover"
-                        />
-                      )}
+                    {/* Nur 8 px Rand zur Karte (`px-2 pb-2`), fast bündig —
+                        so sitzt das Foto in der Referenz, nicht mit demselben
+                        Rand wie der Text darüber. Eigene, große Rundung wie
+                        die Karte selbst, kein Titel mehr darauf: die Referenz
+                        legt den Titel immer neben oder unter das Foto. Fehlt
+                        das Foto, bleibt `bg-photo` stehen. */}
+                    <div className="px-2 pb-2 pt-4">
+                      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-card bg-photo">
+                        {image && (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={image}
+                            alt=""
+                            loading="lazy"
+                            className="absolute inset-0 h-full w-full object-cover"
+                          />
+                        )}
 
-                      {servings ? (
-                        /* Dieselbe Milchglasfläche wie die Knöpfe auf dem
-                           Rezeptfoto, damit auf dem Foto nur eine Sprache
-                           gesprochen wird — bewusst nicht `--accent`, damit
-                           der Listenstatus nicht mit der CTA-Farbe
-                           verwechselt wird. */
-                        <span className="absolute left-3 top-3 rounded-pill bg-card/70 px-3 py-1 text-[13px] font-medium text-text backdrop-blur-[8px]">
-                          Auf der Liste · {servings}
+                        {servings ? (
+                          /* Dieselbe Milchglasfläche wie die Knöpfe auf dem
+                             Rezeptfoto, damit auf dem Foto nur eine Sprache
+                             gesprochen wird — bewusst nicht `--accent`, damit
+                             der Listenstatus nicht mit der CTA-Farbe
+                             verwechselt wird. */
+                          <span className="absolute left-3 top-3 rounded-pill bg-card/70 px-3 py-1 text-[13px] font-medium text-text backdrop-blur-[8px]">
+                            Auf der Liste · {servings}
+                          </span>
+                        ) : null}
+
+                        {/* „Details" in der Referenz: Gold-Pille mit einem
+                            eigenen, schwarzen Kreis-Badge am Ende, nicht nur
+                            ein Icon in Akzent-Tinte. Einzige Stelle, an der
+                            eine Gold-Fläche direkt auf einem Foto sitzt statt
+                            auf `--bg`. */}
+                        <span className="absolute bottom-3 right-3 flex items-center gap-2 rounded-pill bg-accent py-1.5 pl-4 pr-1.5 text-[13px] font-semibold text-accent-ink">
+                          Ansehen
+                          <span className="flex h-6 w-6 items-center justify-center rounded-pill bg-text text-card">
+                            <ChevronRightIcon className="h-3.5 w-3.5" />
+                          </span>
                         </span>
-                      ) : null}
-
-                      {/* Einzige Stelle, an der eine Gold-Fläche direkt auf
-                          einem Foto sitzt statt auf `--bg` — wie „Details" in
-                          der Referenz. */}
-                      <span className="absolute bottom-3 right-3 inline-flex items-center gap-0.5 rounded-pill bg-accent py-1.5 pl-3 pr-2 text-[13px] font-semibold text-accent-ink">
-                        Ansehen
-                        <ChevronRightIcon className="h-4 w-4" />
-                      </span>
+                      </div>
                     </div>
                   </Link>
                 </li>

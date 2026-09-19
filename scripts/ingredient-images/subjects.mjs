@@ -17,7 +17,8 @@ export const SUBJECTS = {
   // ── Obst & Gemüse ────────────────────────────────────────────────────────
   "Zwiebel": "a whole yellow onion", "Rote Zwiebel": "a whole red onion",
   "Schalotte": "two brown shallots", "Frühlingszwiebel": "a bunch of spring onions",
-  "Knoblauch": "a whole garlic bulb", "Karotte": "a fresh carrot with green top",
+  "Knoblauch": "a whole garlic bulb", "Knoblauchzehe": "a single garlic clove",
+  "Karotte": "a fresh carrot with green top",
   "Möhre": "two fresh carrots", "Kartoffel": "a raw potato", "Süßkartoffel": "a raw sweet potato",
   "Tomate": "a ripe red tomato with green stem", "Cherrytomate": "a small cluster of cherry tomatoes",
   "Paprika": "a red bell pepper", "Zucchini": "a fresh green zucchini",
@@ -85,7 +86,8 @@ export const SUBJECTS = {
   "Naturjoghurt": BOWL("plain natural yogurt"), "Griechischer Joghurt": BOWL("thick greek yogurt"),
   "Skyr": BOWL("skyr"), "Quark": BOWL("quark cheese"), "Magerquark": BOWL("low fat quark"),
   "Frischkäse": BOWL("cream cheese"), "Butter": "a block of butter", "Margarine": BOWL("margarine"),
-  "Butterschmalz": JAR("clarified butter"), "Eier": "three brown chicken eggs",
+  "Butterschmalz": JAR("clarified butter"), "Schweineschmalz": JAR("white pork lard"),
+  "Eier": "three brown chicken eggs",
   "Gouda": "a wedge of gouda cheese", "Emmentaler": "a wedge of emmental cheese",
   "Bergkäse": "a wedge of alpine cheese", "Mozzarella": "a ball of fresh mozzarella",
   "Feta": "a block of feta cheese", "Parmesan": "a wedge of parmesan cheese",
@@ -118,6 +120,7 @@ export const SUBJECTS = {
   "Pesto": JAR("green basil pesto"), "Ajvar": JAR("red ajvar paste"),
   "Gemüsebrühe": BOWL("vegetable broth"), "Rinderbrühe": BOWL("beef broth"),
   "Hühnerbrühe": BOWL("chicken broth"), "Brühe": BOWL("clear broth"), "Fond": JAR("dark stock"),
+  "Kalbsfond": JAR("veal stock"),
   "Tomatensauce": JAR("tomato sauce"), "Sardinen": "an open tin of sardines",
 
   // ── Nudeln, Reis & Trockenware ───────────────────────────────────────────
@@ -130,6 +133,7 @@ export const SUBJECTS = {
   "Quinoa": BOWL("dry quinoa"), "Polenta": BOWL("dry polenta cornmeal"), "Haferflocken": BOWL("rolled oats"),
   "Müsli": BOWL("muesli"), "Cornflakes": BOWL("cornflakes"), "Linsen": BOWL("brown lentils"),
   "Rote Linsen": BOWL("red lentils"), "Belugalinsen": BOWL("black beluga lentils"),
+  "Berglinsen": BOWL("brown-green mountain lentils"),
   "Semmelbrösel": BOWL("breadcrumbs"), "Paniermehl": BOWL("fine breadcrumbs"),
   "Mehl": BOWL("white wheat flour"), "Weizenmehl": BOWL("wheat flour"),
   "Dinkelmehl": BOWL("spelt flour"), "Vollkornmehl": BOWL("wholegrain flour"),
@@ -142,7 +146,7 @@ export const SUBJECTS = {
   "Leinsamen": BOWL("flax seeds"), "Chiasamen": BOWL("chia seeds"), "Rosinen": BOWL("raisins"),
   "Trockenhefe": BOWL("dry yeast granules"), "Backpulver": BOWL("baking powder"),
   "Natron": BOWL("baking soda"), "Kokosraspeln": BOWL("desiccated coconut"),
-  "Getrocknete Tomaten": BOWL("sun dried tomatoes"),
+  "Getrocknete Tomaten": BOWL("sun dried tomatoes"), "getrocknete Aprikosen": BOWL("dried apricots"),
 
   // ── Backen & Süßes ───────────────────────────────────────────────────────
   "Zucker": BOWL("white sugar"), "Puderzucker": BOWL("powdered sugar"),
@@ -157,13 +161,17 @@ export const SUBJECTS = {
 
   // ── Gewürze, Öle & Saucen ────────────────────────────────────────────────
   "Salz": BOWL("coarse salt"), "Meersalz": BOWL("flaky sea salt"),
-  "Pfeffer": BOWL("black peppercorns"), "Paprikapulver": BOWL("red paprika powder"),
-  "Currypulver": BOWL("yellow curry powder"), "Kurkuma": BOWL("golden turmeric powder"),
+  "Pfeffer": BOWL("black peppercorns"), "schwarzer Pfeffer": BOWL("black peppercorns"),
+  "Paprikapulver": BOWL("red paprika powder"),
+  "Currypulver": BOWL("yellow curry powder"), "scharfes Currypulver": BOWL("hot red curry powder"),
+  "Kurkuma": BOWL("golden turmeric powder"),
   "Kreuzkümmel": BOWL("cumin seeds"), "Kümmel": BOWL("caraway seeds"),
   "Koriandersamen": BOWL("coriander seeds"), "Muskatnuss": "two whole nutmegs",
-  "Zimt": "a few cinnamon sticks", "Nelken": BOWL("whole cloves"),
+  "Zimt": "a few cinnamon sticks", "Nelken": BOWL("whole cloves"), "Gewürznelke": BOWL("whole cloves"),
   "Kardamom": BOWL("green cardamom pods"), "Lorbeerblatt": "a few dried bay leaves",
-  "Wacholderbeeren": BOWL("juniper berries"), "Senfkörner": BOWL("yellow mustard seeds"),
+  "Lorbeerblätter": "a few dried bay leaves",
+  "Wacholderbeeren": BOWL("juniper berries"), "Wacholderbeere": BOWL("juniper berries"),
+  "Senfkörner": BOWL("yellow mustard seeds"),
   "Chiliflocken": BOWL("red chili flakes"), "Cayennepfeffer": BOWL("cayenne pepper powder"),
   "Getrockneter Oregano": BOWL("dried oregano"), "Getrockneter Thymian": BOWL("dried thyme"),
   "Getrockneter Rosmarin": BOWL("dried rosemary"), "Majoran": BOWL("dried marjoram"),
@@ -171,6 +179,7 @@ export const SUBJECTS = {
   "Currypaste": JAR("red curry paste"), "Olivenöl": JAR("green olive oil"),
   "Rapsöl": JAR("rapeseed oil"), "Sonnenblumenöl": JAR("sunflower oil"),
   "Sesamöl": JAR("sesame oil"), "Kokosöl": JAR("solid coconut oil"), "Essig": JAR("clear vinegar"),
+  "Bratöl": JAR("neutral cooking oil"),
   "Balsamico": JAR("dark balsamic vinegar"), "Weißweinessig": JAR("white wine vinegar"),
   "Apfelessig": JAR("apple cider vinegar"), "Senf": JAR("yellow mustard"),
   "Dijonsenf": JAR("dijon mustard"), "Ketchup": JAR("tomato ketchup"),
@@ -181,7 +190,8 @@ export const SUBJECTS = {
   "Zitronensaft": GLASS("lemon juice"), "Gemahlener Kreuzkümmel": BOWL("ground cumin"),
 
   // ── Getränke ─────────────────────────────────────────────────────────────
-  "Mineralwasser": GLASS("sparkling water"), "Rotwein": "a glass of red wine",
+  "Mineralwasser": GLASS("sparkling water"), "Wasser": GLASS("still water"),
+  "Rotwein": "a glass of red wine",
   "Weißwein": "a glass of white wine", "Sekt": "a flute of sparkling wine",
   "Bier": "a glass of golden beer", "Apfelsaft": GLASS("apple juice"),
   "Orangensaft": GLASS("orange juice"), "Tomatensaft": GLASS("tomato juice"),

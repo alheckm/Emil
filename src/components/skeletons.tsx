@@ -84,26 +84,30 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
 /**
  * Der Rezept-Screen, solange das Rezept noch unterwegs ist.
  *
- * Maßgleich mit dem echten: dasselbe Seitenverhältnis des Fotos über die volle
- * Breite, derselbe Seitenrand darunter. Das Foto-Bett ist hier keine getönte
- * Fläche, sondern schon der Ton, den der fertige Screen trägt — beim
+ * Maßgleich mit dem echten: dasselbe Seitenverhältnis, derselbe Seitenrand
+ * und dieselbe Rundung wie `RecipeHero`. Das Foto-Bett ist hier keine
+ * getönte Fläche, sondern schon der Ton, den der fertige Screen trägt — beim
  * Eintreffen der Daten wechselt also nur der Inhalt, nicht die Farbe.
  */
 export function RecipeCardSkeleton() {
   return (
     <Frame>
       <div>
-        <div aria-hidden className="aspect-[4/3] w-full bg-photo" />
+        <div className="px-5 pt-safe">
+          <div
+            aria-hidden
+            className="aspect-[4/3] w-full rounded-card bg-photo"
+          />
+        </div>
         <div className="px-5 pb-6 pt-5">
-          <Box className="h-7 w-3/4" />
-          <div className="mt-4 flex items-center justify-between gap-4">
+          <Box className="h-8 w-3/4" />
+          <div className="mt-3 flex gap-2">
+            <Box className="h-7 w-24 rounded-pill" />
+            <Box className="h-7 w-16 rounded-pill" />
+          </div>
+          <div className="mt-6 flex items-center justify-between gap-4">
             <Box className="h-5 w-24" />
             <Box className="h-10 w-32 rounded-pill" />
-          </div>
-          <div className="mt-5 flex gap-4">
-            {Array.from({ length: 4 }, (_, index) => (
-              <Box key={index} className="size-18 shrink-0 rounded-tile" />
-            ))}
           </div>
           <ul className="mt-6 space-y-3">
             {Array.from({ length: 6 }, (_, index) => (
@@ -114,28 +118,6 @@ export function RecipeCardSkeleton() {
             ))}
           </ul>
         </div>
-      </div>
-    </Frame>
-  );
-}
-
-/**
- * Die Kopfzeile der Rezeptübersicht: Begrüßung plus Einstellungen-Knopf.
- *
- * Eigenes Skelett, weil die Begrüßung den Haushaltsnamen braucht und damit
- * hinter derselben Suspense-Grenze wie die Rezeptkarten hängt — ohne
- * Platzhalter dafür würde die ganze Kopfzeile beim Nachladen nach unten
- * springen.
- */
-export function GreetingSkeleton() {
-  return (
-    <Frame>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <Box className="h-7 w-40" />
-          <Box className="mt-2 h-7 w-32" />
-        </div>
-        <Box className="h-11 w-11 shrink-0 rounded-pill" />
       </div>
     </Frame>
   );
@@ -157,10 +139,18 @@ export function RecipeGridSkeleton({ cards = 2 }: { cards?: number }) {
           <li
             key={index}
             aria-hidden
-            className="overflow-hidden rounded-card bg-card p-4 shadow-card"
+            className="overflow-hidden rounded-card bg-card shadow-card"
           >
-            <Box className="h-6 w-2/3" />
-            <div className="mt-4 aspect-[4/3] w-full rounded-tile bg-photo" />
+            <div className="px-5 pt-5">
+              <Box className="h-8 w-2/3" />
+              <div className="mt-3 flex gap-2">
+                <Box className="h-7 w-24 rounded-pill" />
+                <Box className="h-7 w-16 rounded-pill" />
+              </div>
+            </div>
+            <div className="px-2 pb-2 pt-4">
+              <div className="aspect-[4/3] w-full rounded-card bg-photo" />
+            </div>
           </li>
         ))}
       </ul>
