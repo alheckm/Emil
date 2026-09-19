@@ -16,9 +16,8 @@ import { Notice } from "@/components/ui";
  *
  * Der Aufbau:
  *
- *     Zutaten                        [−  2  +]
+ *     Zutaten            [−  2  +]  ＋ Einkaufsliste
  *     200 g   Nudeln     (die genauen Mengen)
- *     ＋ Einkaufsliste
  *
  * Keine Foto-Kacheln hier — die Referenz kennt für Zutaten keine
  * Entsprechung, und die genauen Mengen stehen ohnehin nur in der Liste, nie
@@ -126,11 +125,18 @@ export function IngredientsSection({
         <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
           Zutaten
         </h2>
-        <ServingStepper
-          value={servings}
-          label={recipe.servingsLabel}
-          onChange={setServings}
-        />
+        <div className="flex flex-wrap items-center gap-3">
+          <ServingStepper
+            value={servings}
+            label={recipe.servingsLabel}
+            onChange={setServings}
+          />
+          <ShoppingListButton
+            state={!onList ? "off" : changed ? "stale" : "on"}
+            disabled={!listId}
+            onClick={onAdd}
+          />
+        </div>
       </div>
 
       <ul className="mt-6 space-y-2">
@@ -170,22 +176,15 @@ export function IngredientsSection({
         })}
       </ul>
 
-      <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <ShoppingListButton
-          state={!onList ? "off" : changed ? "stale" : "on"}
-          disabled={!listId}
-          onClick={onAdd}
-        />
-        {onList && (
-          <button
-            type="button"
-            onClick={onRemove}
-            className="min-h-11 text-[13px] text-muted underline underline-offset-4 press-flat"
-          >
-            Von der Liste nehmen
-          </button>
-        )}
-      </div>
+      {onList && (
+        <button
+          type="button"
+          onClick={onRemove}
+          className="mt-6 min-h-11 text-[13px] text-muted underline underline-offset-4 press-flat"
+        >
+          Von der Liste nehmen
+        </button>
+      )}
     </section>
   );
 }

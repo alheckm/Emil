@@ -335,13 +335,16 @@ keine Entsprechung in der Referenz, und die genaue Menge steht ohnehin nur im
 Text.
 
 Fotos bleiben der Einkaufsliste vorbehalten, wo sie beim Einsortieren im
-Regal tatsächlich helfen: Raster, drei Spalten, `gap-x-2 gap-y-3`, Kachel
-`--radius-tile`, `bg-chip`, freigestelltes Foto `object-fit: cover`. Unter dem
-Foto stehen **Name und Menge**, je 13 px mit `hyphens-auto` und
-Zwei-Zeilen-Deckel — beides gehört zur Kachel, nicht nur der Name, weil im
-Laden die Menge genauso zählt wie die Zutat selbst. Fehlt ein Foto, steht der
-Anfangsbuchstabe in `--muted`. Abgehakt: Bild `opacity-40`, ein Häkchen-Badge
-in `--accent`/`--accent-ink` bleibt kräftig darüber.
+Regal tatsächlich helfen: Raster, drei Spalten, `gap-x-2 gap-y-3`. **Die
+Kachel ist eine einzige `bg-chip`-Fläche mit `--radius-tile`**, die Foto,
+Name und Menge gemeinsam umschließt — nicht nur ein weißes Feld ums Foto mit
+Text lose darunter auf `--bg`. Foto randlos oben in der Kachel
+(`object-fit: cover`, vom `overflow-hidden` der Kachel oben abgerundet), Name
+und Menge darunter, aber **innerhalb derselben weißen Fläche** (`px-2 pb-2
+pt-1`), je 13 px mit `hyphens-auto` und Zwei-Zeilen-Deckel. Fehlt ein Foto,
+steht der Anfangsbuchstabe in `--muted`. Abgehakt: Foto `opacity-40`, ein
+Häkchen-Badge in `--accent`/`--accent-ink` bleibt kräftig darüber, Name
+`line-through`.
 
 **Ein Raster, nach Abteilung geordnet — keine Box je Abteilung.** Ein erster
 Durchgang hatte jede Abteilung als eigenen Abschnitt mit eigenem Drei-Spalten-
@@ -355,14 +358,23 @@ hinweg.
 **Details per Longpress, nicht über ein „⋯"-Menü.** Ein erster Durchgang
 hatte oben rechts auf jeder Kachel einen kleinen `⋯`-Knopf, der die
 Zusatzinfos (Rezeptquellen, Abteilung ändern, „von der Liste nehmen") *unter
-der ganzen Abteilung* aufklappte — das war zweimal indirekt: ein Zusatzknopf
-neben der eigentlichen Trefferfläche, und ein Aufklapp-Ort, der nicht bei der
-gehaltenen Kachel lag. Jetzt hält man die Kachel selbst (500 ms), das öffnet
-die Details **direkt unter dieser einen Kachel**, als eigene volle Zeile im
-selben Raster. Ein kurzer Antipper hakt weiterhin ab, wie zuvor — die ganze
-Kachel bleibt die einzige Trefferfläche. Bekannte Lücke: die Details sind
-damit nur per Touch/Maus-Halten erreichbar, ohne Tastatur-Entsprechung (siehe
-Abschnitt 12).
+der ganzen Abteilung* aufklappte — zweimal indirekt: ein Zusatzknopf neben
+der eigentlichen Trefferfläche, und ein Aufklapp-Ort, der nicht bei der
+gehaltenen Kachel lag. Ein zweiter Durchgang hat das ganze Raster in
+`col-span-3`-Zeilen aufgebrochen, sobald irgendeine Kachel offen war — das
+schob auch die Nachbarn in derselben Reihe nach unten, obwohl nur eine Kachel
+gehalten wurde.
+
+Jetzt hält man die Kachel selbst (500 ms). Die gehaltene Kachel bekommt
+`row-span-2`; **nur ihre eigene Spalte** wächst nach unten, in ihrer Zeile
+bleiben die Nachbarn unverändert stehen. Die Zusatzinfos stehen nicht in
+einer neuen, eigenen Fläche, sondern **in derselben `bg-chip`-Kachel** wie
+Foto/Name/Menge — durch eine Haarlinie (`border-border`) abgesetzt, aber ohne
+Lücke, damit es wie eine einzige, nach unten aufgeklappte Fläche wirkt und
+nicht wie zwei verbundene Kästen. Ein kurzer Antipper hakt weiterhin ab, wie
+zuvor — die ganze Kachel bleibt die einzige Trefferfläche. Bekannte Lücke:
+die Details sind damit nur per Touch/Maus-Halten erreichbar, ohne
+Tastatur-Entsprechung (siehe Abschnitt 12).
 
 ### Bildzuschnitt (ImageCropper)
 `src/app/(app)/rezepte/ImageCropper.tsx`, eingebettet in `RecipeImageField`.
@@ -387,16 +399,23 @@ sonst wieder überschreiben).
 `− 2 +`, 32 px sichtbar / 44 px Trefferfläche, `tabular-nums`,
 `aria-live="polite"`. Die Tippkreise selbst sind `bg-card` (Weiß) — sichtbar
 gegen das `--soft` der Pille. Berechnung immer aus der Basismenge
-(`src/lib/core/scale.ts`), Formatierung über `src/lib/core/format.ts`.
+(`src/lib/core/scale.ts`), Formatierung über `src/lib/core/format.ts`. Steht
+in derselben Kopfzeile wie `ShoppingListAction`, direkt daneben — beide
+Portionsbezogenen Aktionen oben, bevor die Zutatenliste beginnt.
 
 ### ShoppingListAction
-`RecipeActions.tsx`. Ruhezustand: `bg-accent text-accent-ink`, vollgerundet
-(`rounded-pill`), „＋ Einkaufsliste" — die Markenfarbe trägt hier genau die
-Art schmaler, wichtiger Sekundäraktion, die „Details" in der Referenz zeigt.
-Zustand „auf der Liste": Fläche wechselt auf `--soft`, Text auf `--text`,
-Häkchen statt Plus — kein Grün. Ein dritter Zustand („Liste aktualisieren")
-greift, wenn das Rezept mit einer *anderen* Portionszahl auf der Liste liegt;
-`useOptimistic`, korrigiert statt zu verdoppeln (`add_recipe_to_list`).
+`RecipeActions.tsx`. Sitzt in der Kopfzeile des Zutaten-Abschnitts, direkt
+neben dem `ServingStepper` — nicht mehr unter der Zutatenliste. Wer die
+Portionen ändert, findet die Aktion, die davon abhängt, an derselben Stelle,
+statt erst durch die ganze Liste zu scrollen. Ruhezustand: `bg-accent
+text-accent-ink`, vollgerundet (`rounded-pill`), „＋ Einkaufsliste" — die
+Markenfarbe trägt hier genau die Art schmaler, wichtiger Sekundäraktion, die
+„Details" in der Referenz zeigt. Zustand „auf der Liste": Fläche wechselt auf
+`--soft`, Text auf `--text`, Häkchen statt Plus — kein Grün. Ein dritter
+Zustand („Liste aktualisieren") greift, wenn das Rezept mit einer *anderen*
+Portionszahl auf der Liste liegt; `useOptimistic`, korrigiert statt zu
+verdoppeln (`add_recipe_to_list`). „Von der Liste nehmen" bleibt als leiser
+Text-Link unter der Zutatenliste.
 
 ### RecipeSteps
 `src/app/(app)/rezepte/[id]/page.tsx`. Die Ziffer steht in einem Quadrat
