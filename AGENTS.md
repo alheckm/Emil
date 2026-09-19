@@ -2,9 +2,11 @@
 
 ## Gestaltung — vor jeder Änderung an der Oberfläche
 
-`docs/design-system.md` ist verbindlich. `app_design.jpg` im Projektstamm ist
-die **Spezifikation, nicht die Inspiration**: Weicht eine Umsetzung ab, wird die
+`docs/design-system.md` ist verbindlich. `docs/app_redesign.jpg` ist die
+**Spezifikation, nicht die Inspiration**: Weicht eine Umsetzung ab, wird die
 Umsetzung korrigiert und nicht die Abweichung zur Designentscheidung erklärt.
+(`docs/app_design.jpg` ist die frühere Referenz, nur noch zur historischen
+Einordnung — nicht mehr verbindlich, siehe design-system.md Abschnitt 12.)
 
 Wer etwas unter `src/app/`, `src/components/` oder an `src/app/globals.css`
 anfasst, liest das Dokument vorher — der Skill `design` lädt es.
@@ -13,19 +15,27 @@ Die Regeln, die am schnellsten verloren gehen:
 
 - **Nur Tokens.** Farbe, Radius, Schatten kommen aus `globals.css`. Kein
   Hex-Wert im Komponentencode, keine Maße außerhalb der Skala in Abschnitt 5.
-- **Die Referenz nicht abmessen.** Das JPEG ist ein Mockup im Maßstab ~1:1,47.
+- **Die Referenz nicht abmessen.** Das JPEG ist ein Mockup im Maßstab ~1:1,34.
   Untergrenzen: 16 px Schrift in Eingabefeldern (sonst zoomt iOS hinein),
   44 px Trefferfläche, 15 px Fließtext.
 - **Das Grau im JPEG ist nicht die App.** Es ist die Fläche, auf der die beiden
-  iPhone-Screenshots liegen. Gemessen wird *innerhalb* der Gerätekanten.
-- **Keine Karten.** Ein Off-White (`--bg`) läuft durch den ganzen Screen — kein
-  zweiter Hintergrund, kein Schatten, keine Umrandung um Inhaltsblöcke.
-  Trennung kommt aus Weißraum. Was eine Bedienfläche braucht, nimmt `--soft`.
-- **Keine Akzentfarbe.** `--accent` ist ein Warnton für Löschen und Fehler,
-  keine Marke. Farbe trägt das Essen.
+  iPhone-Screenshots liegen. Gemessen wird *innerhalb* der Gerätekanten —
+  dort aber gibt es diesmal echt zwei Flächen (`--bg` und `--card`), keine
+  Fehllesung wie beim alten Bild (design-system.md Abschnitt 2).
+- **Karten nur in der Rezeptübersicht.** `--card` mit `--shadow-card` fasst
+  dort jede Rezeptvorschau. Überall sonst (Rezept-Screen, Einkauf, Werkzeug)
+  läuft `--bg` ohne Karte durch. Was eine Bedienfläche auf `--bg` braucht,
+  nimmt `--soft`, nicht `--card`.
+- **`--accent` ist jetzt Markenfarbe**, kein reiner Warnton mehr — CTA-Pillen,
+  Ziffernkasten, Icon-Badges. Fehler/Löschen bleiben `--danger`. `--accent`
+  nie als dünne Linie oder Text direkt auf `--bg` (Kontrast, siehe
+  design-system.md Abschnitt 4).
 - **Keine bildschirmbreiten CTA-Knöpfe auf Rezept- und Einkaufsscreens.** Dort
-  stehen Aktionen leise neben dem Inhalt. Breite Knöpfe gehören in Formulare
+  stehen Aktionen leise neben dem Inhalt — auch als gefüllte Gold-Pille erlaubt,
+  solange sie nicht bildschirmbreit ist. Breite Knöpfe gehören in Formulare
   (Abschnitt 3, „Zwei Register").
+- **Kein Dark Mode aktuell.** Die neue Referenz zeigt nur Hell; der alte dunkle
+  Modus passt nicht zur neuen Farbfamilie und ist vorläufig entfernt.
 - **Keine pulsierenden Skelette, keine Emojis als Symbole, keine Systemschrift.**
 
 Bewegung: 120–250 ms, `ease-out`, `prefers-reduced-motion` immer mitbedacht.
