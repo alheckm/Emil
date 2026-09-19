@@ -16,7 +16,9 @@ Akzentfarbe) beruhte. Die alte Referenz liegt zur Nachvollziehbarkeit unter
 `docs/app_design.jpg`, ist aber **nicht mehr verbindlich**. Der Wechsel ist
 bewusst und war ein expliziter Auftrag, keine schleichende Abweichung — siehe
 Abschnitt 12. Component- und CSS-Code folgt dieser Dokumentänderung als
-eigener, separater Schritt.
+eigener, separater Schritt — **Abschnitt 14 ist dafür die Arbeitsgrundlage**:
+eine gegen den Code (Stand 19.09.2026) geprüfte Liste jeder Stelle, die das
+alte System noch trägt, mit der jeweils richtigen neuen Klasse/Variable.
 
 ---
 
@@ -140,6 +142,16 @@ wie schon beim Scrim-Wert der Vorgängerfassung.
 | `--ok` | `#28583d` | 5,4 : 1 auf `--bg`. Ohne Vorbild in der Referenz, aus demselben Grün wie zuvor auf die neue Fläche nachgedunkelt. |
 | `--warn` | `#7a4f18` | 4,7 : 1 auf `--bg`. Bewusst dunkler Bronzeton, nicht Gold — sonst ist eine Warnmeldung von einer CTA-Pille nicht zu unterscheiden. |
 | `--shadow-card` | `0 16px 32px -14px rgba(23,25,40,.28)` | Der einzige Schatten im System, exklusiv für `--card`. Weich, weit gestreut, keine harte Kante — Blur/Spread sind an einer JPEG-Kante nicht messbar und deshalb nach Augenmaß gegen den Entwurf gesetzt, nicht pixelgenau abgelesen. |
+| `--photo` | `#bcc4d6` (= `--soft`) | Das Bett unter einem Rezeptfoto, solange die signierte Adresse noch unterwegs ist, oder wenn ein Rezept keins hat. Alter Wert war `#2b2622`, ein warmes Dunkelbraun — gebraucht, damit ein weißer Titel *auf* dem Foto lesbar blieb. Diesen Grund gibt es nicht mehr (Titel steht nicht mehr auf dem Foto, Abschnitt 4 Regel 5), darum jetzt schlicht `--soft`: ein eigener Token bleibt trotzdem bestehen, falls sich das Bett später wieder vom Rest absetzen soll. |
+| `--control` | **entfällt, wird `--card`** | Die kleinen Kreise im Portionswähler waren ein eigener Token, weil `--chip` im dunklen Modus nicht mitziehen konnte (Abschnitt 4, Dunkel-Absatz der Vorgängerfassung). Ohne Dark Mode entfällt der Grund; `--control` und `--chip` sind jetzt identisch mit `--card` (`#ffffff`) und der Token wird ersatzlos entfernt, nicht nur umbenannt. |
+
+**`--brand`, `--brand-text`, `--accent-text` (alte Namen) entfallen.** `--brand`
+stand im Code (`#080808`, identisch zu `--panel`), tauchte aber nie in der
+Farbtabelle der Vorgängerfassung auf — beide Rollen übernimmt jetzt
+`--accent`/`--accent-ink`. `--accent-text` hieß der alte Kontrastpartner der
+Warnfarbe; sein Nachfolger heißt bewusst anders (`--accent-ink`), weil er
+jetzt zu einer inhaltlich anderen Farbe gehört (Marke statt Warnung) — siehe
+Migrationstabelle, Abschnitt 14.
 
 **Ein Vorbehalt zu `--accent` auf `--bg`:** Gold auf dem Fliederblau hat nur
 **1,02 : 1** Kontrast — praktisch unsichtbar als dünne Kontur oder kleines
@@ -197,6 +209,19 @@ Gegenversuch macht, prüft am Rezepttitel gegen den Screenshot, nicht am Namen.
 Playfair Display und Poppins entfallen. Das war die tragende Typo-Entscheidung
 der vorherigen Fassung — der Wechsel ist beabsichtigt, siehe Abschnitt 12.
 
+**Zu den CSS-Variablennamen:** `src/app/layout.tsx` lädt die Schrift aktuell
+als zwei `next/font`-Instanzen (`Playfair_Display` → CSS-Variable
+`--font-serif`, `Poppins` → `--font-sans-ui`), und `globals.css` bildet daraus
+zwei Tailwind-Tokens (`--font-display`, `--font-sans`). Diese zwei Namen
+bleiben — nicht weil es zwei Familien gibt, sondern weil `font-display` an
+rund 20 Stellen im Code steht (Rezepttitel, alle Abschnittsüberschriften,
+Ziffernkasten) und ein Massenumbenennen auf `font-sans` nur Fehlerrisiko ohne
+Nutzen wäre. **Beide Tokens zeigen jetzt auf dieselbe Schrift**, Plus Jakarta
+Sans, geladen als eine `next/font`-Instanz mit zwei Variablennamen (oder eine
+Instanz, zweimal referenziert) — es gibt also weiterhin `font-display` und
+`font-sans` als Klassen, aber keine zwei Schriftfamilien mehr dahinter, nur
+zwei Namen für dieselbe.
+
 ### Kursive Betonung
 
 Die Referenz setzt in der Begrüßung genau ein Wort kursiv (den Namen: „Hey
@@ -216,7 +241,8 @@ Umrechnungswert.
 | Rolle | Größe / Zeile | Schnitt |
 |---|---|---|
 | Rezepttitel (Kachel **und** Detail-Screen) | 26 / 1,2 | 700 |
-| Begrüßung „Hallo, *Name*" | 24 / 1,2 | 700, Name kursiv 500 |
+| Screen-Überschrift (Einkauf, Einstellungen, Konto, Werkzeug-Screens — `ScreenHeader`/`Screen`, `title`) | 26 / 1,2 | 700 |
+| Begrüßung „Hallo, *Name*" (nur Rezeptübersicht, ersetzt dort die generische Screen-Überschrift) | 24 / 1,2 | 700, Name kursiv 500 |
 | Abschnitt („Zutaten", „Zubereitung", „Beschreibung") | 15 / 1,3 | 600 |
 | Fließtext, Beschreibung, Zubereitungsschritte | 15 / 1,5 | 400 |
 | Formularfeld-Inhalt | 16 / 1,4 | 400 |
@@ -312,8 +338,13 @@ Art Milchglas-Badge wie zuvor, jetzt mit `--card`/70 % + Blur statt
 ### RecipeHero (Rezept-Screen)
 Das Foto füllt die volle Bildschirmbreite, oben, bis unter die Statusleiste,
 ohne Rundung — **Seitenverhältnis und Höhenanteil sinken** gegenüber der
-Vorgängerfassung: die Referenz zeigt das Foto bei rund 30 % der Screenhöhe
-(gemessen an beiden Screens der Referenz), nicht mehr 42–46 %. Auf dem Foto
+Vorgängerfassung, und zwar deutlich: von hochkant 9:10 auf **querformatig
+4:3** (`aspect-[4/3]`, ersetzt `aspect-[9/10]`). Gemessen an beiden Screens
+der Referenz (Kachel-Foto ≈ 260 : 190, Detail-Foto ≈ 270 : 185 — beide runden
+auf 4:3), unabhängig von der tatsächlichen Gerätehöhe, die zwischen
+iPhone-Modellen um bis zu 40 % streut. Bei üblichen Gerätehöhen entspricht das
+rund 28–32 % der Screenhöhe — das ist die Rechengröße dahinter, nicht der
+CSS-Wert selbst; verbindlich ist das Seitenverhältnis. Auf dem Foto
 liegen ausschließlich zwei runde Icon-Badges oben links/rechts
 (`rgba(255,255,255,.7)` + `backdrop-filter: blur(8px)`, dunkles Symbol) —
 **kein Titel, kein Scrim.** Das ist die größte strukturelle Änderung: die
@@ -374,7 +405,11 @@ durchgängige Markenfarbe, der schwarze Ziffernkasten entfällt. Ziffer 13 px,
 Schritten 16 px.
 
 ### RowLink / TabBar
-`RowLink`: unverändert, mindestens 56 px hoch, `bg-soft` mit Chevron rechts.
+`RowLink`: unverändert, mindestens 56 px hoch, `bg-soft` mit Chevron rechts,
+Chevron in `text-muted`. **Nicht** `text-accent`: der Chevron war vorher
+`text-brand` (= Schwarz), und ein reflexhaftes `brand → accent` würde ihn Gold
+färben — eine stille Bedienfläche in der Markenfarbe wäre aber ein
+Aktions-Signal ohne Aktion (Regel 3, Abschnitt 4).
 
 `TabBar`: **grundlegend neue Bauform.** Nicht mehr bildschirmbreit-sticky mit
 Haarlinie oben, sondern eine freistehende, vollgerundete Leiste
@@ -392,9 +427,11 @@ Werkzeug-Register. Felder: 48 px hoch, `rounded-soft`, `bg-soft`, Haarlinie
 `--border`, 16 px Schrift, Fokus über `border-text`.
 
 `Button`: 48 px, bildschirmbreit, `rounded-pill`; `primary` = `bg-accent
-text-accent-ink` (das war vorher `bg-brand` — ein Token, das nie definiert
-war; jetzt ist es real), `quiet` = Haarlinie ohne Fläche, `danger` = Kontur in
-`--danger`. Nur auf Werkzeug-Screens.
+text-accent-ink` (das war vorher `bg-brand` — ein Token, das im Code stand,
+aber nie in der Farbtabelle der alten Fassung dieses Dokuments auftauchte;
+`--brand`/`--brand-text` entfallen jetzt zugunsten von `--accent`), `quiet` =
+Haarlinie ohne Fläche, `danger` = Kontur in `--danger`. Nur auf
+Werkzeug-Screens.
 
 `Notice`: `role="alert"` bei Fehlern, Fläche `bg-card` oder `bg-soft`, nie
 nacktes `--bg` — `--danger`-Text braucht dafür Kontrast (Abschnitt 4).
@@ -488,7 +525,7 @@ möglich nachzubauen. Was sich dadurch gegenüber der Vorgängerfassung ändert:
 | Titel als weißer Text auf dem Foto, Scrim | Titel unter/neben dem Foto, kein Scrim | Die neue Referenz legt Text nie über ein Foto |
 | Zutatenkreise | Zutatenkacheln (abgerundetes Rechteck) | Explizite Nutzerentscheidung, angelehnt an die „Gallery"-Kacheln der Referenz |
 | Hell **und** Dunkel | Nur Hell | Explizite Nutzerentscheidung: kein dunkles Gegenstück ohne dunkle Referenz |
-| Foto 42–46 % der Screenhöhe | Foto ca. 30 % der Screenhöhe | Gemessen an beiden Screens der neuen Referenz |
+| Foto hochkant 9:10, 42–46 % der Screenhöhe | Foto querformatig 4:3, ca. 28–32 % der Screenhöhe | Gemessen an beiden Screens der neuen Referenz |
 | Tab-Leiste bildschirmbreit, sticky, Haarlinie | Freistehende, gerundete Leiste mit Schatten | Referenz zeigt eine floatende Pille, keine Vollbreiten-Leiste |
 
 ---
@@ -523,7 +560,143 @@ Schritt (siehe Kopf dieses Dokuments).
 
 ---
 
-## 14. Prüfliste
+## 14. Migrationsprüfung — was aus dem alten System nicht mit rüber darf
+
+Dieser Abschnitt entstand aus einer Prüfung des tatsächlichen Codes gegen
+diese Dokumentation (19.09.2026), *bevor* die Umsetzung begann — mit dem Ziel,
+dass beim Implementieren kein Element des alten Systems unbemerkt bestehen
+bleibt. Er ist eine Arbeitsliste, kein Teil der Gestaltungsregel selbst; Regel
+bleibt, was in den Abschnitten 1–13 steht.
+
+### 14.1 CSS-Variablen — vollständig, `src/app/globals.css`
+
+| Alt | Alter Wert | Neu | Neuer Wert | Status |
+|---|---|---|---|---|
+| `--bg` | `#f5f1ee` | `--bg` | `#c9d2e3` | Wert ändert sich, Rolle bleibt |
+| `--chip` | `#ffffff` | `--chip` | `#ffffff` | unverändert im Wert, Träger jetzt Kacheln statt Kreise |
+| `--soft` | `#ece7e3` | `--soft` | `#bcc4d6` | Wert ändert sich |
+| `--panel` | `#080808` | `--accent` (Rolle übernommen) | `#f6ce8f` | **Ziffernkasten wechselt Token, nicht nur Wert** |
+| `--panel-text` | `#ffffff` | `--accent-ink` | `#0b0b10` (= `--text`) | Rolle übernommen, Wert gedreht (dunkel auf hell statt hell auf dunkel) |
+| `--text` | `#242321` | `--text` | `#0b0b10` | Wert ändert sich |
+| `--muted` | `#756d66` | `--muted` | `#4d5770` | Wert ändert sich |
+| `--accent` | `#b5442c` (Warnton) | `--danger` | `#93331f` | **Umbenannt, nicht nur umgefärbt** — `--accent` heißt jetzt Marke, nicht Warnung |
+| `--brand` | `#080808` | entfällt | — | Rolle geht in `--accent` auf |
+| `--brand-text` | `#ffffff` | entfällt | — | Rolle geht in `--accent-ink` auf |
+| `--accent-text` | `#ffffff` (Kontrast zum alten `--accent`) | entfällt | — | Nachfolgerrolle heißt `--accent-ink`, siehe oben |
+| `--border` | `#e2dbd5` | `--border` | `#a8b2c9` | Wert ändert sich |
+| `--ok` | `#3f6f52` | `--ok` | `#28583d` | Wert ändert sich (Kontrast auf neuem `--bg`) |
+| `--warn` | `#b5762a` | `--warn` | `#7a4f18` | Wert ändert sich |
+| `--scrim` | `rgba(12,10,9,.72)` | **entfällt ersatzlos** | — | Kein Text mehr auf dem Foto |
+| `--photo` | `#2b2622` | `--photo` | `#bcc4d6` (= `--soft`) | Wert ändert sich, Grund entfällt (Abschnitt 4) |
+| `--control` | `#ffffff` | **entfällt ersatzlos** | — | Geht in `--card`/`--chip` auf |
+| `--card` | — (gab es nicht) | `--card` | `#ffffff` | **Neu** |
+| `--accent-ink` | — | `--accent-ink` | `#0b0b10` | **Neu** |
+| `--danger` | — | `--danger` | `#93331f` | **Neu** (Nachfolger des alten `--accent`) |
+| `--shadow-card` | — | `--shadow-card` | `0 16px 32px -14px rgba(23,25,40,.28)` | **Neu** |
+
+**Der komplette `@media (prefers-color-scheme: dark)`-Block entfällt** (Abschnitt
+4, „Dunkel"). Ein Dark Mode, der nach dem Token-Wechsel weiterläuft, würde
+sofort wieder alte Werte gegen neue Rollen ausspielen — er muss ganz raus, nicht
+nur unverändert stehen bleiben.
+
+`--radius-card` ändert sich von `28px` auf `24px`. Neu hinzu kommt
+`--radius-tile` (`14px`) für die Zutatenkacheln — `--radius-soft` (`12px`,
+vorher `11px`) und `--radius-pill` (`999px`) bleiben konzeptionell gleich.
+
+Der gesamte Kommentarblock am Kopf von `globals.css` (Zeilen 3–36 im
+jetzigen Stand) beschreibt die *alte* Herleitung — „Die Farben stammen aus
+app_design.jpg", „Es gibt keine Akzentfarbe" usw. — und muss komplett neu
+geschrieben werden, nicht nur die Werte darunter. Ein Kommentar, der der
+Farbtabelle widerspricht, ist schlimmer als keiner.
+
+### 14.2 `accent` im Code — jede Fundstelle einzeln, nicht pauschal ersetzen
+
+Das ist die gefährlichste Einzelstelle in der ganzen Migration: `--accent`
+bedeutet jetzt etwas anderes (Marke statt Warnung). Ein reflexhaftes
+Suchen-und-Ersetzen von `accent` lässt in beiden Richtungen falsche Ergebnisse
+zu — mal bleibt eine echte Fehlermeldung gold, mal wird ein neutraler Zustand
+fälschlich zur Markenfarbe. Jede Fundstelle (Stand 19.09.2026, `grep -rn
+accent src --include="*.tsx"`) braucht eine eigene Entscheidung:
+
+| Datei:Zeile | Jetzige Klasse | Bedeutung | Wird zu |
+|---|---|---|---|
+| `src/components/ui.tsx:65` | `border-accent text-accent` (`Button` `danger`) | Fehler-Aktion | `border-danger text-danger` |
+| `src/components/ui.tsx:98` | `border-accent/40 bg-accent/10` (`Notice` `error`) | Fehlermeldung | `border-danger/40 bg-danger/10` |
+| `.../rezepte/[id]/RecipeActions.tsx:450` | `border border-accent text-accent` (Löschen-Bestätigung) | Destruktive Aktion | `border border-danger text-danger` |
+| `.../liste/ListView.tsx:614` | `border border-accent text-accent` („Von der Liste nehmen") | Destruktive Aktion | `border border-danger text-danger` |
+| `.../rezepte/RecipeImageField.tsx:143` | `text-accent` (Fehlertext) | Fehlermeldung | `text-danger` |
+| `.../rezepte/importieren/ImportPanel.tsx:272` | `border-accent bg-accent text-accent-text` (aktiver Import-Tab) | **Kein Fehler** — reine Auswahl-Markierung, hat die alte Warnfarbe nur mitbenutzt, weil sie die einzige kräftige Farbe war | `border-text bg-text text-card` (gleiche Logik wie die aktive Filter-Pille, Abschnitt 7) |
+| `.../rezepte/RecipeForm.tsx:405,429,437,453` | `focus:border-accent` | Fokuszustand von Feldern | `focus:border-text` (Design-System kennt keinen Akzent-Fokusring, Abschnitt 10) |
+| `src/app/passwort-neu/page.tsx:46` | `text-accent underline` (Link) | Sekundärer Link, keine Warnung | Bewusst prüfen: als Markenlink in `text-accent` naheliegend (Abschnitt 3, Werkzeug-Register), aber nicht automatisch übernehmen — erst gegenlesen, ob Gold als Fließtext-Link genug Kontrast hat (Abschnitt 4: `--accent` auf `--bg` nur 1,02:1; auf `--card`/`--soft` im Formularkontext ist das unkritisch, sofern der Link nicht direkt auf nacktem `--bg` steht) |
+| `src/app/anmelden/page.tsx:40` | `text-accent underline` (Link zu „Registrieren") | wie oben | wie oben |
+
+### 14.3 Tailwind-Klassen und Formen — Fundstellen mit Datei
+
+| Muster | Wo | Wird zu |
+|---|---|---|
+| `aspect-[9/10]` | `RecipeHero.tsx`, `RecipeBrowser.tsx`, `skeletons.tsx` ×2 | `aspect-[4/3]` (Abschnitt 7, RecipeHero) |
+| `bg-gradient-to-b/-t from-scrim …` (Scrim-Verläufe) | `RecipeHero.tsx`, `RecipeBrowser.tsx` | ersatzlos entfernt, Titel wandert von auf das Foto zu unter/neben das Foto |
+| `text-white` am Rezepttitel | `RecipeHero.tsx:85`, `RecipeBrowser.tsx:215` | `text-text`, weil der Titel nicht mehr auf dem Foto liegt |
+| `rounded-pill` an Zutatenkacheln (`size-18 … rounded-pill bg-chip`) | `RecipeActions.tsx:224-225`, `ListView.tsx` (Raster-Kacheln), `skeletons.tsx:104` | `rounded-tile` (14 px), Form wird Quadrat, nicht mehr Kreis (Abschnitt 7, IngredientTile) |
+| `bg-panel text-panel-text` + `italic` am Ziffernkasten | `rezepte/[id]/page.tsx:157` | `bg-accent text-accent-ink`, **`italic` explizit entfernen** — Kursiv ist jetzt ausschließlich dem Namen in der Begrüßung vorbehalten (Abschnitt 5). Der naheliegende Fehler ist, nur `bg-panel`→`bg-accent` zu ersetzen und das `italic` zu übersehen. |
+| `bg-panel text-panel-text` am Haken-Badge | `ListView.tsx:504` | `bg-accent text-accent-ink` |
+| `bg-brand text-brand-text` | `ui.tsx:63` (`Button` `primary`), `RecipeBrowser.tsx:135` (aktiver Schlagwort-Filter), `rezepte/page.tsx:31` | `bg-accent text-accent-ink` |
+| `text-brand` (Chevron) | `ui.tsx:277` (`RowLink`) | `text-muted`, **nicht** `text-accent` (Abschnitt 7, RowLink) |
+| `bg-control` | `RecipeActions.tsx:327` (Stepper-Kreise) | `bg-card` (Token entfällt, Wert bleibt Weiß) |
+| `rounded-card` | `RecipeBrowser.tsx:183`, `skeletons.tsx:135` | Klasse bleibt, `--radius-card`-Wert ändert sich auf 24 px; zusätzlich braucht die Kachel jetzt `bg-card shadow-card` (bisher keine Fläche) |
+| `border border-border` an ShoppingListButton, Ruhezustand | `RecipeActions.tsx:369` | `bg-accent text-accent-ink` gefüllt, kein reiner Kontur-Button mehr (Abschnitt 7, ShoppingListAction) |
+| `h-9 … rounded-soft` an ShoppingListButton | `RecipeActions.tsx:364` | `rounded-pill` statt `rounded-soft` |
+| Theme-Color-Metatags | `src/app/layout.tsx:74-75` | `#f5f1ee`/`#1f1c19` → `#c9d2e3`; die dunkle Zeile ganz entfernen (kein Dark Mode, Abschnitt 4) |
+| `Playfair_Display`, `Poppins` Imports + Doc-Kommentar „Die beiden Schriften aus app_design.jpg" | `src/app/layout.tsx` | Ein `Plus_Jakarta_Sans`-Import, zwei Variablennamen (Abschnitt 5) |
+| `rounded-xl`, `rounded-lg` (rohe Tailwind-Radien statt Token) | `ImportPanel.tsx:270`, `einstellungen/haushalt/InviteSection.tsx:90,100`, `skeletons.tsx:75` | `rounded-soft` — vorbestehende Abweichung von der „Nur Tokens"-Regel (AGENTS.md), nicht durch den Referenzwechsel verursacht, aber gleich mit erledigen, da `--radius-soft` jetzt ohnehin 12 px ist und `rounded-xl` (12 px) zahlenmäßig deckungsgleich wird |
+
+### 14.4 Betroffene Dateien — vollständige Liste
+
+Jede Datei, die beim Codegrep (19.09.2026) mindestens ein Element aus 14.1–14.3
+enthielt. Eine Implementierung, die diese Liste nicht komplett abarbeitet, hat
+zwangsläufig alte Elemente stehen lassen:
+
+`src/app/globals.css` · `src/app/layout.tsx` · `src/components/ui.tsx` ·
+`src/components/skeletons.tsx` · `src/app/(app)/rezepte/[id]/RecipeHero.tsx` ·
+`src/app/(app)/rezepte/[id]/RecipeActions.tsx` ·
+`src/app/(app)/rezepte/[id]/page.tsx` · `src/app/(app)/rezepte/RecipeBrowser.tsx` ·
+`src/app/(app)/rezepte/page.tsx` · `src/app/(app)/rezepte/RecipeForm.tsx` ·
+`src/app/(app)/rezepte/RecipeImageField.tsx` ·
+`src/app/(app)/rezepte/importieren/ImportPanel.tsx` ·
+`src/app/(app)/liste/ListView.tsx` · `src/app/(app)/TabBar.tsx` (Bauform,
+Abschnitt 7 — keine alten Tokens, aber komplett neue Struktur) ·
+`src/app/passwort-neu/page.tsx` · `src/app/anmelden/page.tsx`
+
+Nicht in der Liste, weil beim Grep ohne alte Tokens: `src/components/icons.tsx`
+(bleibt strukturell gültig, siehe Abschnitt 8), `RecipeForm.tsx` außerhalb der
+vier `focus:border-accent`-Stellen, alle Seiten, die nur `Screen`/`Field`/
+`Button` aus `ui.tsx` ohne eigene Farbklassen verwenden — dort reicht die
+Änderung an `ui.tsx` selbst.
+
+### 14.5 Nachweis vor Abschluss
+
+Vor dem Abhaken der Prüfliste in Abschnitt 15 sollten folgende Suchen in
+`src/` **keine** Treffer mehr liefern:
+
+```
+grep -rn "bg-brand\|text-brand\|bg-control\|aspect-\[9/10\]\|from-scrim" src/
+grep -rn "bg-panel\|text-panel" src/          # außer als bewusst benannter Alt-Verweis in Kommentaren
+grep -rn "Playfair_Display\|Poppins" src/
+grep -rn "rounded-xl\|rounded-lg" src/        # rohe Radien statt --radius-soft
+grep -rEn "size-18|w-18" src/                 # alte Zutatenkreis-Maße
+```
+
+Und folgende Suche sollte **nur noch** Treffer zeigen, die in 14.2 als
+„bleibt `accent`" eingestuft wurden (aktuell: die beiden Link-Stellen, nach
+Prüfung):
+
+```
+grep -rn "accent" src/ --include="*.tsx"
+```
+
+---
+
+## 15. Prüfliste
 
 **Optisch** — im direkten Vergleich mit `docs/app_redesign.jpg`:
 
@@ -531,7 +704,7 @@ Schritt (siehe Kopf dieses Dokuments).
       Übersicht
 - [ ] Karten mit Schatten, Radius 24 px, nur dort
 - [ ] Kein Scrim, kein Titel auf dem Foto — Titel steht daneben/darunter
-- [ ] Foto ca. 30 % der Screenhöhe auf Hero und Kachel
+- [ ] Foto querformatig 4:3 (`aspect-[4/3]`, nicht mehr `aspect-[9/10]`) auf Hero und Kachel
 - [ ] Zutaten als Kacheln, nicht als Kreise, vierte Kachel angeschnitten
 - [ ] Ziffernkasten in `--accent`, Ziffer nicht kursiv
 - [ ] Kursiv ausschließlich am Namen in der Begrüßung

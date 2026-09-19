@@ -10,6 +10,12 @@ Einordnung — nicht mehr verbindlich, siehe design-system.md Abschnitt 12.)
 
 Wer etwas unter `src/app/`, `src/components/` oder an `src/app/globals.css`
 anfasst, liest das Dokument vorher — der Skill `design` lädt es.
+**Für die Umsetzung des Referenzwechsels:** design-system.md Abschnitt 14 ist
+eine gegen den Code geprüfte Migrationstabelle — jede Datei, jeder alte
+Token/jede alte Klasse, die verschwinden muss, mit der jeweils richtigen neuen
+Entsprechung. Vor allem `--accent` verdient Aufmerksamkeit: er bedeutet jetzt
+Markenfarbe statt Warnton, und nicht jede alte `accent`-Stelle im Code wird zu
+`--danger` — Abschnitt 14.2 ordnet jede Fundstelle einzeln ein.
 
 Die Regeln, die am schnellsten verloren gehen:
 
