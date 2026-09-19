@@ -364,6 +364,24 @@ Kachel bleibt die einzige Trefferfläche. Bekannte Lücke: die Details sind
 damit nur per Touch/Maus-Halten erreichbar, ohne Tastatur-Entsprechung (siehe
 Abschnitt 12).
 
+### Bildzuschnitt (ImageCropper)
+`src/app/(app)/rezepte/ImageCropper.tsx`, eingebettet in `RecipeImageField`.
+Kein eigener Screen, kein Modal — sobald ein Foto frisch aufgenommen wurde
+oder „Zuschneiden" antippt wird, ersetzt das Werkzeug an derselben Stelle im
+Formular die Vorschau: gleicher 4:3-Rahmen, gleiches `--radius-soft`, Bett in
+`--soft` wie unter jedem Rezeptfoto (`--photo`). Ziehen verschiebt den
+Ausschnitt; ein eigens gestylter Regler (`zoom-slider` in `globals.css`, Spur
+`--soft`, Griff 28 px gefüllt in `--accent`) zoomt von „deckt den Rahmen
+gerade ab" bis aufs Dreifache — ein Regler statt einer Zwei-Finger-Geste,
+weil Emil einhändig bedient wird und ein Regler zusätzlich mit der Tastatur
+bedienbar bleibt (Abschnitt 11). „Abbrechen" (Kontur, `--muted`) und
+„Übernehmen" (`bg-accent text-accent-ink`) stehen als gleich breites Paar
+darunter — dieselbe Aufteilung wie „Zuschneiden"/„Entfernen" im
+Ruhezustand desselben Feldes. Der Ausschnitt ist fest auf 4:3 verriegelt,
+weil Karte, Hero und diese Vorschau das Foto ohnehin nur in diesem
+Seitenverhältnis zeigen (`object-cover` würde einen anderen Ausschnitt
+sonst wieder überschreiben).
+
 ### ServingStepper
 `RecipeActions.tsx`. Pille rechts neben „Zutaten" (`bg-soft` auf `--bg`),
 `− 2 +`, 32 px sichtbar / 44 px Trefferfläche, `tabular-nums`,
