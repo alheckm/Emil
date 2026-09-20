@@ -215,6 +215,20 @@ async function snapshot(recipe, ingredientRows, felder, laufId) {
   if (error) fail(`Snapshot fehlgeschlagen, nichts geschrieben: ${dbError(error)}`);
 }
 
+/**
+ * Setzt `pflege_stand = now()` über die RPC aus 0015_pflege_stand_touch.sql —
+ * NICHT über `.update({ pflege_stand: new Date().toISOString() })`: ein
+ * clientseitiger Zeitstempel liegt praktisch immer vor dem `now()`, das
+ * `touch_updated_at()` im selben Moment für `updated_at` setzt, und "offen"
+ * (pflege_stand < updated_at) bliebe für immer wahr. `now()` ist innerhalb
+ * einer Transaktion konstant — die RPC setzt darum nur dieses eine Feld, im
+ * selben Statement, in dem der Trigger `updated_at` mitzieht.
+ */
+async function touchPflege(id) {
+  const { error } = await supabase.rpc("touch_recipe_pflege", { p_id: id });
+  if (error) fail(dbError(error));
+}
+
 // ------------------------------------------------------------------ schreibe --
 
 const NUTRITION = z
@@ -270,11 +284,9 @@ async function cmdSchreibe(args) {
   const laufId = option(args, "lauf-id");
   await snapshot(recipe, ingredientRows, Object.keys(update), laufId);
 
-  const { error } = await supabase
-    .from("recipes")
-    .update({ ...update, pflege_stand: new Date().toISOString() })
-    .eq("id", id);
+  const { error } = await supabase.from("recipes").update(update).eq("id", id);
   if (error) fail(dbError(error));
+  await touchPflege(id);
 
   console.log(`Geschrieben: ${id} (${Object.keys(update).join(", ")})`);
 }
@@ -326,6 +338,7 @@ async function cmdZutat(args) {
       .eq("id", row.id);
     if (error) fail(dbError(error));
   }
+  await touchPflege(id);
 
   console.log(`Zugeordnet: ${parsed.data.length} Zeile(n) in ${id}`);
 }
@@ -355,16 +368,14 @@ async function cmdBild(args) {
   const laufId = option(args, "lauf-id");
   await snapshot(recipe, recipe.recipe_ingredients ?? [], ["image_path"], laufId);
 
-  const { error } = await supabase
-    .from("recipes")
-    .update({ image_path: path, pflege_stand: new Date().toISOString() })
-    .eq("id", id);
+  const { error } = await supabase.from("recipes").update({ image_path: path }).eq("id", id);
   if (error) {
     // Rezept nicht aktualisiert — verwaiste Datei wieder entfernen, statt sie
     // im Bucket liegen zu lassen (Muster aus uploadRecipeImage()).
     await supabase.storage.from("recipe-images").remove([path]);
     fail(dbError(error));
   }
+  await touchPflege(id);
 
   console.log(`Bild gesetzt: ${id} → ${path}`);
 }
@@ -400,13 +411,29 @@ async function cmdZurueck(args) {
   const recipe = await loadRecipe(revision.recipe_id);
   const ingredientRows = recipe.recipe_ingredients ?? [];
 
+  // Zwischen Snapshot und Zurückspielen könnte das Rezept in der App
+  // bearbeitet worden sein — save_recipe löscht dabei alle Zutatenzeilen und
+  // legt sie mit neuen IDs neu an (0009_rezepte_speichern.sql). Ein Update
+  // per .eq("id", …) auf eine verschwundene ID träfe dann still null Zeilen,
+  // und Mengenverweise in der wiederhergestellten Anleitung zeigten auf
+  // Positionen, die es so nicht mehr gibt — lieber ganz abbrechen als das.
+  const currentIds = new Set(ingredientRows.map((row) => row.id));
+  const verschwunden = revision.vorher.ingredients.filter((z) => !currentIds.has(z.id));
+  if (verschwunden.length > 0) {
+    fail(
+      `Zurückspielen abgebrochen: ${verschwunden.length} Zutatenzeile(n) aus der Revision ` +
+        `gibt es nicht mehr — das Rezept wurde seither in der App bearbeitet. ` +
+        `Nur von Hand nachvollziehen, nicht automatisch überschreiben.`,
+    );
+  }
+
   // Der aktuelle Stand wird selbst noch einmal gesichert — auch ein "zurück"
   // muss sich zurücknehmen lassen.
   await snapshot(recipe, ingredientRows, ["*restore*"], null);
 
   const { error: updateError } = await supabase
     .from("recipes")
-    .update({ ...revision.vorher.recipe, pflege_stand: new Date().toISOString() })
+    .update(revision.vorher.recipe)
     .eq("id", revision.recipe_id);
   if (updateError) fail(dbError(updateError));
 
@@ -417,6 +444,7 @@ async function cmdZurueck(args) {
       .eq("id", zeile.id);
     if (ingredientError) fail(dbError(ingredientError));
   }
+  await touchPflege(revision.recipe_id);
 
   console.log(`Zurückgespielt: ${revision.recipe_id} auf den Stand vor ${revision.created_at}`);
 }

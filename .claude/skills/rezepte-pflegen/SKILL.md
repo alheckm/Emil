@@ -80,7 +80,7 @@ nicht vorhandene Position ab.
 Nur wenn `imagePath` fehlt, per `mcp__gemini-image__generate_image`:
 fotorealistisch, das fertig angerichtete Gericht von oben, natürliches Licht,
 ruhiger, unaufdringlicher Hintergrund — passend zu den echten Fotos, die
-schon in der App liegen. `output_path` unter das Projekt legen (z. B.
-`scripts/rezept-pflege/tmp/<slug>.jpg`), danach
+schon in der App liegen. `output_path` unter `scripts/rezept-pflege/tmp/<slug>.jpg`
+legen (das Verzeichnis ist gitignored, dort darf Erzeugtes liegen bleiben —
+die Werkzeugliste des headless-Laufs erlaubt kein `rm`), danach
 `node scripts/rezept-pflege/pflege.mjs bild <id> --datei <output_path>`.
-Die temporäre Datei danach löschen — sie gehört nicht ins Repo.
