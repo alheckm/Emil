@@ -406,7 +406,7 @@ export function ListView({
           <ul className="grid grid-cols-3 gap-x-2 gap-y-3">
             {adding.map((item) => (
               <li key={item.id} className="flex flex-col items-center gap-2 opacity-50">
-                <span className="aspect-square w-full rounded-tile bg-chip" />
+                <span className="aspect-square w-full rounded-full bg-chip" />
                 <span className="w-full text-center text-[13px] font-medium leading-tight">
                   {item.label}
                 </span>
@@ -450,10 +450,10 @@ export function ListView({
                     onClick={() => tap(entry)}
                     className="flex select-none flex-col press-flat tap-target touch-manipulation"
                   >
-                    <span className="relative block aspect-square w-full">
+                    <span className="relative block aspect-square w-full p-3">
                       <span
                         className={
-                          "flex h-full w-full items-center justify-center " +
+                          "flex h-full w-full items-center justify-center overflow-hidden rounded-full " +
                           // Abgehakt wird das Bild blass, das Häkchen
                           // darüber bleibt kräftig — sonst verschwindet
                           // genau die Rückmeldung mit, auf die man wartet.

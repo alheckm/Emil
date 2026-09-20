@@ -353,13 +353,15 @@ Fotos bleiben der Einkaufsliste vorbehalten, wo sie beim Einsortieren im
 Regal tatsächlich helfen: Raster, drei Spalten, `gap-x-2 gap-y-3`. **Die
 Kachel ist eine einzige `bg-chip`-Fläche mit `--radius-tile`**, die Foto,
 Name und Menge gemeinsam umschließt — nicht nur ein weißes Feld ums Foto mit
-Text lose darunter auf `--bg`. Foto randlos oben in der Kachel
-(`object-fit: cover`, vom `overflow-hidden` der Kachel oben abgerundet), Name
-und Menge darunter, aber **innerhalb derselben weißen Fläche** (`px-2 pb-2
-pt-1`), je 13 px mit `hyphens-auto` und Zwei-Zeilen-Deckel. Fehlt ein Foto,
-steht der Anfangsbuchstabe in `--muted`. Abgehakt: Foto `opacity-40`, ein
-Häkchen-Badge in `--accent`/`--accent-ink` bleibt kräftig darüber, Name
-`line-through`.
+Text lose darunter auf `--bg`. Das Foto selbst ist ein Kreis (`rounded-full`),
+mit Rand zur Kachel eingerückt (`p-3` auf dem quadratischen Feld, das die
+Kachelbreite bestimmt), nicht randlos wie die Kachel selbst — die Kachel
+bleibt ein abgerundetes Rechteck (siehe `--radius-tile`), nur das Foto darin
+ist rund. Name und Menge darunter, aber **innerhalb derselben weißen Fläche**
+(`px-2 pb-2 pt-1`), je 13 px mit `hyphens-auto` und Zwei-Zeilen-Deckel. Fehlt
+ein Foto, steht der Anfangsbuchstabe in `--muted`, mittig im selben Kreis-
+Ausschnitt. Abgehakt: Foto `opacity-40`, ein Häkchen-Badge in
+`--accent`/`--accent-ink` bleibt kräftig darüber, Name `line-through`.
 
 **Die Mengenzeile steht immer, notfalls unsichtbar** (`invisible`, mit einem
 geschützten Leerzeichen als Inhalt). Ohne sie wäre eine Zutat ohne Menge
