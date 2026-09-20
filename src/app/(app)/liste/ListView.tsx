@@ -39,10 +39,10 @@ import { Section, Notice } from "@/components/ui";
  *   Kachel, damit die Reihe nicht ausfranst.
  * - **Das Häkchen wirkt sofort**, auch bevor der Server geantwortet hat. Geht
  *   es schief, springt es zurück und die Meldung erklärt warum.
- * - **Ein Raster, nach Abteilung geordnet — keine Boxen je Abteilung.** Die
- *   Abteilung entscheidet nur die Reihenfolge, nicht ob eine Kachel in einem
- *   eigenen Kästchen mit eigenem Restplatz landet. Der Name der Abteilung
- *   steht als schmale Zeile über der ersten Kachel, die zu ihr gehört.
+ * - **Ein Raster, nach Abteilung geordnet — ohne Überschriften.** Die
+ *   Abteilung entscheidet nur die Reihenfolge der Kacheln, nicht ob dazwischen
+ *   eine Zeile mit ihrem Namen steht. Die Liste besteht ausschließlich aus
+ *   Kacheln.
  * - **Details per Longpress, nicht über ein „⋯"-Menü.** Die Zusatzinfos
  *   (Rezeptquellen, Abteilung ändern, entfernen) erscheinen direkt unter der
  *   gehaltenen Kachel, als eigene volle Zeile im selben Raster — nicht
@@ -426,7 +426,7 @@ export function ListView({
       )}
 
       <ul className="grid grid-cols-3 items-start gap-x-2 gap-y-3">
-        {visibleEntries.map((entry, index) => {
+        {visibleEntries.map((entry) => {
           const checked = checkedNow[entry.id] ?? entry.checked;
           const { text } = formatAmount(entry.amount, entry.mergeUnit);
           const src = ingredientImage(entry.name);
@@ -437,24 +437,9 @@ export function ListView({
             .filter(Boolean)
             .join(" ");
           const isOpen = open === entry.id;
-          const isNewCategory =
-            index === 0 ||
-            visibleEntries[index - 1].categoryName !== entry.categoryName;
 
           return (
             <Fragment key={entry.id}>
-              {isNewCategory && (
-                <li
-                  className={
-                    "col-span-3 " + (index === 0 ? "" : "pt-2")
-                  }
-                >
-                  <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
-                    {entry.categoryName}
-                  </h2>
-                </li>
-              )}
-
               {/* Offen wächst nur diese eine Spalte nach unten (row-span-2)
                   — die Nachbarn in derselben Reihe bleiben stehen, wo sie
                   sind. Foto, Name/Menge und die Zusatzinfos teilen sich eine
