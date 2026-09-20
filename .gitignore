@@ -55,5 +55,8 @@ next-env.d.ts
 # `design` ist nicht installiert, sondern gehört zum Projekt. Ohne ihn liest
 # ein frischer Klon docs/design-system.md nie.
 !/.claude/skills/design/
+# Ebenso `rezepte-pflegen`: treibt den headless-Lauf aus
+# scripts/rezept-pflege/lauf.sh an, siehe docs/plan-rezept-pflege.md.
+!/.claude/skills/rezepte-pflegen/
 /.claude/helpers/
 .claude/settings.local.json

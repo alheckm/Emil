@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Wöchentlicher Rezept-Pflege-Lauf, siehe docs/plan-rezept-pflege.md und
+  scripts/rezept-pflege/lauf.sh.
+
+  Installation (erst nach ausdrücklichem OK, und erst nachdem lauf.sh einmal
+  von Hand erfolgreich lief):
+
+    cp scripts/rezept-pflege/de.emil.rezept-pflege.plist \
+       ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/de.emil.rezept-pflege.plist
+
+  Sofort testen, statt bis Sonntag zu warten:
+
+    launchctl kickstart -k gui/$(id -u)/de.emil.rezept-pflege
+
+  Wieder entfernen:
+
+    launchctl unload ~/Library/LaunchAgents/de.emil.rezept-pflege.plist
+    rm ~/Library/LaunchAgents/de.emil.rezept-pflege.plist
+
+  Der Mac muss zur Startzeit wach sein — launchd holt einen verpassten Lauf
+  nicht automatisch nach. Bei Bedarf `sudo pmset repeat wakeorpoweron MTWTFSS
+  03:00:00`, oder die Startzeit unten auf eine Uhrzeit legen, zu der der Mac
+  ohnehin meist an ist.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>de.emil.rezept-pflege</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/alexanderheckmann/Documents/Projekte/Emil/scripts/rezept-pflege/lauf.sh</string>
+  </array>
+
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key>
+    <integer>0</integer>
+    <key>Hour</key>
+    <integer>3</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/Users/alexanderheckmann/Documents/Projekte/Emil/scripts/rezept-pflege/logs/launchd.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/alexanderheckmann/Documents/Projekte/Emil/scripts/rezept-pflege/logs/launchd.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

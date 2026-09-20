@@ -599,10 +599,11 @@ Arbeitsliste, kein Ist-Zustand. Stand 19.09.2026:
    nur per Halten (Touch/Maus) erreichbar. Braucht noch einen Weg ohne
    Zeigegerät — etwa eine Kontextmenü-Taste oder eine zweite, per Tastatur
    fokussierbare Aktion.
-7. **Die „Saisonal"-Pille hat noch keine Daten.** `recipes.season_months`
-   (Migration 0013) ist vorbereitet, aber leer — nichts befüllt sie bisher.
-   Geplant ist eine automatische Verschlagwortung; bis die steht, filtert die
-   Pille zuverlässig auf null Treffer (siehe FilterRow, Abschnitt 7).
+7. **Die „Saisonal"-Pille wartet auf den ersten Pflege-Lauf.**
+   `recipes.season_months` (Migration 0013) wird jetzt von der automatischen
+   Rezept-Pflege befüllt (`docs/plan-rezept-pflege.md`), aber bis der erste
+   wöchentliche Lauf durch ist, filtert die Pille weiterhin auf null Treffer
+   (siehe FilterRow, Abschnitt 7).
 
 ---
 
