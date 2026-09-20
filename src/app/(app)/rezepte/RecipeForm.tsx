@@ -6,6 +6,7 @@ import Link from "next/link";
 import { parseIngredient } from "@/lib/core/parseIngredient";
 import { parseAmount } from "@/lib/core/numbers";
 import { formatNumber } from "@/lib/core/format";
+import { stripStepMarkers } from "@/lib/core/steps";
 import { UNITS } from "@/lib/core/units";
 import {
   CONFIDENCE_REVIEW_THRESHOLD,
@@ -154,7 +155,10 @@ export function RecipeForm({
   );
   const [tags, setTags] = useState((recipe?.tags ?? []).join(", "));
   const [instructions, setInstructions] = useState(
-    (recipe?.instructions ?? draft?.instructions ?? []).join("\n"),
+    (recipe
+      ? stripStepMarkers(recipe.instructions, recipe.ingredients, recipe.baseServings)
+      : (draft?.instructions ?? [])
+    ).join("\n"),
   );
   const [notes, setNotes] = useState(recipe?.notes ?? "");
   const [rows, setRows] = useState<Row[]>(() => {

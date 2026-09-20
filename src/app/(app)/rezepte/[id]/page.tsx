@@ -6,7 +6,7 @@ import { getRecipe, type Recipe } from "@/lib/data/recipes";
 import { getRecipeImageUrl } from "@/lib/data/recipeImages";
 import { Notice, Screen, ScreenHeader } from "@/components/ui";
 import { RecipeCardSkeleton } from "@/components/skeletons";
-import { DeleteRecipe, IngredientsSection } from "./RecipeActions";
+import { DeleteRecipe, RecipeIngredientsAndSteps } from "./RecipeActions";
 import { RecipeHero } from "./RecipeHero";
 
 /**
@@ -109,10 +109,6 @@ async function RecipeDetail({ params }: { params: Params }) {
 
       <ListAwareIngredients recipe={value} />
 
-      {value.instructions.length > 0 && (
-        <RecipeSteps steps={value.instructions} />
-      )}
-
       {value.notes && (
         <section className="px-5 pb-6">
           <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
@@ -147,40 +143,6 @@ async function RecipeDetail({ params }: { params: Params }) {
   );
 }
 
-/**
- * Die Zubereitung.
- *
- * Die Ziffer steht in einem Quadrat in `--accent` — die Markenfarbe aus
- * docs/app_redesign.jpg, nicht mehr der schwarze Ziffernkasten (Nutzer-
- * entscheidung, design-system.md Abschnitt 7 und 14.3). **Nicht kursiv**:
- * Kursiv ist jetzt ausschließlich dem Namen in der Begrüßung vorbehalten
- * (Abschnitt 5) — das ist genau die Stelle, an der ein bloßes `bg-panel` →
- * `bg-accent` das alte `italic` übersehen hätte. `aria-hidden`, weil eine
- * geordnete Liste die Nummer ohnehin ansagt und sie sonst doppelt käme.
- */
-function RecipeSteps({ steps }: { steps: string[] }) {
-  return (
-    <section className="px-5 pb-6">
-      <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
-        Zubereitung
-      </h2>
-      <ol className="mt-4 space-y-4">
-        {steps.map((step, index) => (
-          <li key={index} className="flex gap-4">
-            <span
-              aria-hidden
-              className="flex size-6 shrink-0 items-center justify-center rounded-soft bg-accent font-display text-[13px] font-bold text-accent-ink"
-            >
-              {index + 1}
-            </span>
-            <span className="min-w-0 text-[15px] leading-[1.55]">{step}</span>
-          </li>
-        ))}
-      </ol>
-    </section>
-  );
-}
-
 async function ListAwareIngredients({ recipe }: { recipe: Recipe }) {
   const list = await getListState();
 
@@ -191,7 +153,7 @@ async function ListAwareIngredients({ recipe }: { recipe: Recipe }) {
           <Notice tone="error">{list.error}</Notice>
         </div>
       )}
-      <IngredientsSection
+      <RecipeIngredientsAndSteps
         listId={list.listId}
         recipe={recipe}
         plannedServings={list.planned[recipe.id] ?? null}

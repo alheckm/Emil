@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { buildListItems } from "@/lib/core/mergeList";
 import { formatAmount } from "@/lib/core/format";
 import { scaleAmount } from "@/lib/core/scale";
+import { resolveSteps } from "@/lib/core/steps";
 import { getBrowserSupabase } from "@/lib/client/supabase";
 import { deleteRecipe, type Recipe } from "@/lib/data/recipes";
 import { addRecipeToList, removeRecipeFromList } from "@/lib/data/shoppingList";
@@ -32,8 +33,14 @@ import { Notice } from "@/components/ui";
  * eingeplanten Zahl: wer die Portionen ändert und erneut auflegt, korrigiert
  * damit die Liste, statt die Menge zu verdoppeln — das übernimmt
  * `add_recipe_to_list`, indem es zuerst den eigenen früheren Anteil entfernt.
+ *
+ * Die Zubereitung hängt hier mit dran, nicht in einer eigenen Komponente:
+ * die automatische Rezept-Pflege schreibt Mengenverweise (`{{z:N}}`, siehe
+ * src/lib/core/steps.ts) in die Anleitung, damit „300 g Möhren anschwitzen"
+ * mit demselben Portionswähler mitrechnet wie die Zutatenliste darüber —
+ * beides braucht also denselben `servings`-Zustand.
  */
-export function IngredientsSection({
+export function RecipeIngredientsAndSteps({
   listId,
   recipe,
   plannedServings,
@@ -113,8 +120,16 @@ export function IngredientsSection({
   const onList = planned !== null;
   const changed = onList && planned !== servings;
 
+  const steps = resolveSteps(
+    recipe.instructions,
+    recipe.ingredients,
+    recipe.baseServings,
+    servings,
+  );
+
   return (
-    <section className="px-5 pb-6 pt-5">
+    <>
+      <section className="px-5 pb-6 pt-5">
       {error && (
         <div className="mb-4">
           <Notice tone="error">{error}</Notice>
@@ -175,6 +190,46 @@ export function IngredientsSection({
           );
         })}
       </ul>
+      </section>
+
+      {steps.length > 0 && <RecipeSteps steps={steps} />}
+    </>
+  );
+}
+
+/**
+ * Die Zubereitung.
+ *
+ * Die Ziffer steht in einem Quadrat in `--accent` — die Markenfarbe aus
+ * docs/app_redesign.jpg, nicht mehr der schwarze Ziffernkasten (Nutzer-
+ * entscheidung, design-system.md Abschnitt 7 und 14.3). **Nicht kursiv**:
+ * Kursiv ist jetzt ausschließlich dem Namen in der Begrüßung vorbehalten
+ * (Abschnitt 5) — das ist genau die Stelle, an der ein bloßes `bg-panel` →
+ * `bg-accent` das alte `italic` übersehen hätte. `aria-hidden`, weil eine
+ * geordnete Liste die Nummer ohnehin ansagt und sie sonst doppelt käme.
+ *
+ * Mengenverweise (`{{z:N}}`, siehe src/lib/core/steps.ts) sind hier bereits
+ * aufgelöst — die Komponente selbst weiß nichts von ihnen.
+ */
+function RecipeSteps({ steps }: { steps: string[] }) {
+  return (
+    <section className="px-5 pb-6">
+      <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
+        Zubereitung
+      </h2>
+      <ol className="mt-4 space-y-4">
+        {steps.map((step, index) => (
+          <li key={index} className="flex gap-4">
+            <span
+              aria-hidden
+              className="flex size-6 shrink-0 items-center justify-center rounded-soft bg-accent font-display text-[13px] font-bold text-accent-ink"
+            >
+              {index + 1}
+            </span>
+            <span className="min-w-0 text-[15px] leading-[1.55]">{step}</span>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }
