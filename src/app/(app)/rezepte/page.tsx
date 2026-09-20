@@ -5,6 +5,7 @@ import { getListState } from "@/lib/server/listState";
 import { listHouseholdTags, searchRecipes } from "@/lib/data/recipes";
 import { getRecipeImageUrls } from "@/lib/data/recipeImages";
 import { Notice, Screen } from "@/components/ui";
+import { PlusIcon } from "@/components/icons";
 import { RecipeGridSkeleton } from "@/components/skeletons";
 import { RecipeBrowser } from "./RecipeBrowser";
 
@@ -13,32 +14,31 @@ export const metadata = { title: "Rezepte" };
 /**
  * Die Rezeptübersicht.
  *
- * Der Rahmen — Überschrift und die beiden Knöpfe zum Anlegen — ist statisch
- * und landet damit in der App Shell: er steht, sobald der Tab angetippt wird.
+ * Der Rahmen — Überschrift mit dem Knopf zum Anlegen — ist statisch und
+ * landet damit in der App Shell: er steht, sobald der Tab angetippt wird.
  * Nur die Treffer strömen nach, und die hängen am Suchtext in der Adresse,
  * sind also URL-Daten und können gar nicht vorab im Shell liegen.
  */
 export default function RecipesPage(props: PageProps<"/rezepte">) {
   return (
-    <Screen title="Rezepte">
-      <div className="flex flex-wrap gap-2">
-        {/* „Importieren" ist der Haupteinstieg zu neuen Rezepten und trägt
-            deshalb die Markenfarbe — „Von Hand" bleibt die leise
-            Nebenoption. */}
+    <Screen
+      title="Rezepte"
+      action={
+        // Einziger Einstieg zu neuen Rezepten, deshalb in Markenfarbe wie
+        // die „Bearbeiten"-Aktion auf dem Rezept-Screen. „Importieren" bleibt
+        // das Ziel, weil es der Haupteinstieg ist — die Zeile dort führt mit
+        // „Lieber von Hand eingeben" weiter zum manuellen Formular.
         <Link
           href="/rezepte/importieren"
-          className="inline-flex min-h-11 items-center rounded-pill bg-accent px-4 text-[13px] font-medium text-accent-ink press tap-target"
+          aria-label="Rezept hinzufügen"
+          className="flex h-11 w-11 items-center justify-center press tap-target"
         >
-          Importieren
+          <span className="flex h-9 w-9 items-center justify-center rounded-pill bg-accent text-accent-ink">
+            <PlusIcon className="h-5 w-5" />
+          </span>
         </Link>
-        <Link
-          href="/rezepte/neu"
-          className="inline-flex min-h-11 items-center rounded-pill bg-soft px-4 text-[13px] font-medium press tap-target"
-        >
-          Von Hand
-        </Link>
-      </div>
-
+      }
+    >
       <Suspense fallback={<RecipeGridSkeleton />}>
         <Results searchParams={props.searchParams} />
       </Suspense>

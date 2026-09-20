@@ -255,20 +255,35 @@ nicht über mehr Durchmesser.
 
 ### Screen-Kopfzeile
 `src/components/ui.tsx`, `ScreenHeader`/`Screen`. Schlichte Überschrift
-(„Rezepte", „Einkaufsliste", „Einstellungen" …) in der Skala aus Abschnitt 5,
-ohne Aktion rechts — der runde Icon-Knopf zu Konto/Haushalt, der hier zuerst
-saß (`SettingsButton`), ist auf Wunsch in die Tab-Leiste gewandert (siehe
-TabBar unten); die Kopfzeile trägt jetzt nur noch den Titel. **Keine
-Begrüßung mit Namen:** ein erster Durchgang hatte „Hallo, *Haushaltsname*"
-nach dem Vorbild der Referenz-Begrüßung eingeführt — das war nicht verlangt,
-brauchte Kursiv ohne sonstigen Zweck in der App und wurde wieder auf die
-schlichte Überschrift zurückgenommen.
+(„Rezepte", „Einkaufsliste", „Einstellungen" …) in der Skala aus Abschnitt 5.
+Der runde Icon-Knopf zu Konto/Haushalt, der hier zuerst saß
+(`SettingsButton`), ist auf Wunsch in die Tab-Leiste gewandert (siehe TabBar
+unten) — die meisten Kopfzeilen tragen also nur den Titel. **Eine Ausnahme:**
+`/rezepte` nutzt den `action`-Steckplatz wieder, für den einzigen Einstieg zu
+neuen Rezepten — eine 44-px-Trefferfläche mit 36-px-Kreis in `--accent`
+(dieselbe Rolle wie „Bearbeiten" in RecipeHero, Aktion statt Navigation), die
+zu `/rezepte/importieren` führt. Der Steckplatz ist bewusst kein
+allgemeines Muster für jede Kopfzeile — nur wo eine Seite genau eine
+primäre, nicht aufschiebbare Aktion hat, sonst bleibt es bei Titel allein.
+**Keine Begrüßung mit Namen:** ein erster Durchgang hatte „Hallo,
+*Haushaltsname*" nach dem Vorbild der Referenz-Begrüßung eingeführt — das war
+nicht verlangt, brauchte Kursiv ohne sonstigen Zweck in der App und wurde
+wieder auf die schlichte Überschrift zurückgenommen.
 
 ### FilterRow
-Die bestehende Schlagwort-Filterung aus den Rezept-Tags, im neuen Farbschema:
-eine waagerechte, randlose Reihe aus Pillen. Aktiv: `--text`-gefüllte Pille,
-Text `--card`-weiß. Inaktiv: `--soft`-gefüllte Pille, Text `--muted`. Kein
-Rahmen auf beiden Zuständen — die Fläche allein trägt den Zustand.
+Die Schlagwort-Filterung aus den Rezept-Tags, im neuen Farbschema: eine
+waagerechte, randlose Reihe aus Pillen. Aktiv: `--text`-gefüllte Pille, Text
+`--card`-weiß. Inaktiv: `--soft`-gefüllte Pille, Text `--muted`. Kein Rahmen
+auf beiden Zuständen — die Fläche allein trägt den Zustand. Direkt unter dem
+Suchfeld auf `/rezepte`, `RecipeBrowser.tsx`.
+
+Zwei Pillen in derselben Reihe sind fest und laufen **nicht** über echte
+Schlagwörter, sondern über eigene Bedingungen: „≤ 30 Min" (`totalTimeMin`)
+und „Saisonal" (aktueller Monat gegen `seasonMonths`). Sie stehen deshalb
+immer da, auch ohne passendes Rezept — anders als die Tag-Pillen dahinter,
+die nur zeigen, was ein Rezept tatsächlich trägt. `seasonMonths` ist eine
+vorbereitete, noch leere Spalte (Abschnitt 12); die Pille findet erst etwas,
+sobald sie befüllt ist.
 
 ### RecipeBrowserCard
 `src/app/(app)/rezepte/RecipeBrowser.tsx`. Eine echte Karte: `--card`-Fläche,
@@ -582,6 +597,10 @@ Arbeitsliste, kein Ist-Zustand. Stand 19.09.2026:
    nur per Halten (Touch/Maus) erreichbar. Braucht noch einen Weg ohne
    Zeigegerät — etwa eine Kontextmenü-Taste oder eine zweite, per Tastatur
    fokussierbare Aktion.
+7. **Die „Saisonal"-Pille hat noch keine Daten.** `recipes.season_months`
+   (Migration 0013) ist vorbereitet, aber leer — nichts befüllt sie bisher.
+   Geplant ist eine automatische Verschlagwortung; bis die steht, filtert die
+   Pille zuverlässig auf null Treffer (siehe FilterRow, Abschnitt 7).
 
 ---
 

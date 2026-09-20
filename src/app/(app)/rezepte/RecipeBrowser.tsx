@@ -19,7 +19,11 @@ import { ChevronRightIcon } from "@/components/icons";
  *   `tags` ohnehin schon mit sich; ein Serverbesuch dafür wäre eine Netzrunde
  *   für eine Array-Prüfung. Die Adresse wird trotzdem mitgeführt, aber über
  *   `history.replaceState` — das ändert die Adresszeile, ohne zu navigieren,
- *   und bleibt damit teilbar.
+ *   und bleibt damit teilbar. Zwei feste Pillen laufen über denselben
+ *   Mechanismus, sind aber keine Schlagwörter: „≤ 30 Min" prüft
+ *   `totalTimeMin`, „Saisonal" den aktuellen Monat gegen `seasonMonths` — bis
+ *   die geplante automatische Verschlagwortung `seasonMonths` befüllt, findet
+ *   die Pille nichts (design-system.md, Abschnitt 12).
  * - **Der Suchtext** bleibt auf dem Server. Gesucht wird per Volltext über
  *   Titel *und* Zutaten; das im Browser nachzubauen hieße, alle Zutaten aller
  *   Rezepte mitzuschicken und die Suche trotzdem anders aussehen zu lassen als
@@ -27,6 +31,11 @@ import { ChevronRightIcon } from "@/components/icons";
  *   und in einer Transition, sodass die Liste währenddessen blass wird statt
  *   einzufrieren.
  */
+
+/** Reservierte Werte im `filter`-Parameter, die keine Schlagwörter sind. */
+const QUICK_ZEIT = "__zeit30";
+const QUICK_SAISON = "__saisonal";
+
 export function RecipeBrowser({
   recipes,
   tags,
@@ -59,8 +68,13 @@ export function RecipeBrowser({
     setValue(currentQuery);
   }
 
-  const [activeTag, setActiveTag] = useOptimistic(params.get("tag"));
+  const [activeFilter, setActiveFilter] = useOptimistic(params.get("filter"));
   const [searching, setSearching] = useOptimistic(false);
+
+  const isZeitFilter = activeFilter === QUICK_ZEIT;
+  const isSaisonFilter = activeFilter === QUICK_SAISON;
+  const activeTag =
+    activeFilter && !isZeitFilter && !isSaisonFilter ? activeFilter : null;
 
   useEffect(() => {
     if (value === currentQuery) return;
@@ -76,20 +90,20 @@ export function RecipeBrowser({
     return () => clearTimeout(timer);
   }, [value, currentQuery, params, router, setSearching]);
 
-  function toggleTag(tag: string) {
-    const next = activeTag === tag ? null : tag;
+  function toggleFilter(filterValue: string) {
+    const next = activeFilter === filterValue ? null : filterValue;
 
     // `useOptimistic` greift im aktuellen Frame — anders als ein `useState`-
     // Setter, der in der Transition aufgeschoben würde. Der Chip ist also
     // aktiv, bevor irgendetwas anderes passiert.
     startTransition(() => {
-      setActiveTag(next);
+      setActiveFilter(next);
 
       // Adresse nachziehen, ohne zu navigieren: kein Server, kein Rendern,
       // aber der Link bleibt teilbar und der Zurück-Knopf verhält sich richtig.
       const search = new URLSearchParams(params.toString());
-      if (next) search.set("tag", next);
-      else search.delete("tag");
+      if (next) search.set("filter", next);
+      else search.delete("filter");
       window.history.replaceState(
         null,
         "",
@@ -98,11 +112,24 @@ export function RecipeBrowser({
     });
   }
 
-  const visible = useMemo(
-    () =>
-      activeTag ? recipes.filter((r) => r.tags.includes(activeTag)) : recipes,
-    [recipes, activeTag],
-  );
+  // Nur für den Monatsvergleich der „Saisonal"-Pille — einmal pro Mount reicht,
+  // ein Rezept wechselt seine Saison nicht während eine Liste offen ist.
+  const [currentMonth] = useState(() => new Date().getMonth() + 1);
+
+  const visible = useMemo(() => {
+    if (isZeitFilter) {
+      return recipes.filter(
+        (r) => r.totalTimeMin !== null && r.totalTimeMin <= 30,
+      );
+    }
+    if (isSaisonFilter) {
+      return recipes.filter((r) => r.seasonMonths.includes(currentMonth));
+    }
+    if (activeTag) {
+      return recipes.filter((r) => r.tags.includes(activeTag));
+    }
+    return recipes;
+  }, [recipes, isZeitFilter, isSaisonFilter, activeTag, currentMonth]);
 
   return (
     <div className="space-y-6" data-pending={searching ? "" : undefined}>
@@ -120,30 +147,32 @@ export function RecipeBrowser({
           className="min-h-12 w-full rounded-pill bg-soft px-5 text-base outline-none placeholder:text-muted/70"
         />
 
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {tags.map(({ tag, count }) => {
-              const active = activeTag === tag;
-              return (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => toggleTag(tag)}
-                  aria-pressed={active}
-                  className={
-                    "min-h-11 rounded-pill px-4 text-[13px] press tap-target " +
-                    (active
-                      ? "bg-text text-card"
-                      : "bg-soft text-muted")
-                  }
-                >
-                  {tag}
-                  <span className="ml-1.5 opacity-60">{count}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
+        {/* Zwei feste Schnellfilter zuerst, danach die echten Schlagwörter —
+            eine Reihe, derselbe Pillen-Stil (design-system.md, Abschnitt 7,
+            FilterRow). Die festen Pillen stehen immer da, auch ohne
+            passende Rezepte — anders als die Tag-Liste darunter, die nur
+            zeigt, was es wirklich gibt. */}
+        <div className="flex flex-wrap gap-2">
+          <FilterPill active={isZeitFilter} onClick={() => toggleFilter(QUICK_ZEIT)}>
+            ≤ 30 Min
+          </FilterPill>
+          <FilterPill
+            active={isSaisonFilter}
+            onClick={() => toggleFilter(QUICK_SAISON)}
+          >
+            Saisonal
+          </FilterPill>
+          {tags.map(({ tag, count }) => (
+            <FilterPill
+              key={tag}
+              active={activeTag === tag}
+              onClick={() => toggleFilter(tag)}
+            >
+              {tag}
+              <span className="ml-1.5 opacity-60">{count}</span>
+            </FilterPill>
+          ))}
+        </div>
       </div>
 
       {/* Nur die Trefferliste wird blass, während die Textsuche läuft — der
@@ -152,9 +181,11 @@ export function RecipeBrowser({
         {visible.length === 0 ? (
           <Section>
             <p className="text-[15px] leading-[1.55] text-muted">
-              {currentQuery || activeTag
+              {currentQuery
                 ? "Nichts gefunden. Gesucht wird in Titeln und Zutaten — vielleicht heißt die Zutat im Rezept anders."
-                : "Noch kein Rezept. Am schnellsten geht es über „Importieren“: die Adresse einer Rezeptseite einfügen, oder ein Kochbuch-Foto in claude.ai digitalisieren und das Ergebnis hier einsetzen."}
+                : activeFilter
+                  ? "Nichts gefunden. Kein Rezept passt gerade zu diesem Filter."
+                  : "Noch kein Rezept. Am schnellsten geht es über „Importieren“: die Adresse einer Rezeptseite einfügen, oder ein Kochbuch-Foto in claude.ai digitalisieren und das Ergebnis hier einsetzen."}
             </p>
           </Section>
         ) : (
@@ -258,5 +289,35 @@ export function RecipeBrowser({
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * Eine Pille in der Filterreihe — für die zwei festen Schnellfilter und die
+ * echten Schlagwörter gleichermaßen (design-system.md, Abschnitt 7,
+ * FilterRow): aktiv `--text`-gefüllt mit `--card`-weißem Text, inaktiv
+ * `--soft` mit `--muted`-Text, kein Rahmen in beiden Zuständen.
+ */
+function FilterPill({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={
+        "min-h-11 rounded-pill px-4 text-[13px] press tap-target " +
+        (active ? "bg-text text-card" : "bg-soft text-muted")
+      }
+    >
+      {children}
+    </button>
   );
 }

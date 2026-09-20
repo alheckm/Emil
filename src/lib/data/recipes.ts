@@ -23,6 +23,12 @@ export interface RecipeSummary {
   servingsLabel: string;
   totalTimeMin: number | null;
   tags: string[];
+  /**
+   * Monate (1–12), in denen das Rezept Saison hat — vorbereitet für die
+   * geplante automatische Verschlagwortung, die diese Spalte befüllt. Bis
+   * dahin leer, siehe design-system.md Abschnitt 12.
+   */
+  seasonMonths: number[];
   imagePath: string | null;
   sourceUrl: string | null;
   createdAt: string;
@@ -102,7 +108,7 @@ export interface SavedRecipe {
 
 const SUMMARY_COLUMNS =
   "id, title, base_servings, servings_label, total_time_min, tags, " +
-  "image_path, source_url, created_at";
+  "season_months, image_path, source_url, created_at";
 
 interface SummaryRow {
   id: string;
@@ -111,6 +117,7 @@ interface SummaryRow {
   servings_label: string;
   total_time_min: number | null;
   tags: string[] | null;
+  season_months: number[] | null;
   image_path: string | null;
   source_url: string | null;
   created_at: string;
@@ -124,6 +131,7 @@ function toSummary(row: SummaryRow): RecipeSummary {
     servingsLabel: row.servings_label,
     totalTimeMin: row.total_time_min,
     tags: row.tags ?? [],
+    seasonMonths: row.season_months ?? [],
     imagePath: row.image_path,
     sourceUrl: row.source_url,
     createdAt: row.created_at,
