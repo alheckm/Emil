@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseIngredient } from "../parseIngredient";
+import { parseIngredient, parseQuickAdd } from "../parseIngredient";
 import { CONFIDENCE_REVIEW_THRESHOLD } from "../types";
 
 /**
@@ -184,5 +184,63 @@ describe("parseIngredient – Schreibweisen aus Kochbüchern", () => {
     const parsed = parseIngredient("   ");
     expect(parsed.name).toBe("");
     expect(parsed.confidence).toBe(0);
+  });
+});
+
+describe('parseQuickAdd – Freitext im „Etwas ergänzen"-Feld', () => {
+  it("liest Menge ohne Einheit", () => {
+    expect(parseQuickAdd("erdbeeren 3")).toEqual({
+      name: "erdbeeren",
+      amount: "3",
+      unitCode: null,
+    });
+  });
+
+  it("liest Menge und Einheit mit Leerzeichen", () => {
+    expect(parseQuickAdd("schmand 150 ml")).toEqual({
+      name: "schmand",
+      amount: "150",
+      unitCode: "ml",
+    });
+  });
+
+  it("liest Menge und Einheit ohne Leerzeichen", () => {
+    expect(parseQuickAdd("tomaten 500g")).toEqual({
+      name: "tomaten",
+      amount: "500",
+      unitCode: "g",
+    });
+  });
+
+  it("liest beide Schreibweisen zum selben Ergebnis", () => {
+    expect(parseQuickAdd("tomaten 500g")).toEqual(parseQuickAdd("tomaten 500 g"));
+  });
+
+  it("liest Kommazahlen als Menge", () => {
+    expect(parseQuickAdd("cola 0,5l")).toEqual({
+      name: "cola",
+      amount: "0.5",
+      unitCode: "l",
+    });
+  });
+
+  it("nimmt den ganzen Text als Namen, wenn nur eine Zahl ohne Namen dasteht", () => {
+    expect(parseQuickAdd("5")).toEqual({ name: "5", amount: null, unitCode: null });
+  });
+
+  it("nimmt den ganzen Text als Namen, wenn hinter der Zahl keine bekannte Einheit steht", () => {
+    expect(parseQuickAdd("7up")).toEqual({ name: "7up", amount: null, unitCode: null });
+  });
+
+  it("findet die letzte Zahl, auch wenn vorher schon eine im Namen steckt", () => {
+    expect(parseQuickAdd("Milch 3,5% 1l")).toEqual({
+      name: "Milch 3,5%",
+      amount: "1",
+      unitCode: "l",
+    });
+  });
+
+  it("lässt ein leeres Feld ein leeres Ergebnis liefern", () => {
+    expect(parseQuickAdd("   ")).toEqual({ name: "", amount: null, unitCode: null });
   });
 });

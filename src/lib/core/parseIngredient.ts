@@ -189,6 +189,55 @@ export function parseIngredient(
 }
 
 /**
+ * Zerlegt die Freitext-Eingabe im „Etwas ergänzen"-Feld der Einkaufsliste.
+ *
+ * Anders als {@link parseIngredient} steht die Menge hier am Ende, nicht am
+ * Anfang: „Erdbeeren 3", „Schmand 150 ml", „Tomaten 500g" — mit und ohne
+ * Leerzeichen zwischen Zahl und Einheit. Der faule Quantifizierer vor dem
+ * Zahlenmuster sorgt dafür, dass bei mehreren Zahlen im Text (z. B. einer
+ * Zahl im Produktnamen) die *letzte* als Menge gilt, weil das Muster ohnehin
+ * bis zum Zeilenende passen muss.
+ *
+ * Erkennt der Rest hinter der Zahl keine bekannte Einheit, gilt die ganze
+ * Eingabe als Name — lieber unverändert übernehmen als eine Zahl mitten im
+ * Produktnamen falsch abtrennen.
+ */
+const QUICK_ADD_PATTERN = new RegExp(
+  `^(.*?)\\s*(${NUMBER_PATTERN})\\s*([A-Za-zÄÖÜäöüß]+)?$`,
+);
+
+export function parseQuickAdd(rawText: string): {
+  name: string;
+  amount: string | null;
+  unitCode: string | null;
+} {
+  const trimmed = rawText.replace(/\s+/g, " ").trim();
+  const fallback = { name: trimmed, amount: null, unitCode: null };
+  if (!trimmed) return fallback;
+
+  const match = trimmed.match(QUICK_ADD_PATTERN);
+  if (!match) return fallback;
+
+  const [, namePart, amountPart, unitPart] = match;
+  const amount = parseAmount(amountPart);
+  if (amount === null) return fallback;
+
+  let unitCode: string | null = null;
+  if (unitPart) {
+    const unit = findUnit(unitPart);
+    // Unbekanntes Wort hinter der Zahl ist keine Einheit — dann eher gar
+    // nicht parsen, als der Zahl fälschlich eine Einheit anzudichten.
+    if (!unit) return fallback;
+    unitCode = unit.code;
+  }
+
+  const name = namePart.trim();
+  if (!name) return fallback;
+
+  return { name, amount, unitCode };
+}
+
+/**
  * Wie sicher ist das Ergebnis? Unter 0.8 markiert der Prüf-Screen die Zeile.
  * Lieber eine Zeile zu viel markieren als eine falsche Menge durchlassen.
  */

@@ -4,8 +4,8 @@ import { Fragment, startTransition, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatAmount } from "@/lib/core/format";
 import { ingredientImage } from "@/lib/core/ingredientImages";
-import { parseAmount } from "@/lib/core/numbers";
-import { mergeUnitFor, UNITS } from "@/lib/core/units";
+import { parseQuickAdd } from "@/lib/core/parseIngredient";
+import { mergeUnitFor } from "@/lib/core/units";
 import { toMergeAmount } from "@/lib/core/mergeList";
 import { getBrowserSupabase } from "@/lib/client/supabase";
 import { subscribeToList } from "@/lib/client/realtime";
@@ -108,9 +108,7 @@ export function ListView({
   // umspringen zu lassen wäre unehrlicher als ein eigener kurzer Abschnitt.
   const [adding, setAdding] = useState<{ id: string; label: string }[]>([]);
 
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [unitCode, setUnitCode] = useState("");
+  const [entryText, setEntryText] = useState("");
 
   // Neue Daten vom Server: die eigenen, vorgezogenen Änderungen sind darin
   // enthalten und werden hier wieder fallen gelassen. Das passiert beim
@@ -300,31 +298,25 @@ export function ListView({
   }
 
   function addByHand() {
-    if (!name.trim()) return;
+    const text = entryText.trim();
+    if (!text) return;
     const supabase = getBrowserSupabase();
     if (!supabase) {
       setError("Supabase ist nicht konfiguriert.");
       return;
     }
 
-    // Dieselbe Umrechnung wie beim Rezept: gespeichert wird in der Einheit,
-    // in der zusammengefasst wird — sonst stünde „0,5 kg" neben „500 g".
-    const parsed = amount.trim() ? parseAmount(amount) : null;
-    if (amount.trim() && parsed === null) {
-      setError("Die Menge war nicht zu lesen. Zahlen wie 2, 1,5 oder 1/2.");
-      return;
-    }
+    // Menge und Einheit stecken im selben Feld: „Erdbeeren 3", „Schmand 150
+    // ml", „Tomaten 500g" — der Parser trennt sie, mit oder ohne Leerzeichen.
+    const { name: label, amount: parsed, unitCode } = parseQuickAdd(text);
     const unit = unitCode || null;
-    const label = name.trim();
     const id = crypto.randomUUID();
 
-    // Felder sofort leeren und die Zutat sofort anzeigen. Wer im Laden drei
+    // Feld sofort leeren und die Zutat sofort anzeigen. Wer im Laden drei
     // Dinge hintereinander eintippt, soll nicht zwischendurch auf den Server
     // warten müssen.
     setAdding((current) => [...current, { id, label }]);
-    setName("");
-    setAmount("");
-    setUnitCode("");
+    setEntryText("");
 
     run(
       () =>
@@ -339,9 +331,7 @@ export function ListView({
       () => {
         setAdding((current) => current.filter((item) => item.id !== id));
         // Zurück ins Feld, damit nichts verloren geht.
-        setName(label);
-        setAmount(amount);
-        setUnitCode(unitCode);
+        setEntryText(text);
       },
     );
   }
@@ -389,40 +379,20 @@ export function ListView({
         <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
           Etwas ergänzen
         </h2>
-        <div className="mt-3 flex gap-2">
-          <input
-            aria-label="Zutat"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder="Zahnpasta"
-            autoCapitalize="sentences"
-            className="h-12 min-w-0 flex-1 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
-          />
-          <input
-            aria-label="Menge"
-            value={amount}
-            onChange={(event) => setAmount(event.target.value)}
-            placeholder="Menge"
-            inputMode="decimal"
-            className="h-12 w-20 shrink-0 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
-          />
-          <select
-            aria-label="Einheit"
-            value={unitCode}
-            onChange={(event) => setUnitCode(event.target.value)}
-            className="h-12 w-24 shrink-0 appearance-none rounded-soft border border-border bg-soft px-2 text-base outline-none focus:border-text"
-          >
-            <option value="">ohne</option>
-            {UNITS.map((unit) => (
-              <option key={unit.code} value={unit.code}>
-                {unit.display}
-              </option>
-            ))}
-          </select>
-        </div>
+        <input
+          aria-label="Etwas ergänzen"
+          value={entryText}
+          onChange={(event) => setEntryText(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") addByHand();
+          }}
+          placeholder="Etwas ergänzen"
+          autoCapitalize="sentences"
+          className="mt-3 h-12 w-full rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
+        />
         <button
           type="button"
-          disabled={!name.trim()}
+          disabled={!entryText.trim()}
           onClick={addByHand}
           className="mt-3 h-11 w-full rounded-pill border border-border text-[15px] press disabled:opacity-50"
         >
