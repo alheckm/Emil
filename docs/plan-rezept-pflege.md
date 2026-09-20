@@ -124,6 +124,18 @@ das *Auflösen* bleibt.
 Bananenspieß", jede Testschreibung wurde per `zurueck` wieder exakt auf den
 Ausgangsstand gebracht.
 
+**Zwei Fehler nachträglich gefunden und behoben** (siehe Commit
+"zwei Fehler vor dem ersten scharfen Lauf behoben"): `pflege_stand` wurde
+clientseitig gesetzt und lag darum praktisch immer vor dem `updated_at`, das
+der Trigger im selben Moment in der Datenbank setzt — „offen" wäre für jedes
+bearbeitete Rezept für immer wahr geblieben. Migration
+`0015_pflege_stand_touch.sql` behebt das mit einer RPC, die `pflege_stand`
+im selben Statement wie den Trigger setzt. Und `zurueck` prüfte nicht, ob die
+zu restaurierenden Zutatenzeilen noch existieren — wurde das Rezept
+zwischenzeitlich in der App bearbeitet, hätte ein stiller No-op-Update
+gedroht. Beides gegen die echte Datenbank nachgetestet, inklusive eines
+simulierten Falls für den zweiten Fehler.
+
 ## Schritt 5 — Der Skill: `.claude/skills/rezepte-pflegen/SKILL.md`
 
 Ablauf plus die harten Regeln (keine Kochschritte erfinden, Tags klein und an
