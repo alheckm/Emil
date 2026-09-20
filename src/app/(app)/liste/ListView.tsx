@@ -354,23 +354,6 @@ export function ListView({
     (entry) => !(checkedNow[entry.id] ?? entry.checked),
   ).length;
 
-  const unsent = pending.length;
-
-  // Bei jedem Abhaken steht der Puffer-Eintrag kurz, bis die Antwort da ist —
-  // im Normalfall Millisekunden. Den Hinweis sofort zu zeigen ließe ihn bei
-  // jedem Tap aufblitzen und die Liste darunter springen. Erst nach einer
-  // Weile anzeigen heißt: beim schnellen Umlauf sieht man ihn nie, bei
-  // echtem Stau (langsames Netz, kein Netz) erscheint er wie gehabt.
-  const [showUnsent, setShowUnsent] = useState(false);
-  useEffect(() => {
-    if (unsent === 0) {
-      setShowUnsent(false);
-      return;
-    }
-    const timer = setTimeout(() => setShowUnsent(true), 400);
-    return () => clearTimeout(timer);
-  }, [unsent]);
-
   return (
     <div className="space-y-6">
       {error && <Notice tone="error">{error}</Notice>}
@@ -380,13 +363,6 @@ export function ListView({
           Kein Netz. Die Liste zeigt den zuletzt geladenen Stand, und dein
           Abhaken wird gemerkt — sobald wieder Empfang da ist, geht es
           automatisch raus.
-        </Notice>
-      )}
-      {online && showUnsent && (
-        <Notice tone="info">
-          {unsent === 1
-            ? "Ein Häkchen wartet noch darauf, gesendet zu werden."
-            : `${unsent} Häkchen warten noch darauf, gesendet zu werden.`}
         </Notice>
       )}
 
