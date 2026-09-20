@@ -88,16 +88,13 @@ async function RecipeDetail({ params }: { params: Params }) {
         <h1 className="font-display text-[32px] font-bold leading-[1.15] [text-wrap:balance]">
           {value.title}
         </h1>
-        <ul className="mt-3 flex flex-wrap gap-2">
-          <li className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium">
-            {value.baseServings} {value.servingsLabel}
-          </li>
-          {value.totalTimeMin && (
+        {value.totalTimeMin && (
+          <ul className="mt-3 flex flex-wrap gap-2">
             <li className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium">
               {value.totalTimeMin} Min
             </li>
-          )}
-        </ul>
+          </ul>
+        )}
       </div>
 
       <ListAwareIngredients recipe={value} />

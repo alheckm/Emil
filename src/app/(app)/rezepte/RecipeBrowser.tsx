@@ -202,7 +202,6 @@ export function RecipeBrowser({
                 ? images[recipe.imagePath]
                 : undefined;
               const facts = [
-                `${recipe.baseServings} ${recipe.servingsLabel}`,
                 recipe.totalTimeMin ? `${recipe.totalTimeMin} Min` : null,
                 ...recipe.tags.slice(0, 2),
               ].filter((fact): fact is string => Boolean(fact));
