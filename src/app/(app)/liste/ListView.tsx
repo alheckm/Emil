@@ -376,9 +376,6 @@ export function ListView({
       )}
 
       <Section>
-        <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
-          Etwas ergänzen
-        </h2>
         <input
           aria-label="Etwas ergänzen"
           value={entryText}
@@ -388,16 +385,9 @@ export function ListView({
           }}
           placeholder="Etwas ergänzen"
           autoCapitalize="sentences"
-          className="mt-3 h-12 w-full rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
+          enterKeyHint="done"
+          className="h-12 w-full rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
         />
-        <button
-          type="button"
-          disabled={!entryText.trim()}
-          onClick={addByHand}
-          className="mt-3 h-11 w-full rounded-pill border border-border text-[15px] press disabled:opacity-50"
-        >
-          Auf die Liste
-        </button>
       </Section>
 
       {visibleEntries.length + adding.length === 0 ? (
