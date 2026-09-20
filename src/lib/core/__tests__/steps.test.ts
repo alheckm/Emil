@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveSteps, stripStepMarkers } from "../steps";
+import { resolveSteps, stepMarkerPositions, stripStepMarkers } from "../steps";
 
 const ingredients = [
   {
@@ -59,6 +59,17 @@ describe("resolveSteps", () => {
     expect(resolveSteps(["{{z:9}} anschwitzen."], ingredients, 4, 6)).toEqual(
       [" anschwitzen."],
     );
+  });
+});
+
+describe("stepMarkerPositions", () => {
+  it("sammelt alle referenzierten Positionen ohne Duplikate", () => {
+    const steps = ["{{z:1}} und {{z:2}} anschwitzen.", "{{z:1}} abschmecken."];
+    expect(stepMarkerPositions(steps)).toEqual([1, 2]);
+  });
+
+  it("ist leer ohne Verweise", () => {
+    expect(stepMarkerPositions(["Den Ofen vorheizen."])).toEqual([]);
   });
 });
 

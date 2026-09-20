@@ -71,3 +71,19 @@ export function stripStepMarkers(
 ): string[] {
   return resolveSteps(steps, ingredients, baseServings, baseServings);
 }
+
+/**
+ * Alle Positionen, auf die die Anleitung verweist — für die Prüfung vor dem
+ * Schreiben (scripts/rezept-pflege/pflege.mjs): ein Verweis auf eine Position,
+ * die es nicht gibt, wird abgelehnt statt beim nächsten Rendern wortlos zu
+ * verschwinden.
+ */
+export function stepMarkerPositions(steps: readonly string[]): number[] {
+  const positions = new Set<number>();
+  for (const step of steps) {
+    for (const match of step.matchAll(MARKER)) {
+      positions.add(Number(match[1]));
+    }
+  }
+  return [...positions];
+}
