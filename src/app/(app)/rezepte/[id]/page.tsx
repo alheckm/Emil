@@ -88,11 +88,21 @@ async function RecipeDetail({ params }: { params: Params }) {
         <h1 className="font-display text-[32px] font-bold leading-[1.15] [text-wrap:balance]">
           {value.title}
         </h1>
-        {value.totalTimeMin && (
+        {(value.totalTimeMin || value.tags.length > 0) && (
           <ul className="mt-3 flex flex-wrap gap-2">
-            <li className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium">
-              {value.totalTimeMin} Min
-            </li>
+            {value.totalTimeMin && (
+              <li className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium">
+                {value.totalTimeMin} Min
+              </li>
+            )}
+            {value.tags.map((tag) => (
+              <li
+                key={tag}
+                className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium"
+              >
+                {tag}
+              </li>
+            ))}
           </ul>
         )}
       </div>
