@@ -1,25 +1,31 @@
 """
 Macht aus den Rohbildern (raw/*.png, je ~200 KB) Web-Assets:
-Hintergrund auf reines Weiss ziehen, freistellen, gleich gross in den Kreis
-setzen, auf 192 px, WebP.
+Hintergrund auf die feste Pastellfarbe der Zutat ziehen, freistellen, gleich
+gross in den Kreis setzen, auf 192 px, WebP.
 
 Die Bilder liegen in der App in einem Kreis. Das Modell liefert sie aber als
-Quadrat mit einem Hintergrund, der nur *fast* weiss ist (meist 244-254) und
-oft noch einen leichten Verlauf hat. Frueher wurde nur auf das Motiv
-zugeschnitten und der Rest mit reinem Weiss aufgefuellt — dabei blieb die
-Naht zwischen dem grauen Modellhintergrund und dem weissen Rand als heller
-Rahmen im Kreis stehen. Deshalb hier drei Schritte:
+Quadrat mit einem Hintergrund, der nur *fast* die Zielfarbe trifft und oft
+noch ein leichtes Rauschen oder einen Verlauf hat. Deshalb hier drei Schritte:
 
-1. Flat-Field: der Hintergrund wird als glatte Flaeche (Quadrik) geschaetzt
-   und herausgerechnet. Danach ist er ueberall exakt 255 — der ganze Kreis
-   ist eine Flaeche, egal wo zugeschnitten wird.
-2. Freistellen: was sich kaum vom Hintergrund abhebt, wird vollends weiss.
-   Der weiche Schlagschatten bleibt gedaempft stehen, er setzt das Motiv auf.
+1. Hintergrund schaetzen: eine glatte Flaeche (Quadrik), angesetzt am
+   Bildrand — dort steht laut Prompt garantiert nur Hintergrund, gleich
+   welche Farbe er hat. Das ersetzt die frühere Annahme "Hintergrund ist
+   hell", die nur fuer Weiss galt.
+2. Freistellen: nur was nah an dieser geschaetzten Flaeche liegt, wird auf
+   die Zielfarbe gezogen. Das Motiv selbst wird NICHT umgerechnet, nur der
+   Hintergrund ersetzt — sonst faerbt jeder Wechsel der Zielfarbe (z. B. von
+   Weiss frueher auf Pastellrot heute) das ganze Bild mit ein, statt nur den
+   Grund zu tauschen. Der weiche Schlagschatten bleibt gedaempft stehen und
+   blendet dabei sanft in die neue Grundfarbe.
 3. Zentrieren auf den *Umkreis* des Motivs, nicht auf sein Rechteck: nur so
    sitzt jede Zutat mittig im Kreis und keine Kante wird angeschnitten. Die
    Ausdehnung kommt aus den Kanten im Bild, nicht aus der Helligkeit — sonst
-   zieht der Schatten die Mitte nach unten rechts, und weisse Motive
+   zieht der Schatten die Mitte nach unten rechts, und helle Motive
    (Knoblauch, Mozzarella, Quark) verlieren ihre halbe Silhouette.
+
+Funktioniert unabhaengig davon, ob ein Rohbild schon mit Pastellgrund erzeugt
+wurde oder noch aus der alten reinweissen Generation stammt — beide Faelle
+laufen durch dieselbe Schaetzung und landen auf derselben Zielfarbe.
 
     ~/.mflux/venv/bin/python scripts/ingredient-images/process.py
 """
@@ -42,9 +48,10 @@ MAP_FILE = ROOT / "src" / "lib" / "core" / "ingredientImages.ts"
 SIZE = 192       # Chip ist ~64 px, 3x fuer Retina
 QUALITY = 82
 
-# Abstand vom Weiss (0-255), ab dem ein Pixel zum Motiv zaehlt.
-FADE_LO = 5.0    # darunter: Hintergrundrauschen, wird weiss
-FADE_HI = 20.0   # darueber: Motiv, bleibt wie es ist
+# Abstand von der geschaetzten Hintergrundflaeche (0-255), ab dem ein Pixel
+# zum Motiv zaehlt statt zum Grund.
+FADE_LO = 5.0    # darunter: Hintergrundrauschen, wird zur Zielfarbe
+FADE_HI = 20.0   # darueber: Motiv, bleibt Original-Pixel
 EDGE = 10.0      # Kontrastsprung, der eine Motivkante ausmacht
 GROW = 14.0      # bis hierhin waechst die Silhouette in weiche Raender hinein
 COVER = 0.94     # Anteil des Kreisdurchmessers, den das Motiv einnimmt
@@ -59,20 +66,23 @@ def slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", out).strip("-")
 
 
-def flatten_background(a: np.ndarray) -> np.ndarray:
-    """Den Hintergrund als Quadrik schaetzen und auf reines Weiss ziehen."""
+def fit_background(a: np.ndarray) -> np.ndarray:
+    """Den Hintergrund als glatte Flaeche (Quadrik) schaetzen — unabhaengig
+    von seiner Farbe. Start ist der Bildrand: jedes Motiv steht laut Prompt
+    zentriert mit Rand, dort ist garantiert nur Hintergrund. Frueher war die
+    Startannahme "hell = Hintergrund", das setzte Weiss voraus."""
     h, w, _ = a.shape
     yy, xx = np.mgrid[0:h, 0:w]
     x = (xx / w - 0.5).astype(np.float32)
     y = (yy / h - 0.5).astype(np.float32)
     basis = np.stack([np.ones_like(x), x, y, x * x, x * y, y * y], -1)
 
-    lum = a.min(axis=2)
-    # Startannahme: die helle Mehrheit des Bildes ist Hintergrund. Danach
-    # zweimal nachziehen — jetzt zaehlt nur noch, was am Modell klebt.
-    fit = lum > np.percentile(lum, 60)
+    border = max(1, round(min(h, w) * 0.06))
+    fit = np.zeros((h, w), bool)
+    fit[:border, :] = fit[-border:, :] = fit[:, :border] = fit[:, -border:] = True
+
     model = None
-    for _ in range(3):
+    for _ in range(4):
         sample = fit[::2, ::2]
         if sample.sum() < 500:
             break
@@ -80,10 +90,10 @@ def flatten_background(a: np.ndarray) -> np.ndarray:
             basis[::2, ::2][sample], a[::2, ::2][sample], rcond=None
         )[0]
         model = basis @ coefficients
-        fit = (model.min(axis=2) - lum) < 5.0
+        fit = np.abs(a - model).max(axis=2) < 6.0
     if model is None:  # Motiv fuellt das Bild — dann eben eine flache Schaetzung
-        model = np.full_like(a, float(np.percentile(lum, 90)))
-    return np.clip(a * (255.0 / np.maximum(model, 1.0)), 0.0, 255.0)
+        model = np.full_like(a, np.median(a.reshape(-1, 3), axis=0))
+    return model
 
 
 def local_share(mask: np.ndarray, radius: int) -> np.ndarray:
@@ -99,20 +109,26 @@ def local_share(mask: np.ndarray, radius: int) -> np.ndarray:
     return window / (k * k)
 
 
-def silhouette(a: np.ndarray, distance: np.ndarray) -> np.ndarray:
-    """Wo das Motiv liegt — ueber Kanten, damit der Schatten aussen vor bleibt."""
+def silhouette(a: np.ndarray, dist: np.ndarray) -> np.ndarray:
+    """Wo das Motiv liegt — ueber Kanten, damit der Schatten aussen vor bleibt.
+
+    Die Kante wird auf allen drei Kanaelen gesucht, nicht nur auf der
+    Helligkeit: eine rote Erdbeere vor pastellrotem Grund unterscheidet sich
+    kaum in der Helligkeit, aber deutlich im Farbton."""
     h, w, _ = a.shape
-    lum = a.min(axis=2)
-    gradient = np.zeros_like(lum)
-    gradient[:, 1:-1] = np.abs(lum[:, 2:] - lum[:, :-2])
-    gradient[1:-1, :] = np.maximum(gradient[1:-1, :], np.abs(lum[2:, :] - lum[:-2, :]))
+    gradient = np.zeros((h, w), np.float32)
+    gradient[:, 1:-1] = np.abs(a[:, 2:] - a[:, :-2]).max(axis=2)
+    gradient[1:-1, :] = np.maximum(
+        gradient[1:-1, :], np.abs(a[2:, :] - a[:-2, :]).max(axis=2)
+    )
 
     radius = max(1, round(min(h, w) * 0.004))
     mask = local_share(gradient > EDGE, radius) > 0.15
 
-    # Kanten allein enden bei Weiss auf Weiss zu frueh (Mozzarella, Quark).
-    # Deshalb von der Kante aus so weit wachsen, wie es noch Motiv gibt.
-    near = distance > GROW
+    # Kanten allein enden bei aehnlichen Farben (Mozzarella auf Beige,
+    # Knoblauch auf Weiss) zu frueh. Deshalb von der Kante aus so weit
+    # wachsen, wie es noch Motiv gibt.
+    near = dist > GROW
     for _ in range(6):
         wider = (local_share(mask, radius + 1) > 0.0) & near
         if wider.sum() == mask.sum():
@@ -120,45 +136,60 @@ def silhouette(a: np.ndarray, distance: np.ndarray) -> np.ndarray:
         mask = wider | mask
 
     if not mask.any():
-        mask = distance > FADE_HI
+        mask = dist > FADE_HI
     if not mask.any():
-        mask = distance > FADE_LO
+        mask = dist > FADE_LO
     return mask
 
 
-def to_chip(im: Image.Image) -> Image.Image:
-    """Ein Rohbild zum fertigen Chip: weisser Grund, Motiv mittig im Kreis."""
-    a = flatten_background(np.asarray(im.convert("RGB"), np.float32))
+def to_chip(im: Image.Image, target: np.ndarray) -> Image.Image:
+    """Ein Rohbild zum fertigen Chip: Motiv mittig im Kreis.
+
+    Erste Version hat hier den Hintergrund aktiv auf `target` umgerechnet
+    (und den Schlagschatten dabei weggebuegelt — er ist ja per Definition
+    dunkler als der Hintergrund, also verschwand er beim Glattziehen in der
+    hellen Pastellfarbe). Der Prompt in subjects.mjs verlangt die Zielfarbe
+    aber schon vom Modell selbst, mit neun Schritten liefert es sie zuverlaessig
+    flach UND mit einem sauberen dunklen Schatten mit — also wird hier nur
+    noch zugeschnitten, nicht mehr umgefaerbt. `target` bleibt nur als
+    Fuellfarbe fuer den (seltenen) Rand ausserhalb des Rohbilds stehen."""
+    a = np.asarray(im.convert("RGB"), np.float32)
     h, w, _ = a.shape
 
-    distance = 255.0 - a.min(axis=2)
-    alpha = np.clip((distance - FADE_LO) / (FADE_HI - FADE_LO), 0.0, 1.0)
-    freed = 255.0 - (255.0 - a) * alpha[..., None]
+    model = fit_background(a)
+    dist = np.abs(a - model).max(axis=2)
 
-    ys, xs = np.nonzero(silhouette(a, distance))
+    ys, xs = np.nonzero(silhouette(a, dist))
     cx = (float(xs.min()) + float(xs.max())) / 2.0
     cy = (float(ys.min()) + float(ys.max())) / 2.0
     radius = math.sqrt(float(((xs - cx) ** 2 + (ys - cy) ** 2).max()))
     side = max(8, int(round(2 * radius / COVER)))
 
-    canvas = np.full((side, side, 3), 255.0, np.float32)
+    canvas = np.tile(target, (side, side, 1)).astype(np.float32)
     x0, y0 = int(round(cx - side / 2)), int(round(cy - side / 2))
     sx0, sy0 = max(0, x0), max(0, y0)
     sx1, sy1 = min(w, x0 + side), min(h, y0 + side)
-    canvas[sy0 - y0:sy1 - y0, sx0 - x0:sx1 - x0] = freed[sy0:sy1, sx0:sx1]
+    canvas[sy0 - y0:sy1 - y0, sx0 - x0:sx1 - x0] = a[sy0:sy1, sx0:sx1]
 
     chip = Image.fromarray(canvas.round().astype(np.uint8))
     return chip.resize((SIZE, SIZE), Image.LANCZOS)
 
 
-def ingredient_names() -> list[str]:
-    """Jede Zutat mit definiertem Bildmotiv — siehe generate.py."""
+def ingredient_colors() -> dict[str, str]:
+    """Jede Zutat mit definiertem Bildmotiv -> Ziel-Hex ihrer Pastellkategorie
+    (siehe subjects.mjs: COLORS/PALETTE/hexFor)."""
     script = (
         "import('%s/scripts/ingredient-images/subjects.mjs').then(m => "
-        "console.log(JSON.stringify(Object.keys(m.SUBJECTS))))" % ROOT
+        "console.log(JSON.stringify(Object.fromEntries("
+        "Object.keys(m.SUBJECTS).map(n => [n, m.hexFor(n)])))))" % ROOT
     )
     res = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True)
     return json.loads(res.stdout)
+
+
+def hex_to_rgb(hex_code: str) -> np.ndarray:
+    hex_code = hex_code.lstrip("#")
+    return np.array([int(hex_code[i:i + 2], 16) for i in (0, 2, 4)], np.float32)
 
 
 def main() -> int:
@@ -167,17 +198,18 @@ def main() -> int:
         return 1
 
     OUT.mkdir(parents=True, exist_ok=True)
-    names = ingredient_names()
+    colors = ingredient_colors()
     written, missing, total_bytes = [], [], 0
 
-    for name in names:
+    for name, hex_code in colors.items():
         slug = slugify(name)
         src = RAW / f"{slug}.png"
         if not src.exists():
             missing.append(name)
             continue
         dst = OUT / f"{slug}.webp"
-        to_chip(Image.open(src)).save(dst, "WEBP", quality=QUALITY, method=6)
+        target = hex_to_rgb(hex_code)
+        to_chip(Image.open(src), target).save(dst, "WEBP", quality=QUALITY, method=6)
         total_bytes += dst.stat().st_size
         written.append((name, slug))
 

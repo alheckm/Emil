@@ -9,9 +9,17 @@
  * Haufen Staub im Nichts. Das Gefäß ist absichtlich immer dasselbe weiße
  * Schälchen bzw. Glas — sonst wird die Reihe unruhig.
  */
+import { readFileSync } from "node:fs";
+
 const BOWL = (what) => `a small plain white ceramic bowl filled with ${what}`;
 const JAR = (what) => `a small clear glass jar of ${what}`;
 const GLASS = (what) => `a plain clear drinking glass of ${what}`;
+
+/** Sieben feste Pastelltöne — Werte + Prompt-Text stehen in palette.json,
+ * damit process.py (Python) dieselben Hex-Werte liest wie hier. */
+export const PALETTE = JSON.parse(
+  readFileSync(new URL("./palette.json", import.meta.url), "utf8"),
+);
 
 export const SUBJECTS = {
   // ── Obst & Gemüse ────────────────────────────────────────────────────────
@@ -209,10 +217,186 @@ export const SUBJECTS = {
   "Spülmittel": "a bottle of dish soap",
 };
 
-/** Ein Template fuer alle: nur so sehen 350 Bilder wie eine Familie aus. */
-export const STYLE =
-  "centered on a pure white seamless background, soft even studio lighting, " +
-  "subtle soft shadow directly beneath, food product photography, sharp focus, " +
-  "high detail, natural colours, no text, no labels, no hands, no props";
+/**
+ * Feste Pastell-Kategorie pro Zutat — dieselbe Kategorie ergibt denselben
+ * Hintergrund, damit z. B. Tomate und Erdbeeren (beide rot) optisch
+ * zusammengehören, statt dass das Modell pro Bild neu rät. Fehlt eine Zutat
+ * hier (z. B. beim Rezept-Import frisch entstanden), greift der Default
+ * "beige" in colorFor() — neutral genug, um nie falsch zu wirken.
+ */
+export const COLORS = {
+  // ── Obst & Gemüse ────────────────────────────────────────────────────────
+  "Zwiebel": "yellow", "Rote Zwiebel": "red", "Schalotte": "beige",
+  "Frühlingszwiebel": "green", "Knoblauch": "beige", "Knoblauchzehe": "beige",
+  "Karotte": "orange", "Möhre": "orange", "Kartoffel": "beige", "Süßkartoffel": "orange",
+  "Tomate": "red", "Cherrytomate": "red", "Paprika": "red", "Zucchini": "green",
+  "Aubergine": "purple", "Gurke": "green", "Lauch": "green", "Staudensellerie": "green",
+  "Knollensellerie": "beige", "Kohlrabi": "green", "Weißkohl": "green", "Rotkohl": "purple",
+  "Spitzkohl": "green", "Blumenkohl": "beige", "Brokkoli": "green", "Rosenkohl": "green",
+  "Wirsing": "green", "Spinat": "green", "Mangold": "green", "Feldsalat": "green",
+  "Kopfsalat": "green", "Rucola": "green", "Eisbergsalat": "green", "Romanasalat": "green",
+  "Champignons": "beige", "Pilze": "beige", "Pfifferlinge": "orange", "Kürbis": "orange",
+  "Pastinake": "beige", "Rote Bete": "purple", "Radieschen": "red", "Rettich": "beige",
+  "Fenchel": "green", "Spargel": "beige", "Grüne Bohnen": "green", "Zuckerschoten": "green",
+  "Ingwer": "beige", "Chilischote": "red", "Petersilie": "green", "Basilikum": "green",
+  "Schnittlauch": "green", "Dill": "green", "Koriander": "green", "Minze": "green",
+  "Rosmarin": "green", "Thymian": "green", "Salbei": "green", "Zitrone": "yellow",
+  "Limette": "green", "Orange": "orange", "Apfel": "red", "Banane": "yellow",
+  "Birne": "green", "Erdbeeren": "red", "Himbeeren": "red", "Blaubeeren": "blue",
+  "Weintrauben": "green", "Pfirsich": "orange", "Nektarine": "orange", "Pflaume": "purple",
+  "Kirschen": "red", "Mango": "orange", "Ananas": "yellow", "Avocado": "green",
+  "Wassermelone": "red", "Kiwi": "green", "Datteln": "beige", "Feige": "purple",
+  "Granatapfel": "red",
 
-export const buildPrompt = (subject) => `${subject}, ${STYLE}`;
+  // ── Brot & Backwaren ─────────────────────────────────────────────────────
+  "Brot": "beige", "Vollkornbrot": "beige", "Toastbrot": "beige", "Baguette": "beige",
+  "Brötchen": "beige", "Fladenbrot": "beige", "Tortillas": "beige", "Wraps": "beige",
+  "Knäckebrot": "beige", "Zwieback": "beige", "Croissant": "yellow", "Burgerbrötchen": "beige",
+
+  // ── Fleisch & Fisch ──────────────────────────────────────────────────────
+  "Rindergulasch": "red", "Rinderhackfleisch": "red", "Gemischtes Hackfleisch": "red",
+  "Rinderfilet": "red", "Rumpsteak": "red", "Rinderbraten": "red",
+  "Schweinefilet": "red", "Schweineschnitzel": "red", "Schweinebauch": "red", "Kasseler": "red",
+  "Hähnchenbrust": "beige", "Hähnchenschenkel": "beige", "Hähnchenkeule": "beige",
+  "Ganzes Hähnchen": "beige", "Putenbrust": "beige", "Entenbrust": "red",
+  "Lammkeule": "red", "Lammkotelett": "red", "Speck": "red", "Speckwürfel": "red",
+  "Bacon": "red", "Schinken": "red", "Kochschinken": "red", "Serranoschinken": "red",
+  "Salami": "red", "Bratwurst": "beige", "Chorizo": "red", "Leberwurst": "beige",
+  "Lachsfilet": "orange", "Kabeljau": "beige", "Seelachs": "beige", "Forelle": "beige",
+  "Garnelen": "beige", "Muscheln": "blue", "Tintenfisch": "beige", "Räucherlachs": "orange",
+
+  // ── Kühlregal ────────────────────────────────────────────────────────────
+  "Milch": "beige", "Vollmilch": "beige", "H-Milch": "beige", "Buttermilch": "beige",
+  "Kefir": "beige", "Sahne": "beige", "Schlagsahne": "beige", "Crème fraîche": "beige",
+  "Schmand": "beige", "Saure Sahne": "beige", "Joghurt": "beige", "Naturjoghurt": "beige",
+  "Griechischer Joghurt": "beige", "Skyr": "beige", "Quark": "beige", "Magerquark": "beige",
+  "Frischkäse": "beige", "Butter": "yellow", "Margarine": "yellow", "Butterschmalz": "yellow",
+  "Schweineschmalz": "beige", "Eier": "beige",
+  "Gouda": "yellow", "Emmentaler": "yellow", "Bergkäse": "yellow", "Mozzarella": "beige",
+  "Feta": "beige", "Parmesan": "yellow", "Pecorino": "yellow", "Ricotta": "beige",
+  "Mascarpone": "beige", "Gorgonzola": "beige", "Camembert": "beige", "Brie": "beige",
+  "Halloumi": "beige", "Reibekäse": "yellow", "Frische Hefe": "beige", "Tofu": "beige",
+  "Räuchertofu": "beige", "Blätterteig": "beige", "Pizzateig": "beige",
+  "Hafermilch": "beige", "Sojamilch": "beige", "Mandelmilch": "beige", "Hummus": "beige",
+
+  // ── Tiefkühl ─────────────────────────────────────────────────────────────
+  "TK-Erbsen": "green", "TK-Spinat": "green", "TK-Blattspinat": "green",
+  "TK-Beeren": "purple", "TK-Himbeeren": "red", "TK-Gemüse": "green",
+  "Pommes frites": "yellow", "Fischstäbchen": "beige", "Vanilleeis": "beige",
+  "Blätterteig (TK)": "beige",
+
+  // ── Konserven & Gläser ───────────────────────────────────────────────────
+  "Tomatenmark": "red", "Passierte Tomaten": "red", "Gehackte Tomaten": "red",
+  "Dosentomaten": "red", "Kokosmilch": "beige", "Kidneybohnen": "red",
+  "Kichererbsen (Dose)": "beige", "Weiße Bohnen": "beige", "Mais": "yellow",
+  "Oliven": "green", "Kapern": "green", "Gewürzgurken": "green", "Sauerkraut": "beige",
+  "Rotkohl (Glas)": "purple", "Thunfisch (Dose)": "beige", "Sardellen": "beige",
+  "Erdnussbutter": "beige", "Marmelade": "red", "Honig": "yellow", "Apfelmus": "beige",
+  "Pesto": "green", "Ajvar": "red", "Gemüsebrühe": "beige", "Rinderbrühe": "beige",
+  "Hühnerbrühe": "beige", "Brühe": "beige", "Fond": "beige", "Kalbsfond": "beige",
+  "Tomatensauce": "red", "Sardinen": "beige",
+
+  // ── Nudeln, Reis & Trockenware ───────────────────────────────────────────
+  "Nudeln": "yellow", "Spaghetti": "yellow", "Penne": "yellow", "Fusilli": "yellow",
+  "Tagliatelle": "yellow", "Lasagneplatten": "yellow", "Spätzle": "yellow",
+  "Reis": "beige", "Basmatireis": "beige", "Risottoreis": "beige", "Milchreis": "beige",
+  "Couscous": "beige", "Bulgur": "beige", "Quinoa": "beige", "Polenta": "beige",
+  "Haferflocken": "beige", "Müsli": "beige", "Cornflakes": "beige", "Linsen": "beige",
+  "Rote Linsen": "red", "Belugalinsen": "beige", "Berglinsen": "green",
+  "Semmelbrösel": "beige", "Paniermehl": "beige", "Mehl": "beige", "Weizenmehl": "beige",
+  "Dinkelmehl": "beige", "Vollkornmehl": "beige", "Grieß": "beige", "Speisestärke": "beige",
+  "Kartoffelstärke": "beige", "Saucenbinder": "beige", "Walnüsse": "beige",
+  "Haselnüsse": "beige", "Mandeln": "beige", "Gemahlene Mandeln": "beige",
+  "Cashewkerne": "beige", "Pinienkerne": "beige", "Sonnenblumenkerne": "beige",
+  "Kürbiskerne": "beige", "Sesam": "beige", "Leinsamen": "beige", "Chiasamen": "beige",
+  "Rosinen": "purple", "Trockenhefe": "beige", "Backpulver": "beige", "Natron": "beige",
+  "Kokosraspeln": "beige", "Getrocknete Tomaten": "red", "getrocknete Aprikosen": "orange",
+
+  // ── Backen & Süßes ───────────────────────────────────────────────────────
+  "Zucker": "beige", "Puderzucker": "beige", "Brauner Zucker": "beige",
+  "Vanillezucker": "beige", "Vanilleschote": "beige", "Vanilleextrakt": "beige",
+  "Zartbitterschokolade": "beige", "Vollmilchschokolade": "beige", "Kuvertüre": "beige",
+  "Schokoladenraspel": "beige", "Kakaopulver": "beige", "Marzipan": "beige",
+  "Gelatine": "beige", "Agar-Agar": "beige", "Ahornsirup": "orange",
+  "Agavendicksaft": "beige", "Zuckerrübensirup": "beige", "Rohrzucker": "beige",
+
+  // ── Gewürze, Öle & Saucen ────────────────────────────────────────────────
+  "Salz": "beige", "Meersalz": "beige", "Pfeffer": "beige", "schwarzer Pfeffer": "beige",
+  "Paprikapulver": "red", "Currypulver": "yellow", "scharfes Currypulver": "red",
+  "Kurkuma": "yellow", "Kreuzkümmel": "beige", "Kümmel": "beige", "Koriandersamen": "beige",
+  "Muskatnuss": "beige", "Zimt": "beige", "Nelken": "beige", "Gewürznelke": "beige",
+  "Kardamom": "green", "Lorbeerblatt": "green", "Lorbeerblätter": "green",
+  "Wacholderbeeren": "purple", "Wacholderbeere": "purple", "Senfkörner": "yellow",
+  "Chiliflocken": "red", "Cayennepfeffer": "red", "Getrockneter Oregano": "green",
+  "Getrockneter Thymian": "green", "Getrockneter Rosmarin": "green", "Majoran": "green",
+  "Italienische Kräuter": "green", "Kräuter der Provence": "green", "Currypaste": "red",
+  "Olivenöl": "green", "Rapsöl": "yellow", "Sonnenblumenöl": "yellow", "Sesamöl": "beige",
+  "Kokosöl": "beige", "Essig": "beige", "Bratöl": "yellow", "Balsamico": "beige",
+  "Weißweinessig": "beige", "Apfelessig": "beige", "Senf": "yellow", "Dijonsenf": "yellow",
+  "Ketchup": "red", "Mayonnaise": "beige", "Sojasauce": "beige", "Fischsauce": "beige",
+  "Worcestershiresauce": "beige", "Tabasco": "red", "Sriracha": "red", "Harissa": "red",
+  "Tahini": "beige", "Zitronensaft": "yellow", "Gemahlener Kreuzkümmel": "beige",
+
+  // ── Getränke ─────────────────────────────────────────────────────────────
+  "Mineralwasser": "blue", "Wasser": "blue", "Rotwein": "red", "Weißwein": "yellow",
+  "Sekt": "yellow", "Bier": "yellow", "Apfelsaft": "yellow", "Orangensaft": "orange",
+  "Tomatensaft": "red", "Kaffee": "beige", "Espresso": "beige", "Tee": "beige",
+  "Cola": "beige", "Tonic Water": "blue", "Wodka": "blue", "Rum": "beige",
+  "Weinbrand": "beige", "Portwein": "purple", "Sherry": "beige", "Mirin": "beige",
+
+  // ── Haushalt ─────────────────────────────────────────────────────────────
+  "Backpapier": "beige", "Alufolie": "beige", "Frischhaltefolie": "beige",
+  "Küchenrolle": "beige", "Gefrierbeutel": "blue", "Zahnstocher": "beige",
+  "Küchengarn": "beige", "Müllbeutel": "beige", "Spülmittel": "blue",
+};
+
+export function colorFor(name) {
+  return COLORS[name] ?? "beige";
+}
+
+/**
+ * Komplementärpaare auf dem (vereinfachten Sieben-Ton-)Farbkreis. Beige hat
+ * keinen sinnvollen Gegenpart und bleibt bei sich selbst.
+ */
+export const COMPLEMENT = {
+  green: "red", red: "green",
+  yellow: "purple", purple: "yellow",
+  orange: "blue", blue: "orange",
+  beige: "beige",
+};
+
+/**
+ * "same" = Hintergrund in der Eigenfarbe der Zutat (Banane auf Pastellgelb) —
+ * entschieden nach Vergleich mit "complement" (Gegenton, z. B. Banane auf
+ * Pastelllila): Eigenfarbe wirkt als Familie ruhiger, das war die Wahl.
+ */
+export const BACKGROUND_MODE = "same";
+
+export function backgroundColorFor(name) {
+  const own = colorFor(name);
+  return BACKGROUND_MODE === "complement" ? COMPLEMENT[own] : own;
+}
+
+export function hexFor(name) {
+  return PALETTE[backgroundColorFor(name)].hex;
+}
+
+/**
+ * Ein Template fuer alle: nur so sehen die Bilder wie eine Familie aus.
+ * Fotorealistisch, freigestellt auf einem einfarbigen, hellen Pastellgrund
+ * ohne Verlauf — die Farbe kommt fest aus COLORS/PALETTE, nicht vom Modell
+ * geraten, damit gleichfarbige Zutaten (Tomate, Erdbeeren) denselben
+ * Hintergrund bekommen.
+ */
+export const buildPrompt = (subject, name) => {
+  const { prompt: background } = PALETTE[backgroundColorFor(name)];
+  return (
+    `Photorealistic professional food product photograph of ${subject}, ` +
+    `centered in frame, isolated on a completely flat, uniform ${background} ` +
+    "background with absolutely no gradient — one single flat pastel color " +
+    "fills the entire background edge to edge. Soft realistic shadow directly " +
+    "beneath the subject on the background. Studio lighting on the subject " +
+    "itself, sharp focus, high detail, natural colours, no text, no labels, " +
+    "no hands, no props, no other objects."
+  );
+};

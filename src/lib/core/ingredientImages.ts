@@ -193,6 +193,7 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Kichererbsen (Dose)": "kichererbsen-dose",
   "Weiße Bohnen": "weisse-bohnen",
   "Mais": "mais",
+  "Oliven": "oliven",
   "Kalbsfond": "kalbsfond",
   "Berglinsen": "berglinsen",
   "getrocknete Aprikosen": "getrocknete-aprikosen",
