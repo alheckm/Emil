@@ -134,7 +134,7 @@ export function IngredientsSection({
           <ShoppingListButton
             state={!onList ? "off" : changed ? "stale" : "on"}
             disabled={!listId}
-            onClick={onAdd}
+            onClick={onList && !changed ? onRemove : onAdd}
           />
         </div>
       </div>
@@ -175,16 +175,6 @@ export function IngredientsSection({
           );
         })}
       </ul>
-
-      {onList && (
-        <button
-          type="button"
-          onClick={onRemove}
-          className="mt-6 min-h-11 text-[13px] text-muted underline underline-offset-4 press-flat"
-        >
-          Von der Liste nehmen
-        </button>
-      )}
     </section>
   );
 }
@@ -278,6 +268,9 @@ function StepperButton({
  * Portionszahl auf der Liste, ist der Knopf wieder offen und beschriftet mit
  * „Liste aktualisieren" — sonst sähe die Liste bestätigt aus, während sie
  * andere Mengen enthält als das, was hier gerade auf dem Schirm steht.
+ *
+ * Im Zustand „on" nimmt derselbe Knopf das Rezept wieder von der Liste —
+ * kein eigener Knopf dafür, sonst zwei Wege zum selben Ziel auf engem Raum.
  */
 function ShoppingListButton({
   state,
@@ -294,7 +287,8 @@ function ShoppingListButton({
     <button
       type="button"
       onClick={onClick}
-      disabled={disabled || on}
+      disabled={disabled}
+      aria-label={on ? "Von der Liste nehmen" : undefined}
       aria-live="polite"
       className={
         "inline-flex h-9 items-center gap-2 rounded-pill px-3.5 text-[13px] " +
