@@ -22,7 +22,10 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "scripts" / "ingredient-images" / "raw"
 MODEL_REPO = "filipstrand/Z-Image-Turbo-mflux-4bit"
 SEED = 42          # fest: gleicher Ausgangspunkt fuer alle 350 Bilder
-STEPS = 9          # bei 4 bleibt der Schlagschatten zu schwach, kaum sichtbar
+STEPS = 4          # Turbo-Modell, mehr bringt kaum etwas. Der schwache
+                   # Schatten, den wir frueher hier vermuteten, kam tatsaechlich
+                   # von process.py (siehe to_chip) — mit 4 Schritten hat schon
+                   # z. B. Oliven einen guten, dunklen Schatten geliefert.
 SIZE = 768         # Chips sind winzig; 768 reicht und ist deutlich schneller als 1024
 
 UMLAUTS = {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss", "é": "e", "è": "e", "ê": "e"}

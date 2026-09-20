@@ -58,5 +58,8 @@ next-env.d.ts
 # Ebenso `rezepte-pflegen`: treibt den headless-Lauf aus
 # scripts/rezept-pflege/lauf.sh an, siehe docs/plan-rezept-pflege.md.
 !/.claude/skills/rezepte-pflegen/
+# Ebenso `zutatenbilder`: treibt `npm run zutatenbilder`
+# (scripts/ingredient-images/find-missing.mjs --scope=used --generate) an.
+!/.claude/skills/zutatenbilder/
 /.claude/helpers/
 .claude/settings.local.json
