@@ -26,7 +26,7 @@ import { Section, Notice } from "@/components/ui";
 // Wie lange eine frisch abgehakte Kachel an ihrem Platz stehen bleibt, bevor
 // sie in den Abschnitt „Eingekauft" wandert — lang genug, um das eigene
 // Häkchen noch wahrzunehmen, kurz genug, um nicht wie ein Hänger zu wirken.
-const CHECKED_SECTION_DELAY_MS = 700;
+const CHECKED_SECTION_DELAY_MS = 500;
 
 /**
  * Die Einkaufsliste, wie sie im Supermarkt benutzt wird.
