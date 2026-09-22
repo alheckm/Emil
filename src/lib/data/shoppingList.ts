@@ -96,9 +96,10 @@ interface EntryRow {
 
 /**
  * Alle Zeilen der Liste, sortiert wie der Weg durch den Supermarkt:
- * Abteilung, dann Name. Abgehaktes bleibt an seinem Platz stehen — wer im
- * Laden ein Häkchen setzt, will nicht, dass die Zeile darunter wegspringt und
- * er aus Versehen die falsche antippt.
+ * Abteilung, dann Name. Das ist die Grundordnung — ListView schiebt
+ * Abgehaktes danach ans Ende, ohne diese Reihenfolge sonst anzutasten.
+ * Mehr als 20 Abgehakte gibt es serverseitig ohnehin nicht: `set_entry_checked`
+ * löscht die ältesten, sobald ein 21. dazukommt (Migration 0016).
  */
 export async function listEntries(
   supabase: SupabaseClient,

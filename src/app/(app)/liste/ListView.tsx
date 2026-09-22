@@ -30,9 +30,10 @@ import { Section, Notice } from "@/components/ui";
  *
  * - **Antippen hakt ab.** Die ganze Kachel ist die Trefferfläche, nicht ein
  *   kleines Kästchen — die App wird einhändig und in Bewegung bedient.
- * - **Abgehaktes bleibt stehen.** Einträge nach unten wandern zu lassen sieht
- *   aufgeräumt aus, verschiebt aber im selben Moment die Kachel darunter unter
- *   den Daumen, der schon unterwegs ist.
+ * - **Abgehaktes rutscht ans Ende.** Wer offen ist, steht vorn und wird nicht
+ *   von Erledigtem durchmischt. Über 20 Abgehakte sammeln sich ohnehin nicht
+ *   an — `set_entry_checked` löscht die ältesten, sobald ein 21. dazukommt
+ *   (Migration 0016), unabhängig davon, welches Handy gerade offen ist.
  * - **Drei pro Reihe, Bild oben, Name und Menge darunter.** Ein Bild ist im
  *   Laden schneller erfasst als ein Wort; man sucht im Regal nach der Sache,
  *   nicht nach ihrem Namen. Fehlt das Bild, steht der Anfangsbuchstabe in der
@@ -346,9 +347,20 @@ export function ListView({
   const base = !online && mirrored ? mirrored : shownEntries;
   // Zuletzt noch das, was gerade entfernt wurde — es soll im selben Frame
   // verschwinden, in dem getippt wurde, nicht wenn der Server geantwortet hat.
-  const visibleEntries = applyPendingToggles(base, pending).filter(
-    (entry) => !removed.has(entry.id),
-  );
+  //
+  // Abgehaktes rutscht ans Ende, ohne die Reihenfolge sonst anzutasten: ein
+  // stabiler Sort behält innerhalb von „offen" und „abgehakt" die Reihenfolge
+  // nach Abteilung und Name, die `listEntries` mitgibt. Effektiv abgehakt ist
+  // dabei dieselbe Formel wie unten beim Rendern — inklusive des Antippens,
+  // das noch nicht beim Server angekommen ist.
+  const visibleEntries = applyPendingToggles(base, pending)
+    .filter((entry) => !removed.has(entry.id))
+    .slice()
+    .sort((a, b) => {
+      const aChecked = checkedNow[a.id] ?? a.checked;
+      const bChecked = checkedNow[b.id] ?? b.checked;
+      return Number(aChecked) - Number(bChecked);
+    });
 
   const openCount = visibleEntries.filter(
     (entry) => !(checkedNow[entry.id] ?? entry.checked),
