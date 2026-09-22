@@ -466,33 +466,32 @@ Schritten 16 px.
 sticky Leiste mit Haarlinie mehr. **Vier Einträge:** Einkauf, Rezepte, Todo
 und Konto/Haushalt — der runde Knopf, der zuerst oben rechts auf der
 Kopfzeile saß, ist auf Wunsch hierher gewandert, damit Navigation an einer
-Stelle steht statt an zweien. Todo kam als vierter dazu, zwischen Rezepte und
-Konto, ohne Vorbild in `docs/app_redesign.jpg` — dort gibt es keine
-Entsprechung, das Muster (freistehende Pille, gleich breite Spalten, Label
-immer sichtbar) trägt aber unverändert weiter.
+Stelle steht statt an zweien.
+
+**Nur Symbole, kein Label mehr** — auf Wunsch, gegen den ersten Durchgang
+dieses Dokuments, der ein dauerhaftes Label ausdrücklich vorschrieb. Der
+Widerspruch ist beabsichtigt und hier aufgelöst: das frühere Verbot galt der
+Kombination aus **verschwindendem Label nur bei Inaktiven** und **wachsender
+Spaltenbreite beim aktiven Eintrag** — die beiden zusammen ließen Symbole beim
+Wechsel seitlich springen. Jetzt haben **alle vier Einträge kein Label mehr**,
+gleichzeitig und dauerhaft, bei unverändert gleich breiten Spalten
+(`flex-1`) — es gibt also keinen Zustand mehr, zwischen dem etwas springen
+könnte. Jeder Eintrag braucht dafür ein eigenes `aria-label` (Abschnitt 11):
+ohne sichtbaren Text ist das jetzt die einzige Quelle des Namens.
 
 Der aktive Eintrag ist **nicht** vollflächig schwarz — das war ein erster,
-zu grober Durchgang. Die Referenz zeigt eine helle Kapsel in `--well`
-(`#f3f4f9`, exakt auf der Leiste gemessen — **nicht** `--soft`, das für
-Bedienflächen auf `--bg` reserviert ist und dort deutlich mehr Blaugrau
-braucht, um sich abzusetzen), und nur das Symbol darin sitzt in einem
-eigenen kleinen schwarzen Kreis (`bg-text text-card`, 32 px); das Label steht
-direkt auf der Kapsel, in `--text`.
+zu grober Durchgang. Es gibt weiterhin zwei Ebenen: eine helle Sitzfläche in
+`--well` (`#f3f4f9` — **nicht** `--soft`, das für Bedienflächen auf `--bg`
+reserviert ist), 44 × 44 px, mittig in der Spalte statt über deren volle
+Breite (die volle Breite ergab nur mit Label einen Sinn); darin ein eigener
+kleiner schwarzer Kreis (`bg-text text-card`, 32 px) mit dem Symbol. Der
+inaktive Eintrag zeigt sein Symbol in `--icon-muted` (`#98a0ad`) — heller als
+`--muted`, weil er auf `--card` (Weiß) steht statt auf `--bg`. Wechsel im
+selben Frame (`useOptimistic`), `data-pending` dimmt den Inhalt darüber.
 
-**Alle vier Einträge sind gleich breit** (`flex-1`) und zeigen ihr Label
-dauerhaft, nicht nur der aktive. Ein früherer Stand ließ den aktiven Eintrag
-die überschüssige Breite der Leiste einnehmen (`flex-1`) und die inaktiven
-auf Icongröße schrumpfen (`shrink-0`), ohne Label — das ließ die Symbole beim
-Tab-Wechsel seitlich springen, weil sich die Spaltenbreite mit dem aktiven
-Zustand änderte. Jetzt wechselt beim Tab-Wechsel nur die Farbe/Kapsel, nie
-die Größe: die `--well`-Kapsel füllt die volle Breite ihrer Spalte, beim
-ersten Eintrag reicht sie damit weiterhin bis an die linke Rundung der
-Leiste heran, so wie zuvor bei der asymmetrischen Aufteilung. Der inaktive
-Eintrag zeigt Symbol und Label in `--icon-muted` (`#98a0ad`) — heller als
-`--muted`, weil er auf `--card` (Weiß) steht statt auf `--bg`; `--muted` ist
-für den Kontrast auf der Grundfläche abgestimmt und wirkt auf Weiß zu
-dunkel/kräftig. Wechsel im selben Frame (`useOptimistic`), `data-pending`
-dimmt den Inhalt darüber.
+Todo kam als vierter Eintrag dazu, zwischen Rezepte und Konto, ohne Vorbild in
+`docs/app_redesign.jpg` — dort gibt es keine Entsprechung, das Muster
+(freistehende Pille, gleich breite Spalten) trägt aber unverändert weiter.
 
 ### Todo-Screen
 `src/app/(app)/todo/page.tsx`, `TodoView.tsx`. Redaktionelles Register wie
@@ -662,8 +661,9 @@ gegengeprüft:
 - [x] Tab-Leiste freistehend, gerundet, mit Schatten — aktiver Eintrag als
       helle `--well`-Kapsel mit schwarzem Icon-Kreis, nicht vollflächig
       schwarz und nicht `--soft`
-- [x] Alle Tabs gleich breit, Label immer sichtbar — nur Farbe/Kapsel
-      wechseln aktiv, nie die Größe, damit kein Symbol beim Wechsel springt
+- [x] Alle Tabs gleich breit, nur Symbole, kein Label — Farbe/Sitzfläche
+      wechseln bei allen vier gleichzeitig, nie die Spaltenbreite, damit kein
+      Symbol beim Wechsel springt; `aria-label` je Eintrag statt sichtbarem Text
 - [x] Inaktive Tab-Symbole in `--icon-muted`, nicht `--muted`
 - [x] Konto/Haushalt als vierter Tab-Eintrag statt Knopf in der Kopfzeile,
       Todo als dritter dazwischen

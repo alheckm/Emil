@@ -15,17 +15,17 @@ import { startTransition, useOptimistic } from "react";
  * Bauform nach docs/app_redesign.jpg (design-system.md, Abschnitt 7): keine
  * bildschirmbreite, sticky Leiste mit Haarlinie mehr, sondern eine
  * freistehende, vollgerundete Fläche (`--card` mit `--shadow-card`), mit
- * sichtbarem `--bg`-Rand ringsum. Alle drei Einträge sind gleich breit
- * (`flex-1`) und zeigen ihr Label dauerhaft — nur die Farbe/Kapsel wechselt
- * mit dem aktiven Zustand, nicht die Größe. So bleibt jedes Symbol an seinem
- * Platz, statt beim Tab-Wechsel zur Seite zu springen. Der aktive Eintrag
- * bekommt ein eigenes, dunkles Icon-Badge plus Label auf einer `--well`-Kapsel
- * (heller Ton auf `--card`, nicht `--soft` — das ist für Bedienflächen auf
- * `--bg` reserviert), die die volle Breite ihrer Spalte ausfüllt — beim
- * ersten Eintrag reicht sie damit bis an die linke Rundung der Leiste heran,
- * genau wie zuvor bei der asymmetrischen Aufteilung. Der inaktive Eintrag
- * zeigt Symbol und Label in `--icon-muted` — heller als `--muted`, weil er
- * auf `--card` steht, nicht auf `--bg`.
+ * sichtbarem `--bg`-Rand ringsum. Alle vier Einträge sind gleich breit
+ * (`flex-1`) und zeigen **nur ihr Symbol, kein Label** — auf Wunsch, siehe
+ * design-system.md Abschnitt 7 für die Abgrenzung zum früher verbotenen
+ * Fall (Label nur beim aktiven Eintrag plus wachsende Spaltenbreite): hier
+ * ändert sich die Spaltenbreite nie, also kann auch nichts springen. Der
+ * aktive Eintrag bekommt eine helle `--well`-Sitzfläche (44 px, mittig in der
+ * Spalte statt über deren volle Breite — die volle Breite ergab nur mit
+ * Label einen Sinn) und darin ein eigenes, dunkles Icon-Badge. Der inaktive
+ * Eintrag zeigt sein Symbol in `--icon-muted` — heller als `--muted`, weil er
+ * auf `--card` steht, nicht auf `--bg`. Ohne sichtbaren Text trägt `aria-label`
+ * je Eintrag den Namen für Screenreader.
  *
  * Der Kern gegen die gefühlte Trägheit ist `useOptimistic`: der angetippte Tab
  * wird im selben Frame aktiv, statt erst wenn der Server geantwortet hat.
@@ -45,8 +45,8 @@ import { startTransition, useOptimistic } from "react";
  *
  * Bewusst inline und nicht aus einer Bibliothek: es sind vier Stück, und ein
  * Paket dafür wären ein paar hundert Kilobyte für vier Pfade. Einfarbig über
- * `currentColor`, damit der aktive Zustand allein über die Textfarbe läuft und
- * das Symbol nie gegen sein Label verrutscht.
+ * `currentColor`, damit der aktive Zustand allein über Textfarbe und
+ * Sitzfläche läuft, nie über eine zweite Symbolvariante.
  *
  * 24er-Raster wie bei iOS-Symbolen, damit alle vier optisch gleich schwer
  * wirken.
@@ -159,28 +159,31 @@ function Frame({
               <Link
                 href={tab.href}
                 aria-current={current ? "page" : undefined}
+                aria-label={tab.label}
                 onClick={() => onSelect?.(tab.href)}
                 className={
-                  // Jede Spalte gleich breit und immer mit Label — nur Farbe
-                  // und Kapsel wechseln mit dem aktiven Zustand, nie die
-                  // Größe, sonst springt das Symbol beim Tab-Wechsel zur
-                  // Seite. Die Kapsel füllt dafür ihre ganze Spalte aus, beim
-                  // ersten Eintrag also bis an die linke Rundung der Leiste.
-                  "flex min-h-11 w-full items-center gap-2 rounded-pill pl-1 pr-3 text-[12px] press-flat tap-target " +
-                  (current
-                    ? "bg-well font-semibold text-text"
-                    : "font-medium text-icon-muted")
+                  // Jede Spalte gleich breit, immer — nur Farbe/Sitzfläche
+                  // wechseln mit dem aktiven Zustand, nie die Größe, sonst
+                  // springt das Symbol beim Tab-Wechsel zur Seite.
+                  "flex min-h-11 w-full items-center justify-center press-flat tap-target " +
+                  (current ? "text-text" : "text-icon-muted")
                 }
               >
                 <span
                   className={
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-pill " +
-                    (current ? "bg-text text-card" : "")
+                    "flex h-11 w-11 items-center justify-center rounded-pill " +
+                    (current ? "bg-well" : "")
                   }
                 >
-                  <tab.Icon />
+                  <span
+                    className={
+                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-pill " +
+                      (current ? "bg-text text-card" : "")
+                    }
+                  >
+                    <tab.Icon />
+                  </span>
                 </span>
-                {tab.label}
               </Link>
             </li>
           );
