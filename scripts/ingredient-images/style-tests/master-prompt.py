@@ -24,7 +24,7 @@ STEPS = 4
 WIDTH = 768
 HEIGHT = 1024  # 3 breit : 4 hoch
 
-TAG = "8-final"
+TAG = "9-final"
 
 SUBJECTS = {
     "banane": "a single ripe yellow banana, slightly curved, with a short stem visible at one end",
@@ -37,9 +37,13 @@ SUBJECTS = {
 # mussten gegen die Trainingsgewohnheit des Modells gegengesteuert werden:
 # 1. Ohne "wie ein zentriertes App-Icon"-Vergleich rutscht das Motiv immer
 #    Richtung untere Bildhaelfte (gelernt aus Boden-Produktfotos).
-# 2. Die Zielfarbe muss als "fast weiss, sehr wenig Saettigung" beschrieben
-#    werden — Woerter wie "putty/linen/eggshell" liefern zuverlaessig einen
-#    zu dunklen, zu satten Tanton (siehe Diff-Werte im Tuning).
+# 2. Die Farbbeschreibung ist bimodal, kein Kontinuum: "near-white, extremely
+#    desaturated" trifft F0EDE6 fast exakt (Diff ~2-6), aber wirkt zu hell/
+#    papieren. Jede waermere Beschreibung ("putty", "linen", "warm grey",
+#    "oat", "ivory" — auch mit "not tan/cream" verneint) kippt zuverlaessig
+#    auf einen satteren, sichtbar dunkleren Tanton (Diff ~20-32) — ueber
+#    4 Wortvarianten UND 4 Seeds getestet, nie dazwischen. Entscheidung war
+#    dann bewusst dieser waermere, praesente Ton statt des papierweissen.
 MASTER_PROMPT = (
     "Photorealistic studio product photograph of {subject}, composed like a "
     "centered app icon: the subject occupies the middle third of the frame "
@@ -49,18 +53,14 @@ MASTER_PROMPT = (
     "the vertical middle of the image with generous background margin on "
     "all four sides. Photographed from the front at a slight eye-level "
     "angle (not from above), portrait orientation. The entire background "
-    "is one completely flat, perfectly even, uniform, matte colour filling "
-    "the frame edge to edge with zero variation: a near-white studio "
-    "backdrop, brightness close to pure white paper but with a faint "
-    "cool-neutral grey-beige cast, extremely desaturated and light (hex "
-    "F0EDE6). Absolutely no gradient, no vignette, no darkened or shaded "
-    "corners, no soft light falloff toward the edges, no texture, no "
-    "visible objects besides the subject — every part of the background "
-    "reads as exactly the same flat colour value. A soft, realistic, "
-    "naturally soft-edged, compact shadow sits directly beneath the "
-    "subject only. Natural studio lighting, sharp focus, high detail, "
-    "realistic colours and textures, no text, no labels, no hands, no "
-    "props, no other objects, no frame, no border."
+    "is one completely flat, uniform, matte colour filling the frame edge "
+    "to edge: a pale warm putty beige-grey, like unbleached linen or warm "
+    "eggshell paper (hex F0EDE6, RGB 240 237 230). No gradient, no "
+    "vignette, no darkened corners, no texture, no visible objects besides "
+    "the subject. A soft, realistic, naturally soft-edged, compact shadow "
+    "sits directly beneath the subject only. Natural studio lighting, "
+    "sharp focus, high detail, realistic colours and textures, no text, no "
+    "labels, no hands, no props, no other objects, no frame, no border."
 )
 
 ITEMS = [(f"{name}-{TAG}", MASTER_PROMPT.format(subject=subject)) for name, subject in SUBJECTS.items()]
