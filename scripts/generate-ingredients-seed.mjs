@@ -6,10 +6,12 @@
  * würde den Seed erst beim Einspielen mit einer kryptischen Meldung stoppen.
  */
 import { writeFileSync } from "node:fs";
-import { CATEGORIES, INGREDIENTS } from "./ingredient-seed-data.mjs";
+import { CATEGORIES, INGREDIENTS, PANTRY_STAPLES } from "./ingredient-seed-data.mjs";
 
 const sql = (v) => `'${String(v).replace(/'/g, "''")}'`;
 const norm = (v) => v.toLowerCase().replace(/\s+/g, " ").trim();
+
+const pantryStaples = new Set(PANTRY_STAPLES.map(norm));
 
 const seen = new Map();
 const rows = [];
@@ -25,7 +27,8 @@ for (const [categoryId, names] of Object.entries(INGREDIENTS)) {
       );
     }
     seen.set(key, categoryId);
-    rows.push(`  (${sql(name)}, ${sql(categoryId)})`);
+    const staple = pantryStaples.has(key);
+    rows.push(`  (${sql(name)}, ${sql(categoryId)}, ${staple})`);
   }
 }
 
@@ -40,14 +43,15 @@ on conflict (id) do update
 
 -- name_norm entsteht über die Funktion der Datenbank selbst, damit sie nicht von
 -- der TypeScript-Seite abweichen kann.
-insert into ingredients (household_id, name_norm, display_name, category_id)
-select null, normalize_ingredient_name(t.name), t.name, t.category_id
+insert into ingredients (household_id, name_norm, display_name, category_id, pantry_staple)
+select null, normalize_ingredient_name(t.name), t.name, t.category_id, t.pantry_staple
 from (values
 ${rows.join(",\n")}
-) as t (name, category_id)
+) as t (name, category_id, pantry_staple)
 on conflict (name_norm) where household_id is null do update
   set category_id = excluded.category_id,
-      display_name = excluded.display_name;
+      display_name = excluded.display_name,
+      pantry_staple = excluded.pantry_staple;
 `;
 
 writeFileSync("supabase/seed/0002_stammdaten.sql", out);

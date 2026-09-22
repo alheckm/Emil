@@ -18,10 +18,20 @@ export const CATEGORIES = [
   { id: "trockenware", name: "Nudeln, Reis & Trockenware", sortOrder: 70 },
   { id: "backen", name: "Backen & Süßes", sortOrder: 80 },
   { id: "gewuerze", name: "Gewürze, Öle & Saucen", sortOrder: 90 },
+  { id: "noch-vorraetig", name: "Noch vorrätig?", sortOrder: 95 },
   { id: "getraenke", name: "Getränke", sortOrder: 100 },
   { id: "haushalt", name: "Haushalt", sortOrder: 110 },
   { id: "sonstiges", name: "Sonstiges", sortOrder: 999 },
 ];
+
+/**
+ * Zutaten, die man so gut wie immer im Haus hat — landen nie automatisch über
+ * ein Rezept auf der Liste (siehe pantry_staple in
+ * supabase/migrations/0020_vorrat_und_ausschluss.sql), von Hand ergänzen
+ * bleibt möglich. Bewusst eine eigene Liste statt einer eigenen Abteilung:
+ * ihre Abteilung bleibt „Gewürze, Öle & Saucen", nur das Verhalten ändert sich.
+ */
+export const PANTRY_STAPLES = ["Salz", "Meersalz", "Pfeffer", "Olivenöl"];
 
 export const INGREDIENTS = {
   "obst-gemuese": [
@@ -73,8 +83,7 @@ export const INGREDIENTS = {
     "Kokosmilch", "Kidneybohnen", "Kichererbsen (Dose)", "Weiße Bohnen",
     "Mais", "Oliven", "Kapern", "Gewürzgurken", "Sauerkraut", "Rotkohl (Glas)",
     "Thunfisch (Dose)", "Sardellen", "Erdnussbutter", "Marmelade", "Honig",
-    "Apfelmus", "Pesto", "Ajvar", "Gemüsebrühe", "Rinderbrühe", "Hühnerbrühe",
-    "Brühe", "Fond", "Tomatensauce", "Sardinen",
+    "Apfelmus", "Pesto", "Ajvar", "Fond", "Tomatensauce", "Sardinen",
   ],
   trockenware: [
     "Nudeln", "Spaghetti", "Penne", "Fusilli", "Tagliatelle", "Lasagneplatten",
@@ -94,16 +103,24 @@ export const INGREDIENTS = {
     "Ahornsirup", "Agavendicksaft", "Zuckerrübensirup", "Rohrzucker",
   ],
   gewuerze: [
-    "Salz", "Meersalz", "Pfeffer", "Paprikapulver", "Currypulver", "Kurkuma",
-    "Kreuzkümmel", "Kümmel", "Koriandersamen", "Muskatnuss", "Zimt", "Nelken",
-    "Kardamom", "Lorbeerblatt", "Wacholderbeeren", "Senfkörner", "Chiliflocken",
-    "Cayennepfeffer", "Getrockneter Oregano", "Getrockneter Thymian",
-    "Getrockneter Rosmarin", "Majoran", "Italienische Kräuter",
-    "Kräuter der Provence", "Currypaste", "Olivenöl", "Rapsöl",
+    "Salz", "Meersalz", "Pfeffer", "Currypaste", "Olivenöl", "Rapsöl",
     "Sonnenblumenöl", "Sesamöl", "Kokosöl", "Essig", "Balsamico",
     "Weißweinessig", "Apfelessig", "Senf", "Dijonsenf", "Ketchup", "Mayonnaise",
     "Sojasauce", "Fischsauce", "Worcestershiresauce", "Tabasco", "Sriracha",
-    "Harissa", "Tahini", "Zitronensaft", "Gemahlener Kreuzkümmel",
+    "Harissa", "Tahini", "Zitronensaft",
+  ],
+  // Gewürze und Brühe: fast immer schon ein Rest davon da — die verdienen vor
+  // dem Losgehen einen Blick in den Vorrat, statt unter den übrigen Zutaten
+  // der Abteilung „Gewürze, Öle & Saucen" zu verschwinden (anders als Öle,
+  // Essige und Saucen, die tatsächlich leer werden).
+  "noch-vorraetig": [
+    "Paprikapulver", "Currypulver", "Kurkuma", "Kreuzkümmel", "Kümmel",
+    "Koriandersamen", "Muskatnuss", "Zimt", "Nelken", "Kardamom",
+    "Lorbeerblatt", "Wacholderbeeren", "Senfkörner", "Chiliflocken",
+    "Cayennepfeffer", "Getrockneter Oregano", "Getrockneter Thymian",
+    "Getrockneter Rosmarin", "Majoran", "Italienische Kräuter",
+    "Kräuter der Provence", "Gemahlener Kreuzkümmel", "Gemüsebrühe",
+    "Rinderbrühe", "Hühnerbrühe", "Brühe",
   ],
   getraenke: [
     "Mineralwasser", "Rotwein", "Weißwein", "Sekt", "Bier", "Apfelsaft",

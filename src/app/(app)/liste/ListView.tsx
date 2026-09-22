@@ -32,6 +32,14 @@ import { CloseIcon, MinusIcon, PlusIcon } from "@/components/icons";
 // Häkchen noch wahrzunehmen, kurz genug, um nicht wie ein Hänger zu wirken.
 const CHECKED_SECTION_DELAY_MS = 500;
 
+// Gewürze und Brühe: fast immer schon ein Rest davon da. Die bekommen einen
+// eigenen Abschnitt direkt über „Eingekauft" statt zwischen den übrigen
+// offenen Zeilen zu stehen — ein kurzer Blick in den Vorrat, bevor man sie
+// dem Wocheneinkauf zuschlägt. Von Hand ergänzt landet trotzdem oben im
+// Hauptteil (siehe `openEntries`/`stockCheckEntries` unten): wer „Salz" oder
+// „Curry" von Hand einträgt, meint das jetzt, nicht „vielleicht ist noch was da".
+const STOCK_CHECK_CATEGORY_ID = "noch-vorraetig";
+
 /**
  * Die Einkaufsliste, wie sie im Supermarkt benutzt wird.
  *
@@ -54,7 +62,10 @@ const CHECKED_SECTION_DELAY_MS = 500;
  * - **Ein Raster, nach Abteilung geordnet — ohne Überschriften.** Die
  *   Abteilung entscheidet nur die Reihenfolge der Kacheln, nicht ob dazwischen
  *   eine Zeile mit ihrem Namen steht. Die Liste besteht ausschließlich aus
- *   Kacheln.
+ *   Kacheln — mit einer Ausnahme: Zutaten der Abteilung „Noch vorrätig?"
+ *   (Gewürze, Brühe) stehen in einem eigenen Abschnitt direkt über
+ *   „Eingekauft", weil man die eher noch im Schrank hat als den Rest der
+ *   Liste. Von Hand ergänzt umgeht das bewusst — siehe `STOCK_CHECK_CATEGORY_ID`.
  * - **Details per Longpress.** Gehalten (500 ms) öffnet eine Leiste vom
  *   unteren Bildschirmrand mit Mengen-Stepper, Herkunft, Abteilung (für jede
  *   Zutat änderbar, nicht nur eigene — Migration 0019) und „von der Liste
@@ -463,10 +474,17 @@ export function ListView({
   // Reihenfolge nach Abteilung und Name aus `listEntries`; im Abschnitt
   // „Eingekauft" steht das zuletzt Abgehakte oben.
   const openEntries: ListEntry[] = [];
+  const stockCheckEntries: ListEntry[] = [];
   const checkedEntries: ListEntry[] = [];
   for (const entry of visibleEntries) {
     const settled = sectionChecked[entry.id] ?? entry.checked;
-    (settled ? checkedEntries : openEntries).push(entry);
+    if (settled) {
+      checkedEntries.push(entry);
+    } else if (entry.categoryId === STOCK_CHECK_CATEGORY_ID && !entry.isManual) {
+      stockCheckEntries.push(entry);
+    } else {
+      openEntries.push(entry);
+    }
   }
   checkedEntries.sort((a, b) => {
     const aAt = checkedAtNow[a.id] ?? (a.checkedAt ? Date.parse(a.checkedAt) : 0);
@@ -770,6 +788,17 @@ export function ListView({
       <ul className="grid grid-cols-3 items-start gap-x-2 gap-y-3">
         {openEntries.map(renderEntry)}
       </ul>
+
+      {stockCheckEntries.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
+            Noch vorrätig?
+          </h2>
+          <ul className="grid grid-cols-3 items-start gap-x-2 gap-y-3">
+            {stockCheckEntries.map(renderEntry)}
+          </ul>
+        </section>
+      )}
 
       {checkedEntries.length > 0 && (
         <section className="space-y-3">
