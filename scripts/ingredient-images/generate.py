@@ -26,7 +26,10 @@ STEPS = 4          # Turbo-Modell, mehr bringt kaum etwas. Der schwache
                    # Schatten, den wir frueher hier vermuteten, kam tatsaechlich
                    # von process.py (siehe to_chip) — mit 4 Schritten hat schon
                    # z. B. Oliven einen guten, dunklen Schatten geliefert.
-SIZE = 768         # Chips sind winzig; 768 reicht und ist deutlich schneller als 1024
+WIDTH = 768        # 3:4 Hochformat — der Prompt setzt das Motiv mittig mit
+HEIGHT = 1024      # Rand oben und unten, process.py schneidet danach eh nur
+                   # den Kreis ums Motiv aus, das Seitenverhaeltnis selbst
+                   # ist also nur fuer die Bildkomposition wichtig.
 
 UMLAUTS = {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss", "é": "e", "è": "e", "ê": "e"}
 
@@ -60,7 +63,8 @@ def main() -> int:
     ap.add_argument("--limit", type=int, help="nur die ersten N Zutaten")
     ap.add_argument("--only", help="nur Zutaten, deren Name diesen Text enthaelt")
     ap.add_argument("--names", help="genau diese Zutaten, mit Komma getrennt")
-    ap.add_argument("--size", type=int, default=SIZE)
+    ap.add_argument("--width", type=int, default=WIDTH)
+    ap.add_argument("--height", type=int, default=HEIGHT)
     ap.add_argument("--steps", type=int, default=STEPS)
     args = ap.parse_args()
 
@@ -108,7 +112,7 @@ def main() -> int:
         try:
             image = model.generate_image(
                 seed=SEED, prompt=prompt, num_inference_steps=args.steps,
-                width=args.size, height=args.size,
+                width=args.width, height=args.height,
             )
             image.save(path=str(path))
         except KeyboardInterrupt:

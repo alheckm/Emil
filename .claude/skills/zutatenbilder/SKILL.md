@@ -27,9 +27,9 @@ Das ist `find-missing.mjs --scope=used --generate` (siehe
 2. Vergleicht das mit `src/lib/core/ingredientImages.ts` — was hat noch kein
    Bild?
 3. Für die fehlenden mit Bildmotiv in `subjects.mjs`: ruft `generate.py`
-   (mflux, lokal, ~10–15 s Modell laden + ~40 s pro Bild bei 4 Schritten)
-   und danach `process.py` auf, das die Rohbilder zu 192-px-WebP-Chips
-   zuschneidet und `ingredientImages.ts` neu schreibt.
+   (mflux, lokal, ~10–15 s Modell laden + ~60–100 s pro Bild bei 4 Schritten,
+   768×1024 Hochformat) und danach `process.py` auf, das die Rohbilder zu
+   192-px-WebP-Chips zuschneidet und `ingredientImages.ts` neu schreibt.
 
 Braucht `SUPABASE_SECRET_KEY` in `.env.local` (umgeht RLS) und die lokale
 mflux-Installation unter `~/.mflux/venv`.

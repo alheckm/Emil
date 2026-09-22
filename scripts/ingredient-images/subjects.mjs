@@ -394,16 +394,38 @@ export function hexFor(name) {
  * ohne Verlauf — die Farbe kommt fest aus COLORS/PALETTE, nicht vom Modell
  * geraten, damit gleichfarbige Zutaten (Tomate, Erdbeeren) denselben
  * Hintergrund bekommen.
+ *
+ * Hervorgegangen aus style-tests/tinted-master-prompt.py (siehe Git-Historie
+ * fuer die verworfenen Zwischenstaende). Zwei Punkte mussten gegen die
+ * Trainingsgewohnheit des Modells gegengesteuert werden:
+ * 1. Ohne "wie ein zentriertes App-Icon"-Vergleich rutscht das Motiv immer
+ *    Richtung untere Bildhaelfte (gelernt aus Boden-Produktfotos) — deshalb
+ *    Hochformat 3:4 mit explizitem Rand oben UND unten.
+ * 2. Die Hintergrundfarbe muss als fertige Endfarbe benannt werden, nicht als
+ *    Mischanweisung ("Basis X mit Farbe Y gemischt") — das brachte sichtbar
+ *    Unruhe (Farbverlaeufe/Flecken) in den Hintergrund, vermutlich weil
+ *    "Basis + mischen" zwei widerspruechliche Anweisungen im selben Satz
+ *    sind. Der PALETTE-Text ist deshalb schon die fertige Formulierung.
  */
 export const buildPrompt = (subject, name) => {
-  const { prompt: background } = PALETTE[backgroundColorFor(name)];
+  const { prompt: tint } = PALETTE[backgroundColorFor(name)];
   return (
-    `Photorealistic professional food product photograph of ${subject}, ` +
-    `centered in frame, isolated on a completely flat, uniform ${background} ` +
-    "background with absolutely no gradient — one single flat pastel color " +
-    "fills the entire background edge to edge. Soft realistic shadow directly " +
-    "beneath the subject on the background. Studio lighting on the subject " +
-    "itself, sharp focus, high detail, natural colours, no text, no labels, " +
-    "no hands, no props, no other objects."
+    `Photorealistic studio product photograph of ${subject}, composed like a ` +
+    "centered app icon: the subject occupies the middle third of the frame " +
+    "vertically, with an empty, equally wide band of background above it " +
+    "and an equal empty band of background below it — NOT resting near the " +
+    "bottom edge, NOT a floor-level product shot, the subject floats in " +
+    "the vertical middle of the image with generous background margin on " +
+    "all four sides. Photographed from the front at a slight eye-level " +
+    "angle (not from above), portrait orientation. The entire background " +
+    "is one completely flat, uniform, matte colour filling the frame edge " +
+    `to edge: ${tint} studio backdrop colour — a gentle pastel wash, more ` +
+    "than just a whisper of colour, but still light and airy, not vivid, " +
+    "not saturated, not a bold colour block. No gradient, no vignette, no " +
+    "darkened corners, no texture, no visible objects besides the subject. " +
+    "A soft, realistic, naturally soft-edged, compact shadow sits directly " +
+    "beneath the subject only. Natural studio lighting, sharp focus, high " +
+    "detail, realistic colours and textures, no text, no labels, no hands, " +
+    "no props, no other objects, no frame, no border."
   );
 };
