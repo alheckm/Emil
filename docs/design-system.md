@@ -392,26 +392,33 @@ steht als schmale, volle Zeile über der ersten Kachel, die zu ihr gehört, und
 die Kacheln danach laufen normal weiter — auch über eine unvollständige Reihe
 hinweg.
 
-**Details per Longpress, nicht über ein „⋯"-Menü.** Ein erster Durchgang
-hatte oben rechts auf jeder Kachel einen kleinen `⋯`-Knopf, der die
-Zusatzinfos (Rezeptquellen, Abteilung ändern, „von der Liste nehmen") *unter
-der ganzen Abteilung* aufklappte — zweimal indirekt: ein Zusatzknopf neben
-der eigentlichen Trefferfläche, und ein Aufklapp-Ort, der nicht bei der
-gehaltenen Kachel lag. Ein zweiter Durchgang hat das ganze Raster in
-`col-span-3`-Zeilen aufgebrochen, sobald irgendeine Kachel offen war — das
-schob auch die Nachbarn in derselben Reihe nach unten, obwohl nur eine Kachel
-gehalten wurde.
+**Details per Wischen, nicht per Longpress oder „⋯"-Menü.** Zwei frühere
+Durchgänge sind gescheitert: ein `⋯`-Knopf, der die Zusatzinfos *unter der
+ganzen Abteilung* aufklappte (zweimal indirekt — Zusatzknopf neben der
+Trefferfläche, Aufklapp-Ort fern der Kachel), und ein Longpress (500 ms), der
+die gehaltene Kachel per `row-span-2` in ihrer eigenen Spalte nach unten
+wachsen ließ. Beide zeigten die Details *in* der Kachel, an ihrem Platz im
+Raster — das sah neben unveränderten Nachbarn in derselben Reihe seltsam
+aus, und ein Longpress ist obendrein eine Geste ohne sichtbare Ankündigung.
 
-Jetzt hält man die Kachel selbst (500 ms). Die gehaltene Kachel bekommt
-`row-span-2`; **nur ihre eigene Spalte** wächst nach unten, in ihrer Zeile
-bleiben die Nachbarn unverändert stehen. Die Zusatzinfos stehen nicht in
-einer neuen, eigenen Fläche, sondern **in derselben `bg-chip`-Kachel** wie
-Foto/Name/Menge — durch eine Haarlinie (`border-border`) abgesetzt, aber ohne
-Lücke, damit es wie eine einzige, nach unten aufgeklappte Fläche wirkt und
-nicht wie zwei verbundene Kästen. Ein kurzer Antipper hakt weiterhin ab, wie
-zuvor — die ganze Kachel bleibt die einzige Trefferfläche. Bekannte Lücke:
-die Details sind damit nur per Touch/Maus-Halten erreichbar, ohne
-Tastatur-Entsprechung (siehe Abschnitt 12).
+Jetzt wischt man die Kachel wie in nativen Listen (Mail, Erinnerungen): nach
+links gewischt rutscht die Kachel vor eine schmale, feste Fläche
+(`bg-well`, 96 px) mit zwei Kreis-Knöpfen — Chevron-Rechts auf `bg-soft` für
+„Details", Papierkorb auf `bg-danger/10` für „von der Liste nehmen". Ein
+kurzer Antipper hakt weiterhin ab; ist gerade irgendeine Kachel gewischt
+offen, schließt ein Antippen nur sie, statt zusätzlich zu wirken — wer
+wirklich abhaken will, tippt danach noch einmal. „Details" öffnet eine Leiste
+vom unteren Bildschirmrand (`rounded-t-card`, `bg-card` auf einem
+`bg-text/40`-Scrim, kein zusätzlicher Schatten — Abschnitt 1 reserviert
+`--shadow-card` der Rezeptvorschau) mit Mengen-Stepper, Rezeptquellen bzw.
+„Von Hand ergänzt" und, bei eigenen Zutaten, der Abteilung. Der Mengen-Stepper
+folgt derselben Form wie `ServingStepper` (`− Menge +`), rechnet aber in der
+`mergeUnit` der Zeile statt in Portionen und setzt `amount_override`
+(Migration 0018) — die Zahl ersetzt die berechnete Summe aus Rezept- und
+Handanteilen, bis jemand sie erneut ändert. Bei mengenlosen Zeilen
+(`merge_unit = 'ohne'`) entfällt der Stepper, es gibt nichts zu zählen.
+Bekannte Lücke: Wischen und die Leiste sind damit nur per Touch/Maus
+erreichbar, ohne Tastatur-Entsprechung (siehe Abschnitt 12).
 
 ### Bildzuschnitt (ImageCropper)
 `src/app/(app)/rezepte/ImageCropper.tsx`, eingebettet in `RecipeImageField`.
@@ -625,12 +632,12 @@ Arbeitsliste, kein Ist-Zustand. Stand 19.09.2026:
    (`scripts/ingredient-images/`), sichtbar in der Einkaufsliste — dem
    einzigen Ort, an dem sie noch erscheinen (siehe „Zutatenkacheln — nur in
    der Einkaufsliste", Abschnitt 7).
-6. **Die Zusatzinfos einer Einkaufslisten-Zutat (Longpress) haben keine
+6. **Die Zusatzinfos einer Einkaufslisten-Zutat (Wischen) haben keine
    Tastatur-Entsprechung.** Kurzes Antippen hakt weiter über Enter/Leertaste
-   ab, aber Rezeptquellen, Abteilung ändern und „von der Liste nehmen" sind
-   nur per Halten (Touch/Maus) erreichbar. Braucht noch einen Weg ohne
-   Zeigegerät — etwa eine Kontextmenü-Taste oder eine zweite, per Tastatur
-   fokussierbare Aktion.
+   ab, aber Menge ändern, Rezeptquellen, Abteilung ändern und „von der Liste
+   nehmen" sind nur per Wisch-Geste (Touch/Maus) erreichbar. Braucht noch
+   einen Weg ohne Zeigegerät — etwa eine Kontextmenü-Taste oder eine zweite,
+   per Tastatur fokussierbare Aktion.
 7. **Die „Saisonal"-Pille wartet auf den ersten Pflege-Lauf.**
    `recipes.season_months` (Migration 0013) wird jetzt von der automatischen
    Rezept-Pflege befüllt (`docs/plan-rezept-pflege.md`), aber bis der erste

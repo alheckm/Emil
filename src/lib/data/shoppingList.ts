@@ -194,6 +194,24 @@ export async function setEntryChecked(
   return error ? fail(dataErrorMessage(error)) : ok(undefined);
 }
 
+/**
+ * Menge einer Zeile von Hand festlegen — der Mengen-Stepper in der
+ * Detailleiste. Gilt für Rezept-, Hand- und gemischte Zeilen gleichermaßen:
+ * die Zahl überschreibt die berechnete Summe, ihre Quellen bleiben unter der
+ * Haube unverändert liegen.
+ */
+export async function setEntryAmount(
+  supabase: SupabaseClient,
+  entryId: string,
+  amount: number,
+): Promise<Result> {
+  const { error } = await supabase.rpc("set_entry_amount", {
+    p_entry_id: entryId,
+    p_amount: String(amount),
+  });
+  return error ? fail(dataErrorMessage(error)) : ok(undefined);
+}
+
 /** Rezept auflegen. Die Positionen kommen fertig gerechnet aus `buildListItems`. */
 export async function addRecipeToList(
   supabase: SupabaseClient,

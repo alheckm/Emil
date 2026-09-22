@@ -264,6 +264,22 @@ select,
 }
 
 /* ---------------------------------------------------------------------------
+   Wischaktionen auf der Einkaufslisten-Kachel (ListView.tsx).
+
+   Nur die Übergangsdauer steht hier — die eigentliche Verschiebung ist ein
+   Laufzeitwert (offen/zu) und bleibt darum Inline-Style, nicht Utility.
+--------------------------------------------------------------------------- */
+@utility swipe-front {
+  transition: transform 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swipe-front {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
    Zoom-Regler im Bildzuschnitt (RecipeImageField/ImageCropper).
 
    Ein natives <input type="range"> im Auslieferungszustand ist ein
