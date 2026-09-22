@@ -2,3 +2,6 @@
 # zu kleinen WebPs unter public/ verarbeitet — nur die gehoeren ins Repo.
 raw/
 __pycache__/
+
+# Stil-Test-Renders: reine Vergleichsbilder, kein Teil der App.
+style-tests/out/
