@@ -1,10 +1,12 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { requireHousehold } from "@/lib/server/household";
+import { getListState } from "@/lib/server/listState";
 import { getRecipe } from "@/lib/data/recipes";
 import { Notice, Screen } from "@/components/ui";
 import { RecipeBodySkeleton } from "@/components/skeletons";
 import { RecipeForm } from "../../RecipeForm";
+import { DeleteRecipe } from "../RecipeActions";
 
 export const metadata = { title: "Rezept bearbeiten" };
 
@@ -39,7 +41,14 @@ async function Form({ params }: { params: Params }) {
   if (!recipe.ok) return <Notice tone="error">{recipe.error}</Notice>;
   if (!recipe.value) notFound();
 
+  // Für die Löschen-Aktion ganz unten: sie nimmt das Rezept vorher von der
+  // Liste, falls es dort liegt (siehe DeleteRecipe in RecipeActions.tsx).
+  const list = await getListState();
+
   return (
-    <RecipeForm householdId={context.household.id} recipe={recipe.value} />
+    <>
+      <RecipeForm householdId={context.household.id} recipe={recipe.value} />
+      <DeleteRecipe listId={list.listId} recipeId={recipe.value.id} />
+    </>
   );
 }

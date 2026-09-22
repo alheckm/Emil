@@ -408,13 +408,12 @@ function ShoppingListButton({
 }
 
 /**
- * Löschen — ganz unten, nach allem anderen.
+ * Löschen — auf der Bearbeiten-Seite, ganz unten, nach dem Formular.
  *
- * Es gehört nicht zwischen Zutaten und Zubereitung: dort steht das Rezept, und
- * ein roter Knopf mittendrin wäre genau die Standard-UI, die der Entwurf
- * vermeidet. Unter dem letzten Abschnitt, mit reichlich Luft davor, steht es
- * da, wo die Verwaltung hingehört — leise, aber erreichbar. Der Weg zum
- * Bearbeiten sitzt oben rechts auf dem Foto (siehe RecipeHero).
+ * Nicht auf dem Rezept-Screen: dort steht das Rezept, und ein roter Knopf
+ * mittendrin wäre genau die Standard-UI, die der Entwurf vermeidet. Löschen
+ * ist Verwaltung, keine Leseaktion — sie gehört dorthin, wo auch sonst
+ * verwaltet wird, unter dem letzten Feld, mit reichlich Luft davor.
  */
 export function DeleteRecipe({
   listId,
@@ -462,7 +461,7 @@ export function DeleteRecipe({
   }
 
   return (
-    <div className="space-y-3 px-5 pb-10 pt-4">
+    <div className="space-y-3 pb-10 pt-4">
       {error && <Notice tone="error">{error}</Notice>}
       <div className="text-center">
         <button

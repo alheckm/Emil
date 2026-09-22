@@ -6,7 +6,7 @@ import { getRecipe, type Recipe } from "@/lib/data/recipes";
 import { getRecipeImageUrl } from "@/lib/data/recipeImages";
 import { Notice, Screen, ScreenHeader } from "@/components/ui";
 import { RecipeCardSkeleton } from "@/components/skeletons";
-import { DeleteRecipe, RecipeIngredientsAndSteps } from "./RecipeActions";
+import { RecipeIngredientsAndSteps } from "./RecipeActions";
 import { RecipeHero } from "./RecipeHero";
 
 /**
@@ -120,25 +120,20 @@ async function RecipeDetail({ params }: { params: Params }) {
         </section>
       )}
 
-      {(value.tags.length > 0 || value.sourceUrl) && (
-        <div className="space-y-1 px-5 pb-6 text-[13px] text-muted">
-          {value.tags.length > 0 && <p>{value.tags.join(" · ")}</p>}
-          {value.sourceUrl && (
-            <p className="truncate">
-              <a
-                href={value.sourceUrl}
-                className="underline underline-offset-4"
-                rel="noreferrer noopener"
-                target="_blank"
-              >
-                Quelle
-              </a>
-            </p>
-          )}
+      {value.sourceUrl && (
+        <div className="px-5 pb-6 text-[13px] text-muted">
+          <p className="truncate">
+            <a
+              href={value.sourceUrl}
+              className="underline underline-offset-4"
+              rel="noreferrer noopener"
+              target="_blank"
+            >
+              Quelle
+            </a>
+          </p>
         </div>
       )}
-
-      <ListAwareDelete recipeId={value.id} />
     </>
   );
 }
@@ -160,13 +155,6 @@ async function ListAwareIngredients({ recipe }: { recipe: Recipe }) {
       />
     </>
   );
-}
-
-async function ListAwareDelete({ recipeId }: { recipeId: string }) {
-  // Zweiter Aufruf, aber keine zweite Netzrunde: `getListState()` ist für die
-  // Dauer des Requests zwischengespeichert.
-  const list = await getListState();
-  return <DeleteRecipe listId={list.listId} recipeId={recipeId} />;
 }
 
 async function RecipeImage({ imagePath }: { imagePath: string }) {
