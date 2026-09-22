@@ -35,6 +35,8 @@ export interface ListEntry {
   /** Mindestens eine Quelle ohne Menge („Salz und Pfeffer" neben „1 TL Salz"). */
   hasUnquantified: boolean;
   checked: boolean;
+  /** Zeitpunkt des Abhakens; `null` solange offen. Bestimmt die Reihenfolge im „Abgehakt"-Abschnitt. */
+  checkedAt: string | null;
   note: string | null;
   isManual: boolean;
   updatedAt: string;
@@ -77,6 +79,7 @@ interface EntryRow {
   total_amount: string | null;
   has_unquantified: boolean;
   checked: boolean;
+  checked_at: string | null;
   note: string | null;
   is_manual: boolean;
   updated_at: string;
@@ -109,7 +112,7 @@ export async function listEntries(
     .from("shopping_list_entry_totals")
     .select(
       `id, ingredient_id, merge_unit, total_amount::text, has_unquantified,
-       checked, note, is_manual, updated_at,
+       checked, checked_at, note, is_manual, updated_at,
        ingredients ( display_name, household_id, category_id,
                      categories ( name, sort_order ) ),
        shopping_list_sources ( recipe_id, servings, amount_base::text,
@@ -127,6 +130,7 @@ export async function listEntries(
     amount: row.total_amount,
     hasUnquantified: row.has_unquantified,
     checked: row.checked,
+    checkedAt: row.checked_at,
     note: row.note,
     isManual: row.is_manual,
     updatedAt: row.updated_at,

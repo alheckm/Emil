@@ -23,6 +23,11 @@ import {
 } from "@/lib/data/shoppingList";
 import { Section, Notice } from "@/components/ui";
 
+// Wie lange eine frisch abgehakte Kachel an ihrem Platz stehen bleibt, bevor
+// sie in den Abschnitt „Abgehakt" wandert — lang genug, um das eigene
+// Häkchen noch wahrzunehmen, kurz genug, um nicht wie ein Hänger zu wirken.
+const CHECKED_SECTION_DELAY_MS = 700;
+
 /**
  * Die Einkaufsliste, wie sie im Supermarkt benutzt wird.
  *
@@ -30,9 +35,11 @@ import { Section, Notice } from "@/components/ui";
  *
  * - **Antippen hakt ab.** Die ganze Kachel ist die Trefferfläche, nicht ein
  *   kleines Kästchen — die App wird einhändig und in Bewegung bedient.
- * - **Abgehaktes rutscht ans Ende.** Wer offen ist, steht vorn und wird nicht
- *   von Erledigtem durchmischt. Über 20 Abgehakte sammeln sich ohnehin nicht
- *   an — `set_entry_checked` löscht die ältesten, sobald ein 21. dazukommt
+ * - **Abgehaktes wandert in einen eigenen Abschnitt.** Kurz nach dem Antippen
+ *   (`CHECKED_SECTION_DELAY_MS`) — man soll das eigene Häkchen noch an seinem
+ *   Platz sehen, bevor die Kachel unter „Abgehakt" auftaucht. Dort steht das
+ *   zuletzt Abgehakte oben. Über 20 Abgehakte sammeln sich ohnehin nicht an —
+ *   `set_entry_checked` löscht die ältesten, sobald ein 21. dazukommt
  *   (Migration 0016), unabhängig davon, welches Handy gerade offen ist.
  * - **Drei pro Reihe, Bild oben, Name und Menge darunter.** Ein Bild ist im
  *   Laden schneller erfasst als ein Wort; man sucht im Regal nach der Sache,
@@ -65,6 +72,33 @@ export function ListView({
   const [error, setError] = useState("");
   const [open, setOpen] = useState<string | null>(null);
   const [checkedNow, setCheckedNow] = useState<Record<string, boolean>>({});
+  // Ob eine Zeile schon im Abschnitt „Abgehakt" steht. Folgt `checkedNow` mit
+  // Verzögerung beim Abhaken (siehe `CHECKED_SECTION_DELAY_MS`), damit das
+  // Häkchen erst kurz an seinem Platz zu sehen ist, bevor die Kachel wandert
+  // — beim Abwählen sofort, da rutscht nichts weg, das man noch anschaut.
+  const [sectionChecked, setSectionChecked] = useState<
+    Record<string, boolean>
+  >({});
+  // Zeitpunkt des Antippens, für die Reihenfolge im Abschnitt: zuletzt
+  // abgehakt steht oben. Bis der Server antwortet, zählt dieser lokale Wert;
+  // danach übernimmt `entry.checkedAt`.
+  const [checkedAtNow, setCheckedAtNow] = useState<Record<string, number>>(
+    {},
+  );
+  const sectionTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>(
+    {},
+  );
+
+  // Läuft vor jedem erneuten Aufsetzen (also bei jedem neuen `entries` von
+  // Server, direkt nachdem der Render-Zweig unten `sectionChecked` schon
+  // zurückgesetzt hat) und beim Unmount — nie während des Renderns selbst,
+  // das verbietet der `react-hooks/refs`-Lint.
+  useEffect(() => {
+    return () => {
+      Object.values(sectionTimers.current).forEach(clearTimeout);
+      sectionTimers.current = {};
+    };
+  }, [entries]);
 
   // Longpress statt „⋯"-Knopf: gehalten öffnet die Details, kurz angetippt
   // hakt ab. `longPressed` unterscheidet die beiden — der native Klick, der
@@ -128,6 +162,8 @@ export function ListView({
     setCheckedNow({});
     setRemoved(new Set());
     setAdding([]);
+    setSectionChecked({});
+    setCheckedAtNow({});
   }
 
   const online = useOnlineStatus();
@@ -196,9 +232,29 @@ export function ListView({
     };
   }, [online, router]);
 
+  function scheduleSection(entryId: string, next: boolean) {
+    const existing = sectionTimers.current[entryId];
+    if (existing) {
+      clearTimeout(existing);
+      delete sectionTimers.current[entryId];
+    }
+    if (next) {
+      sectionTimers.current[entryId] = setTimeout(() => {
+        delete sectionTimers.current[entryId];
+        setSectionChecked((current) => ({ ...current, [entryId]: true }));
+      }, CHECKED_SECTION_DELAY_MS);
+    } else {
+      setSectionChecked((current) => ({ ...current, [entryId]: false }));
+    }
+  }
+
   async function toggle(entry: ListEntry) {
     const next = !(checkedNow[entry.id] ?? entry.checked);
     setCheckedNow((current) => ({ ...current, [entry.id]: next }));
+    if (next) {
+      setCheckedAtNow((current) => ({ ...current, [entry.id]: Date.now() }));
+    }
+    scheduleSection(entry.id, next);
     setError("");
 
     const supabase = getBrowserSupabase();
@@ -347,24 +403,213 @@ export function ListView({
   const base = !online && mirrored ? mirrored : shownEntries;
   // Zuletzt noch das, was gerade entfernt wurde — es soll im selben Frame
   // verschwinden, in dem getippt wurde, nicht wenn der Server geantwortet hat.
-  //
-  // Abgehaktes rutscht ans Ende, ohne die Reihenfolge sonst anzutasten: ein
-  // stabiler Sort behält innerhalb von „offen" und „abgehakt" die Reihenfolge
-  // nach Abteilung und Name, die `listEntries` mitgibt. Effektiv abgehakt ist
-  // dabei dieselbe Formel wie unten beim Rendern — inklusive des Antippens,
-  // das noch nicht beim Server angekommen ist.
-  const visibleEntries = applyPendingToggles(base, pending)
-    .filter((entry) => !removed.has(entry.id))
-    .slice()
-    .sort((a, b) => {
-      const aChecked = checkedNow[a.id] ?? a.checked;
-      const bChecked = checkedNow[b.id] ?? b.checked;
-      return Number(aChecked) - Number(bChecked);
-    });
+  const visibleEntries = applyPendingToggles(base, pending).filter(
+    (entry) => !removed.has(entry.id),
+  );
 
   const openCount = visibleEntries.filter(
     (entry) => !(checkedNow[entry.id] ?? entry.checked),
   ).length;
+
+  // Aufgeteilt in „offen" und „Abgehakt": `sectionChecked` folgt `checkedNow`
+  // erst mit Verzögerung, darum bleibt eine frisch abgehakte Kachel kurz an
+  // ihrem Platz stehen (siehe `scheduleSection`). Offene behalten die
+  // Reihenfolge nach Abteilung und Name aus `listEntries`; im Abschnitt
+  // „Abgehakt" steht das zuletzt Abgehakte oben.
+  const openEntries: ListEntry[] = [];
+  const checkedEntries: ListEntry[] = [];
+  for (const entry of visibleEntries) {
+    const settled = sectionChecked[entry.id] ?? entry.checked;
+    (settled ? checkedEntries : openEntries).push(entry);
+  }
+  checkedEntries.sort((a, b) => {
+    const aAt = checkedAtNow[a.id] ?? (a.checkedAt ? Date.parse(a.checkedAt) : 0);
+    const bAt = checkedAtNow[b.id] ?? (b.checkedAt ? Date.parse(b.checkedAt) : 0);
+    return bAt - aAt;
+  });
+
+  function renderEntry(entry: ListEntry) {
+    const checked = checkedNow[entry.id] ?? entry.checked;
+    const { text } = formatAmount(entry.amount, entry.mergeUnit);
+    const src = ingredientImage(entry.name);
+    const menge = [
+      text,
+      entry.hasUnquantified ? (text ? "+ etwas" : "etwas") : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+    const isOpen = open === entry.id;
+
+    return (
+      <Fragment key={entry.id}>
+        {/* Offen wächst nur diese eine Spalte nach unten (row-span-2)
+            — die Nachbarn in derselben Reihe bleiben stehen, wo sie
+            sind. Foto, Name/Menge und die Zusatzinfos teilen sich eine
+            einzige `bg-chip`-Fläche, damit es wie eine aufklappende
+            Kachel wirkt statt wie zwei verbundene Kästen. */}
+        <li className={"relative" + (isOpen ? " row-span-2" : "")}>
+          <div className="flex h-full flex-col overflow-hidden rounded-tile bg-chip">
+            <button
+              type="button"
+              aria-pressed={checked}
+              aria-expanded={isOpen}
+              onPointerDown={() => startPress(entry.id)}
+              onPointerUp={cancelPress}
+              onPointerLeave={cancelPress}
+              onPointerCancel={cancelPress}
+              onContextMenu={(event) => event.preventDefault()}
+              onClick={() => tap(entry)}
+              className="flex select-none flex-col press-flat tap-target touch-manipulation"
+            >
+              <span className="relative block aspect-square w-full p-3">
+                <span
+                  className={
+                    "flex h-full w-full items-center justify-center overflow-hidden rounded-full " +
+                    // Abgehakt wird das Bild blass, das Häkchen
+                    // darüber bleibt kräftig — sonst verschwindet
+                    // genau die Rückmeldung mit, auf die man wartet.
+                    (checked ? "opacity-40" : "")
+                  }
+                >
+                  {src ? (
+                    /* Kein next/image: die Datei liegt schon in genau
+                       der Größe im public-Ordner, in der sie gebraucht
+                       wird. Der Optimierer hätte hier nichts zu tun
+                       und käme nur als zusätzliche Runde dazu. */
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={src}
+                      alt=""
+                      width={192}
+                      height={192}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span
+                      aria-hidden
+                      className="text-[24px] font-medium text-muted"
+                    >
+                      {entry.name.slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
+                </span>
+
+                {checked && (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span
+                      aria-hidden
+                      className="flex h-9 w-9 items-center justify-center rounded-pill bg-accent text-[17px] text-accent-ink"
+                    >
+                      ✓
+                    </span>
+                  </span>
+                )}
+              </span>
+
+              <span className="w-full px-2 pb-2 pt-1 text-center">
+                <span
+                  className={
+                    "block text-[13px] font-medium leading-tight " +
+                    (checked ? "text-muted line-through" : "")
+                  }
+                >
+                  {entry.name}
+                </span>
+                {/* Immer gerendert, notfalls unsichtbar: sonst wird
+                    eine Kachel ohne Menge einen Zeile kürzer als ihre
+                    Nachbarn in derselben Reihe. */}
+                <span
+                  className={
+                    "mt-0.5 block text-[13px] leading-tight " +
+                    (menge ? "" : "invisible")
+                  }
+                >
+                  {menge || " "}
+                </span>
+              </span>
+            </button>
+
+            {isOpen && (
+              <div className="flex-1 space-y-3 border-t border-border p-3 text-left">
+                {entry.note && (
+                  <p className="text-[13px] text-muted">{entry.note}</p>
+                )}
+
+                {entry.sources.length > 0 ? (
+                  <ul className="space-y-1 text-[13px] text-muted">
+                    {entry.sources.map((source, sourceIndex) => (
+                      <li key={`${source.recipeId}-${sourceIndex}`}>
+                        {source.recipeTitle ?? "Rezept"}
+                        {source.servings ? ` (${source.servings})` : ""}
+                        {source.amount
+                          ? `: ${formatAmount(source.amount, entry.mergeUnit).text}`
+                          : ": ohne Menge"}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-[13px] text-muted">
+                    Von Hand ergänzt.
+                  </p>
+                )}
+
+                {entry.categoryEditable ? (
+                  <label className="block">
+                    <span className="text-[13px] text-muted">
+                      Abteilung
+                    </span>
+                    <select
+                      value={entry.categoryId ?? "sonstiges"}
+                      onChange={(event) =>
+                        run(() => {
+                          const supabase = getBrowserSupabase();
+                          if (!supabase) {
+                            return Promise.resolve({
+                              ok: false,
+                              error: "Supabase ist nicht konfiguriert.",
+                            });
+                          }
+                          return setIngredientCategory(
+                            supabase,
+                            entry.ingredientId,
+                            event.target.value,
+                          );
+                        })
+                      }
+                      className="mt-1 h-11 w-full appearance-none rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
+                    >
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="mt-1 block text-[13px] text-muted">
+                      Bleibt für diese Zutat gespeichert.
+                    </span>
+                  </label>
+                ) : (
+                  <p className="text-[13px] text-muted">
+                    Abteilung „{entry.categoryName}“ — aus der
+                    Zutatenliste, für alle Haushalte gleich.
+                  </p>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => removeEntry(entry)}
+                  className="h-11 w-full rounded-pill border border-danger text-[15px] text-danger press"
+                >
+                  Von der Liste nehmen
+                </button>
+              </div>
+            )}
+          </div>
+        </li>
+      </Fragment>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -429,189 +674,19 @@ export function ListView({
       )}
 
       <ul className="grid grid-cols-3 items-start gap-x-2 gap-y-3">
-        {visibleEntries.map((entry) => {
-          const checked = checkedNow[entry.id] ?? entry.checked;
-          const { text } = formatAmount(entry.amount, entry.mergeUnit);
-          const src = ingredientImage(entry.name);
-          const menge = [
-            text,
-            entry.hasUnquantified ? (text ? "+ etwas" : "etwas") : "",
-          ]
-            .filter(Boolean)
-            .join(" ");
-          const isOpen = open === entry.id;
-
-          return (
-            <Fragment key={entry.id}>
-              {/* Offen wächst nur diese eine Spalte nach unten (row-span-2)
-                  — die Nachbarn in derselben Reihe bleiben stehen, wo sie
-                  sind. Foto, Name/Menge und die Zusatzinfos teilen sich eine
-                  einzige `bg-chip`-Fläche, damit es wie eine aufklappende
-                  Kachel wirkt statt wie zwei verbundene Kästen. */}
-              <li className={"relative" + (isOpen ? " row-span-2" : "")}>
-                <div className="flex h-full flex-col overflow-hidden rounded-tile bg-chip">
-                  <button
-                    type="button"
-                    aria-pressed={checked}
-                    aria-expanded={isOpen}
-                    onPointerDown={() => startPress(entry.id)}
-                    onPointerUp={cancelPress}
-                    onPointerLeave={cancelPress}
-                    onPointerCancel={cancelPress}
-                    onContextMenu={(event) => event.preventDefault()}
-                    onClick={() => tap(entry)}
-                    className="flex select-none flex-col press-flat tap-target touch-manipulation"
-                  >
-                    <span className="relative block aspect-square w-full p-3">
-                      <span
-                        className={
-                          "flex h-full w-full items-center justify-center overflow-hidden rounded-full " +
-                          // Abgehakt wird das Bild blass, das Häkchen
-                          // darüber bleibt kräftig — sonst verschwindet
-                          // genau die Rückmeldung mit, auf die man wartet.
-                          (checked ? "opacity-40" : "")
-                        }
-                      >
-                        {src ? (
-                          /* Kein next/image: die Datei liegt schon in genau
-                             der Größe im public-Ordner, in der sie gebraucht
-                             wird. Der Optimierer hätte hier nichts zu tun
-                             und käme nur als zusätzliche Runde dazu. */
-                          /* eslint-disable-next-line @next/next/no-img-element */
-                          <img
-                            src={src}
-                            alt=""
-                            width={192}
-                            height={192}
-                            loading="lazy"
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <span
-                            aria-hidden
-                            className="text-[24px] font-medium text-muted"
-                          >
-                            {entry.name.slice(0, 1).toUpperCase()}
-                          </span>
-                        )}
-                      </span>
-
-                      {checked && (
-                        <span className="absolute inset-0 flex items-center justify-center">
-                          <span
-                            aria-hidden
-                            className="flex h-9 w-9 items-center justify-center rounded-pill bg-accent text-[17px] text-accent-ink"
-                          >
-                            ✓
-                          </span>
-                        </span>
-                      )}
-                    </span>
-
-                    <span className="w-full px-2 pb-2 pt-1 text-center">
-                      <span
-                        className={
-                          "block text-[13px] font-medium leading-tight " +
-                          (checked ? "text-muted line-through" : "")
-                        }
-                      >
-                        {entry.name}
-                      </span>
-                      {/* Immer gerendert, notfalls unsichtbar: sonst wird
-                          eine Kachel ohne Menge einen Zeile kürzer als ihre
-                          Nachbarn in derselben Reihe. */}
-                      <span
-                        className={
-                          "mt-0.5 block text-[13px] leading-tight " +
-                          (menge ? "" : "invisible")
-                        }
-                      >
-                        {menge || " "}
-                      </span>
-                    </span>
-                  </button>
-
-                  {isOpen && (
-                    <div className="flex-1 space-y-3 border-t border-border p-3 text-left">
-                      {entry.note && (
-                        <p className="text-[13px] text-muted">{entry.note}</p>
-                      )}
-
-                      {entry.sources.length > 0 ? (
-                        <ul className="space-y-1 text-[13px] text-muted">
-                          {entry.sources.map((source, sourceIndex) => (
-                            <li key={`${source.recipeId}-${sourceIndex}`}>
-                              {source.recipeTitle ?? "Rezept"}
-                              {source.servings ? ` (${source.servings})` : ""}
-                              {source.amount
-                                ? `: ${formatAmount(source.amount, entry.mergeUnit).text}`
-                                : ": ohne Menge"}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-[13px] text-muted">
-                          Von Hand ergänzt.
-                        </p>
-                      )}
-
-                      {entry.categoryEditable ? (
-                        <label className="block">
-                          <span className="text-[13px] text-muted">
-                            Abteilung
-                          </span>
-                          <select
-                            value={entry.categoryId ?? "sonstiges"}
-                            onChange={(event) =>
-                              run(() => {
-                                const supabase = getBrowserSupabase();
-                                if (!supabase) {
-                                  return Promise.resolve({
-                                    ok: false,
-                                    error: "Supabase ist nicht konfiguriert.",
-                                  });
-                                }
-                                return setIngredientCategory(
-                                  supabase,
-                                  entry.ingredientId,
-                                  event.target.value,
-                                );
-                              })
-                            }
-                            className="mt-1 h-11 w-full appearance-none rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
-                          >
-                            {categories.map((category) => (
-                              <option key={category.id} value={category.id}>
-                                {category.name}
-                              </option>
-                            ))}
-                          </select>
-                          <span className="mt-1 block text-[13px] text-muted">
-                            Bleibt für diese Zutat gespeichert.
-                          </span>
-                        </label>
-                      ) : (
-                        <p className="text-[13px] text-muted">
-                          Abteilung „{entry.categoryName}“ — aus der
-                          Zutatenliste, für alle Haushalte gleich.
-                        </p>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={() => removeEntry(entry)}
-                        className="h-11 w-full rounded-pill border border-danger text-[15px] text-danger press"
-                      >
-                        Von der Liste nehmen
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </li>
-            </Fragment>
-          );
-        })}
+        {openEntries.map(renderEntry)}
       </ul>
+
+      {checkedEntries.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
+            Abgehakt
+          </h2>
+          <ul className="grid grid-cols-3 items-start gap-x-2 gap-y-3">
+            {checkedEntries.map(renderEntry)}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }
