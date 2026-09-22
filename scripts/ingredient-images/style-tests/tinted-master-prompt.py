@@ -20,11 +20,12 @@ genannten Beispielfarben zu einem Mittelwert.
 Deshalb wieder ein expliziter {tint}-Platzhalter — aber die Farbe kommt
 nicht mehr aus einer von Hand gepflegten Zutat->Farbe-Tabelle, sondern aus
 COLORS in subjects.mjs (via colorFor(), derselbe Subprocess-Aufruf wie in
-process.py/generate.py). COLORS kennt nur 7 Kategorien (yellow/red/beige/
-green/orange/purple/blue) und hat fuer jede der ~350 Zutaten UND jede
-kuenftige (Default "beige") schon einen Eintrag — TINT_PHRASES unten muss
-nur diese 7 Kategorien abdecken, nicht jede Zutat einzeln. Skaliert also
-automatisch mit, ohne dass hier je etwas nachgepflegt werden muss.
+process.py/generate.py). COLORS kennt nur 6 Kategorien (yellow/red/green/
+orange/purple/blue — "beige" wurde als eigene Kategorie gestrichen, siehe
+subjects.mjs) und hat fuer jede der ~350 Zutaten UND jede kuenftige (Default
+"yellow") schon einen Eintrag — TINT_PHRASES unten muss nur diese 6
+Kategorien abdecken, nicht jede Zutat einzeln. Skaliert also automatisch
+mit, ohne dass hier je etwas nachgepflegt werden muss.
 
 Ersetzt NICHT master-prompt.py / dessen out/*-9-final.png (beiger,
 einheitlicher Ton) — das bleibt die andere Variante zum Vergleich.
@@ -67,9 +68,9 @@ GERMAN_NAME = {
     "blaubeeren": "Blaubeeren",
 }
 
-# Deckt alle 7 Kategorien aus COLORS in subjects.mjs ab — nicht pro Zutat,
+# Deckt alle 6 Kategorien aus COLORS in subjects.mjs ab — nicht pro Zutat,
 # sondern pro Kategorie, damit jede kuenftige Zutat automatisch eine davon
-# erbt, sobald sie einen COLORS-Eintrag hat (oder per Default "beige").
+# erbt, sobald sie einen COLORS-Eintrag hat (oder per Default "yellow").
 # Etwas praesenter als der erste Versuch ("barely perceptible" wirkte laut
 # Rueckmeldung zu schwach) — weiterhin blass, aber deutlich sichtbar.
 #
@@ -80,10 +81,13 @@ GERMAN_NAME = {
 # einer einzigen flachen Flaeche), vermutlich weil "Basis X + Farbe Y
 # mischen" zwei widerspruechliche Anweisungen im selben Satz sind. Jetzt
 # wird direkt die gewuenschte Endfarbe benannt.
+#
+# Kein Eintrag "beige" mehr: die Kategorie wurde in subjects.mjs komplett
+# gestrichen, jede vormals "beige" markierte Zutat laeuft jetzt ueber
+# "yellow" oder "orange" — colorFor() kann "beige" also nie mehr liefern.
 TINT_PHRASES = {
     "yellow": "a soft pastel warm yellow, almost white but clearly tinted",
     "red": "a soft pastel rose-red, almost white but clearly tinted",
-    "beige": "a soft pastel warm beige-tan, almost white but clearly tinted",
     "green": "a soft pastel sage-green, almost white but clearly tinted",
     "orange": "a soft pastel peachy orange, almost white but clearly tinted",
     "purple": "a soft pastel mauve-purple, almost white but clearly tinted",

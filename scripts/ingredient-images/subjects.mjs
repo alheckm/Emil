@@ -222,147 +222,154 @@ export const SUBJECTS = {
  * Hintergrund, damit z. B. Tomate und Erdbeeren (beide rot) optisch
  * zusammengehören, statt dass das Modell pro Bild neu rät. Fehlt eine Zutat
  * hier (z. B. beim Rezept-Import frisch entstanden), greift der Default
- * "beige" in colorFor() — neutral genug, um nie falsch zu wirken.
+ * "yellow" in colorFor().
+ *
+ * Es gibt keine neutrale achte Kategorie "beige" mehr (gestrichen, weil sie
+ * als Sammelbecken fuer alles Unentschiedene taugte, aber selbst nie eine
+ * saubere Pastellfarbe ergab). Jede vormals "beige" markierte Zutat wurde
+ * einzeln nach "yellow" (blass, cremig — Milchprodukte, helles Mehl, Reis,
+ * Gefluegel, Zucker, Salz …) oder "orange" (warm, braeunlich — Kruste,
+ * Gewuerze, Nuesse, Kaffee, Schokolade …) einsortiert. Der Default-Fallback
+ * fuer unbekannte Zutaten ist "yellow", aus demselben Grund wie vorher
+ * "beige": am wenigsten wahrscheinlich, klar falsch zu wirken.
  */
 export const COLORS = {
   // ── Obst & Gemüse ────────────────────────────────────────────────────────
-  "Zwiebel": "yellow", "Rote Zwiebel": "red", "Schalotte": "beige",
-  "Frühlingszwiebel": "green", "Knoblauch": "beige", "Knoblauchzehe": "beige",
-  "Karotte": "orange", "Möhre": "orange", "Kartoffel": "beige", "Süßkartoffel": "orange",
+  "Zwiebel": "yellow", "Rote Zwiebel": "red", "Schalotte": "orange",
+  "Frühlingszwiebel": "green", "Knoblauch": "yellow", "Knoblauchzehe": "yellow",
+  "Karotte": "orange", "Möhre": "orange", "Kartoffel": "orange", "Süßkartoffel": "orange",
   "Tomate": "red", "Cherrytomate": "red", "Paprika": "red", "Zucchini": "green",
   "Aubergine": "purple", "Gurke": "green", "Lauch": "green", "Staudensellerie": "green",
-  "Knollensellerie": "beige", "Kohlrabi": "green", "Weißkohl": "green", "Rotkohl": "purple",
-  "Spitzkohl": "green", "Blumenkohl": "beige", "Brokkoli": "green", "Rosenkohl": "green",
+  "Knollensellerie": "orange", "Kohlrabi": "green", "Weißkohl": "green", "Rotkohl": "purple",
+  "Spitzkohl": "green", "Blumenkohl": "yellow", "Brokkoli": "green", "Rosenkohl": "green",
   "Wirsing": "green", "Spinat": "green", "Mangold": "green", "Feldsalat": "green",
   "Kopfsalat": "green", "Rucola": "green", "Eisbergsalat": "green", "Romanasalat": "green",
-  "Champignons": "beige", "Pilze": "beige", "Pfifferlinge": "orange", "Kürbis": "orange",
-  "Pastinake": "beige", "Rote Bete": "purple", "Radieschen": "red", "Rettich": "beige",
-  "Fenchel": "green", "Spargel": "beige", "Grüne Bohnen": "green", "Zuckerschoten": "green",
-  "Ingwer": "beige", "Chilischote": "red", "Petersilie": "green", "Basilikum": "green",
+  "Champignons": "yellow", "Pilze": "orange", "Pfifferlinge": "orange", "Kürbis": "orange",
+  "Pastinake": "yellow", "Rote Bete": "purple", "Radieschen": "red", "Rettich": "yellow",
+  "Fenchel": "green", "Spargel": "yellow", "Grüne Bohnen": "green", "Zuckerschoten": "green",
+  "Ingwer": "orange", "Chilischote": "red", "Petersilie": "green", "Basilikum": "green",
   "Schnittlauch": "green", "Dill": "green", "Koriander": "green", "Minze": "green",
   "Rosmarin": "green", "Thymian": "green", "Salbei": "green", "Zitrone": "yellow",
   "Limette": "green", "Orange": "orange", "Apfel": "red", "Banane": "yellow",
   "Birne": "green", "Erdbeeren": "red", "Himbeeren": "red", "Blaubeeren": "blue",
   "Weintrauben": "green", "Pfirsich": "orange", "Nektarine": "orange", "Pflaume": "purple",
   "Kirschen": "red", "Mango": "orange", "Ananas": "yellow", "Avocado": "green",
-  "Wassermelone": "red", "Kiwi": "green", "Datteln": "beige", "Feige": "purple",
+  "Wassermelone": "red", "Kiwi": "green", "Datteln": "orange", "Feige": "purple",
   "Granatapfel": "red",
 
   // ── Brot & Backwaren ─────────────────────────────────────────────────────
-  "Brot": "beige", "Vollkornbrot": "beige", "Toastbrot": "beige", "Baguette": "beige",
-  "Brötchen": "beige", "Fladenbrot": "beige", "Tortillas": "beige", "Wraps": "beige",
-  "Knäckebrot": "beige", "Zwieback": "beige", "Croissant": "yellow", "Burgerbrötchen": "beige",
+  "Brot": "orange", "Vollkornbrot": "orange", "Toastbrot": "yellow", "Baguette": "orange",
+  "Brötchen": "orange", "Fladenbrot": "yellow", "Tortillas": "yellow", "Wraps": "yellow",
+  "Knäckebrot": "orange", "Zwieback": "yellow", "Croissant": "yellow", "Burgerbrötchen": "orange",
 
   // ── Fleisch & Fisch ──────────────────────────────────────────────────────
   "Rindergulasch": "red", "Rinderhackfleisch": "red", "Gemischtes Hackfleisch": "red",
   "Rinderfilet": "red", "Rumpsteak": "red", "Rinderbraten": "red",
   "Schweinefilet": "red", "Schweineschnitzel": "red", "Schweinebauch": "red", "Kasseler": "red",
-  "Hähnchenbrust": "beige", "Hähnchenschenkel": "beige", "Hähnchenkeule": "beige",
-  "Ganzes Hähnchen": "beige", "Putenbrust": "beige", "Entenbrust": "red",
+  "Hähnchenbrust": "yellow", "Hähnchenschenkel": "yellow", "Hähnchenkeule": "yellow",
+  "Ganzes Hähnchen": "yellow", "Putenbrust": "yellow", "Entenbrust": "red",
   "Lammkeule": "red", "Lammkotelett": "red", "Speck": "red", "Speckwürfel": "red",
   "Bacon": "red", "Schinken": "red", "Kochschinken": "red", "Serranoschinken": "red",
-  "Salami": "red", "Bratwurst": "beige", "Chorizo": "red", "Leberwurst": "beige",
-  "Lachsfilet": "orange", "Kabeljau": "beige", "Seelachs": "beige", "Forelle": "beige",
-  "Garnelen": "beige", "Muscheln": "blue", "Tintenfisch": "beige", "Räucherlachs": "orange",
+  "Salami": "red", "Bratwurst": "yellow", "Chorizo": "red", "Leberwurst": "orange",
+  "Lachsfilet": "orange", "Kabeljau": "yellow", "Seelachs": "yellow", "Forelle": "yellow",
+  "Garnelen": "yellow", "Muscheln": "blue", "Tintenfisch": "yellow", "Räucherlachs": "orange",
 
   // ── Kühlregal ────────────────────────────────────────────────────────────
-  "Milch": "beige", "Vollmilch": "beige", "H-Milch": "beige", "Buttermilch": "beige",
-  "Kefir": "beige", "Sahne": "beige", "Schlagsahne": "beige", "Crème fraîche": "beige",
-  "Schmand": "beige", "Saure Sahne": "beige", "Joghurt": "beige", "Naturjoghurt": "beige",
-  "Griechischer Joghurt": "beige", "Skyr": "beige", "Quark": "beige", "Magerquark": "beige",
-  "Frischkäse": "beige", "Butter": "yellow", "Margarine": "yellow", "Butterschmalz": "yellow",
-  "Schweineschmalz": "beige", "Eier": "beige",
-  "Gouda": "yellow", "Emmentaler": "yellow", "Bergkäse": "yellow", "Mozzarella": "beige",
-  "Feta": "beige", "Parmesan": "yellow", "Pecorino": "yellow", "Ricotta": "beige",
-  "Mascarpone": "beige", "Gorgonzola": "beige", "Camembert": "beige", "Brie": "beige",
-  "Halloumi": "beige", "Reibekäse": "yellow", "Frische Hefe": "beige", "Tofu": "beige",
-  "Räuchertofu": "beige", "Blätterteig": "beige", "Pizzateig": "beige",
-  "Hafermilch": "beige", "Sojamilch": "beige", "Mandelmilch": "beige", "Hummus": "beige",
+  "Milch": "yellow", "Vollmilch": "yellow", "H-Milch": "yellow", "Buttermilch": "yellow",
+  "Kefir": "yellow", "Sahne": "yellow", "Schlagsahne": "yellow", "Crème fraîche": "yellow",
+  "Schmand": "yellow", "Saure Sahne": "yellow", "Joghurt": "yellow", "Naturjoghurt": "yellow",
+  "Griechischer Joghurt": "yellow", "Skyr": "yellow", "Quark": "yellow", "Magerquark": "yellow",
+  "Frischkäse": "yellow", "Butter": "yellow", "Margarine": "yellow", "Butterschmalz": "yellow",
+  "Schweineschmalz": "yellow", "Eier": "yellow",
+  "Gouda": "yellow", "Emmentaler": "yellow", "Bergkäse": "yellow", "Mozzarella": "yellow",
+  "Feta": "yellow", "Parmesan": "yellow", "Pecorino": "yellow", "Ricotta": "yellow",
+  "Mascarpone": "yellow", "Gorgonzola": "yellow", "Camembert": "yellow", "Brie": "yellow",
+  "Halloumi": "yellow", "Reibekäse": "yellow", "Frische Hefe": "orange", "Tofu": "yellow",
+  "Räuchertofu": "orange", "Blätterteig": "yellow", "Pizzateig": "yellow",
+  "Hafermilch": "yellow", "Sojamilch": "yellow", "Mandelmilch": "yellow", "Hummus": "yellow",
 
   // ── Tiefkühl ─────────────────────────────────────────────────────────────
   "TK-Erbsen": "green", "TK-Spinat": "green", "TK-Blattspinat": "green",
   "TK-Beeren": "purple", "TK-Himbeeren": "red", "TK-Gemüse": "green",
-  "Pommes frites": "yellow", "Fischstäbchen": "beige", "Vanilleeis": "beige",
-  "Blätterteig (TK)": "beige",
+  "Pommes frites": "yellow", "Fischstäbchen": "orange", "Vanilleeis": "yellow",
+  "Blätterteig (TK)": "yellow",
 
   // ── Konserven & Gläser ───────────────────────────────────────────────────
   "Tomatenmark": "red", "Passierte Tomaten": "red", "Gehackte Tomaten": "red",
-  "Dosentomaten": "red", "Kokosmilch": "beige", "Kidneybohnen": "red",
-  "Kichererbsen (Dose)": "beige", "Weiße Bohnen": "beige", "Mais": "yellow",
-  "Oliven": "green", "Kapern": "green", "Gewürzgurken": "green", "Sauerkraut": "beige",
-  "Rotkohl (Glas)": "purple", "Thunfisch (Dose)": "beige", "Sardellen": "beige",
-  "Erdnussbutter": "beige", "Marmelade": "red", "Honig": "yellow", "Apfelmus": "beige",
-  "Pesto": "green", "Ajvar": "red", "Gemüsebrühe": "beige", "Rinderbrühe": "beige",
-  "Hühnerbrühe": "beige", "Brühe": "beige", "Fond": "beige", "Kalbsfond": "beige",
-  "Tomatensauce": "red", "Sardinen": "beige",
+  "Dosentomaten": "red", "Kokosmilch": "yellow", "Kidneybohnen": "red",
+  "Kichererbsen (Dose)": "yellow", "Weiße Bohnen": "yellow", "Mais": "yellow",
+  "Oliven": "green", "Kapern": "green", "Gewürzgurken": "green", "Sauerkraut": "yellow",
+  "Rotkohl (Glas)": "purple", "Thunfisch (Dose)": "yellow", "Sardellen": "orange",
+  "Erdnussbutter": "orange", "Marmelade": "red", "Honig": "yellow", "Apfelmus": "yellow",
+  "Pesto": "green", "Ajvar": "red", "Gemüsebrühe": "yellow", "Rinderbrühe": "orange",
+  "Hühnerbrühe": "yellow", "Brühe": "yellow", "Fond": "orange", "Kalbsfond": "orange",
+  "Tomatensauce": "red", "Sardinen": "yellow",
 
   // ── Nudeln, Reis & Trockenware ───────────────────────────────────────────
   "Nudeln": "yellow", "Spaghetti": "yellow", "Penne": "yellow", "Fusilli": "yellow",
   "Tagliatelle": "yellow", "Lasagneplatten": "yellow", "Spätzle": "yellow",
-  "Reis": "beige", "Basmatireis": "beige", "Risottoreis": "beige", "Milchreis": "beige",
-  "Couscous": "beige", "Bulgur": "beige", "Quinoa": "beige", "Polenta": "beige",
-  "Haferflocken": "beige", "Müsli": "beige", "Cornflakes": "beige", "Linsen": "beige",
-  "Rote Linsen": "red", "Belugalinsen": "beige", "Berglinsen": "green",
-  "Semmelbrösel": "beige", "Paniermehl": "beige", "Mehl": "beige", "Weizenmehl": "beige",
-  "Dinkelmehl": "beige", "Vollkornmehl": "beige", "Grieß": "beige", "Speisestärke": "beige",
-  "Kartoffelstärke": "beige", "Saucenbinder": "beige", "Walnüsse": "beige",
-  "Haselnüsse": "beige", "Mandeln": "beige", "Gemahlene Mandeln": "beige",
-  "Cashewkerne": "beige", "Pinienkerne": "beige", "Sonnenblumenkerne": "beige",
-  "Kürbiskerne": "beige", "Sesam": "beige", "Leinsamen": "beige", "Chiasamen": "beige",
-  "Rosinen": "purple", "Trockenhefe": "beige", "Backpulver": "beige", "Natron": "beige",
-  "Kokosraspeln": "beige", "Getrocknete Tomaten": "red", "getrocknete Aprikosen": "orange",
+  "Reis": "yellow", "Basmatireis": "yellow", "Risottoreis": "yellow", "Milchreis": "yellow",
+  "Couscous": "yellow", "Bulgur": "orange", "Quinoa": "yellow", "Polenta": "yellow",
+  "Haferflocken": "yellow", "Müsli": "orange", "Cornflakes": "yellow", "Linsen": "orange",
+  "Rote Linsen": "red", "Belugalinsen": "orange", "Berglinsen": "green",
+  "Semmelbrösel": "orange", "Paniermehl": "orange", "Mehl": "yellow", "Weizenmehl": "yellow",
+  "Dinkelmehl": "yellow", "Vollkornmehl": "orange", "Grieß": "yellow", "Speisestärke": "yellow",
+  "Kartoffelstärke": "yellow", "Saucenbinder": "yellow", "Walnüsse": "orange",
+  "Haselnüsse": "orange", "Mandeln": "orange", "Gemahlene Mandeln": "yellow",
+  "Cashewkerne": "yellow", "Pinienkerne": "yellow", "Sonnenblumenkerne": "orange",
+  "Kürbiskerne": "orange", "Sesam": "yellow", "Leinsamen": "orange", "Chiasamen": "orange",
+  "Rosinen": "purple", "Trockenhefe": "orange", "Backpulver": "yellow", "Natron": "yellow",
+  "Kokosraspeln": "yellow", "Getrocknete Tomaten": "red", "getrocknete Aprikosen": "orange",
 
   // ── Backen & Süßes ───────────────────────────────────────────────────────
-  "Zucker": "beige", "Puderzucker": "beige", "Brauner Zucker": "beige",
-  "Vanillezucker": "beige", "Vanilleschote": "beige", "Vanilleextrakt": "beige",
-  "Zartbitterschokolade": "beige", "Vollmilchschokolade": "beige", "Kuvertüre": "beige",
-  "Schokoladenraspel": "beige", "Kakaopulver": "beige", "Marzipan": "beige",
-  "Gelatine": "beige", "Agar-Agar": "beige", "Ahornsirup": "orange",
-  "Agavendicksaft": "beige", "Zuckerrübensirup": "beige", "Rohrzucker": "beige",
+  "Zucker": "yellow", "Puderzucker": "yellow", "Brauner Zucker": "orange",
+  "Vanillezucker": "yellow", "Vanilleschote": "orange", "Vanilleextrakt": "orange",
+  "Zartbitterschokolade": "orange", "Vollmilchschokolade": "orange", "Kuvertüre": "orange",
+  "Schokoladenraspel": "orange", "Kakaopulver": "orange", "Marzipan": "yellow",
+  "Gelatine": "yellow", "Agar-Agar": "yellow", "Ahornsirup": "orange",
+  "Agavendicksaft": "yellow", "Zuckerrübensirup": "orange", "Rohrzucker": "orange",
 
   // ── Gewürze, Öle & Saucen ────────────────────────────────────────────────
-  "Salz": "beige", "Meersalz": "beige", "Pfeffer": "beige", "schwarzer Pfeffer": "beige",
+  "Salz": "yellow", "Meersalz": "yellow", "Pfeffer": "orange", "schwarzer Pfeffer": "orange",
   "Paprikapulver": "red", "Currypulver": "yellow", "scharfes Currypulver": "red",
-  "Kurkuma": "yellow", "Kreuzkümmel": "beige", "Kümmel": "beige", "Koriandersamen": "beige",
-  "Muskatnuss": "beige", "Zimt": "beige", "Nelken": "beige", "Gewürznelke": "beige",
+  "Kurkuma": "yellow", "Kreuzkümmel": "orange", "Kümmel": "orange", "Koriandersamen": "orange",
+  "Muskatnuss": "orange", "Zimt": "orange", "Nelken": "orange", "Gewürznelke": "orange",
   "Kardamom": "green", "Lorbeerblatt": "green", "Lorbeerblätter": "green",
   "Wacholderbeeren": "purple", "Wacholderbeere": "purple", "Senfkörner": "yellow",
   "Chiliflocken": "red", "Cayennepfeffer": "red", "Getrockneter Oregano": "green",
   "Getrockneter Thymian": "green", "Getrockneter Rosmarin": "green", "Majoran": "green",
   "Italienische Kräuter": "green", "Kräuter der Provence": "green", "Currypaste": "red",
-  "Olivenöl": "green", "Rapsöl": "yellow", "Sonnenblumenöl": "yellow", "Sesamöl": "beige",
-  "Kokosöl": "beige", "Essig": "beige", "Bratöl": "yellow", "Balsamico": "beige",
-  "Weißweinessig": "beige", "Apfelessig": "beige", "Senf": "yellow", "Dijonsenf": "yellow",
-  "Ketchup": "red", "Mayonnaise": "beige", "Sojasauce": "beige", "Fischsauce": "beige",
-  "Worcestershiresauce": "beige", "Tabasco": "red", "Sriracha": "red", "Harissa": "red",
-  "Tahini": "beige", "Zitronensaft": "yellow", "Gemahlener Kreuzkümmel": "beige",
+  "Olivenöl": "green", "Rapsöl": "yellow", "Sonnenblumenöl": "yellow", "Sesamöl": "yellow",
+  "Kokosöl": "yellow", "Essig": "yellow", "Bratöl": "yellow", "Balsamico": "orange",
+  "Weißweinessig": "yellow", "Apfelessig": "yellow", "Senf": "yellow", "Dijonsenf": "yellow",
+  "Ketchup": "red", "Mayonnaise": "yellow", "Sojasauce": "orange", "Fischsauce": "orange",
+  "Worcestershiresauce": "orange", "Tabasco": "red", "Sriracha": "red", "Harissa": "red",
+  "Tahini": "yellow", "Zitronensaft": "yellow", "Gemahlener Kreuzkümmel": "orange",
 
   // ── Getränke ─────────────────────────────────────────────────────────────
   "Mineralwasser": "blue", "Wasser": "blue", "Rotwein": "red", "Weißwein": "yellow",
   "Sekt": "yellow", "Bier": "yellow", "Apfelsaft": "yellow", "Orangensaft": "orange",
-  "Tomatensaft": "red", "Kaffee": "beige", "Espresso": "beige", "Tee": "beige",
-  "Cola": "beige", "Tonic Water": "blue", "Wodka": "blue", "Rum": "beige",
-  "Weinbrand": "beige", "Portwein": "purple", "Sherry": "beige", "Mirin": "beige",
+  "Tomatensaft": "red", "Kaffee": "orange", "Espresso": "orange", "Tee": "yellow",
+  "Cola": "orange", "Tonic Water": "blue", "Wodka": "blue", "Rum": "orange",
+  "Weinbrand": "orange", "Portwein": "purple", "Sherry": "yellow", "Mirin": "yellow",
 
   // ── Haushalt ─────────────────────────────────────────────────────────────
-  "Backpapier": "beige", "Alufolie": "beige", "Frischhaltefolie": "beige",
-  "Küchenrolle": "beige", "Gefrierbeutel": "blue", "Zahnstocher": "beige",
-  "Küchengarn": "beige", "Müllbeutel": "beige", "Spülmittel": "blue",
+  "Backpapier": "orange", "Alufolie": "yellow", "Frischhaltefolie": "yellow",
+  "Küchenrolle": "yellow", "Gefrierbeutel": "blue", "Zahnstocher": "yellow",
+  "Küchengarn": "orange", "Müllbeutel": "orange", "Spülmittel": "blue",
 };
 
 export function colorFor(name) {
-  return COLORS[name] ?? "beige";
+  return COLORS[name] ?? "yellow";
 }
 
 /**
- * Komplementärpaare auf dem (vereinfachten Sieben-Ton-)Farbkreis. Beige hat
- * keinen sinnvollen Gegenpart und bleibt bei sich selbst.
+ * Komplementärpaare auf dem (vereinfachten Sechs-Ton-)Farbkreis.
  */
 export const COMPLEMENT = {
   green: "red", red: "green",
   yellow: "purple", purple: "yellow",
   orange: "blue", blue: "orange",
-  beige: "beige",
 };
 
 /**

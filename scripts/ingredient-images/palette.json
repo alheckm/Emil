@@ -3,7 +3,6 @@
   "yellow": { "hex": "#F7EBB8", "prompt": "soft pastel butter-yellow" },
   "orange": { "hex": "#F6DDBE", "prompt": "soft pastel peach-orange" },
   "red": { "hex": "#F3D6D6", "prompt": "soft pastel dusty-rose red" },
-  "beige": { "hex": "#EEE3D2", "prompt": "soft pastel warm beige" },
   "blue": { "hex": "#D7E5F0", "prompt": "soft pastel powder-blue" },
   "purple": { "hex": "#E4D8EC", "prompt": "soft pastel lilac-purple" }
 }
