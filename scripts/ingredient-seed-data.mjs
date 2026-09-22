@@ -17,8 +17,7 @@ export const CATEGORIES = [
   { id: "konserven", name: "Konserven & Gläser", sortOrder: 60 },
   { id: "trockenware", name: "Nudeln, Reis & Trockenware", sortOrder: 70 },
   { id: "backen", name: "Backen & Süßes", sortOrder: 80 },
-  { id: "gewuerze", name: "Gewürze, Öle & Saucen", sortOrder: 90 },
-  { id: "noch-vorraetig", name: "Noch vorrätig?", sortOrder: 95 },
+  { id: "gewuerze", name: "Gewürze und Öle", sortOrder: 90 },
   { id: "getraenke", name: "Getränke", sortOrder: 100 },
   { id: "haushalt", name: "Haushalt", sortOrder: 110 },
   { id: "sonstiges", name: "Sonstiges", sortOrder: 999 },
@@ -29,7 +28,7 @@ export const CATEGORIES = [
  * ein Rezept auf der Liste (siehe pantry_staple in
  * supabase/migrations/0020_vorrat_und_ausschluss.sql), von Hand ergänzen
  * bleibt möglich. Bewusst eine eigene Liste statt einer eigenen Abteilung:
- * ihre Abteilung bleibt „Gewürze, Öle & Saucen", nur das Verhalten ändert sich.
+ * ihre Abteilung bleibt „Gewürze und Öle", nur das Verhalten ändert sich.
  */
 export const PANTRY_STAPLES = ["Salz", "Meersalz", "Pfeffer", "Olivenöl"];
 
@@ -102,20 +101,17 @@ export const INGREDIENTS = {
     "Schokoladenraspel", "Kakaopulver", "Marzipan", "Gelatine", "Agar-Agar",
     "Ahornsirup", "Agavendicksaft", "Zuckerrübensirup", "Rohrzucker",
   ],
+  // Gewürze, Öle und Brühe: fast immer schon ein Rest davon da. ListView
+  // zeigt die ganze Abteilung deshalb unter „Noch vorrätig?" statt zwischen
+  // den übrigen offenen Zeilen (siehe STOCK_CHECK_CATEGORY_ID in ListView.tsx).
+  // Saucen und Essig-Alternativen wie Senf gehören bewusst nicht dazu — die
+  // werden tatsächlich leer und regelmäßig nachgekauft, landen also unten bei
+  // „sonstiges" und damit ganz normal auf der Liste.
   gewuerze: [
-    "Salz", "Meersalz", "Pfeffer", "Currypaste", "Olivenöl", "Rapsöl",
-    "Sonnenblumenöl", "Sesamöl", "Kokosöl", "Essig", "Balsamico",
-    "Weißweinessig", "Apfelessig", "Senf", "Dijonsenf", "Ketchup", "Mayonnaise",
-    "Sojasauce", "Fischsauce", "Worcestershiresauce", "Tabasco", "Sriracha",
-    "Harissa", "Tahini", "Zitronensaft",
-  ],
-  // Gewürze und Brühe: fast immer schon ein Rest davon da — die verdienen vor
-  // dem Losgehen einen Blick in den Vorrat, statt unter den übrigen Zutaten
-  // der Abteilung „Gewürze, Öle & Saucen" zu verschwinden (anders als Öle,
-  // Essige und Saucen, die tatsächlich leer werden).
-  "noch-vorraetig": [
-    "Paprikapulver", "Currypulver", "Kurkuma", "Kreuzkümmel", "Kümmel",
-    "Koriandersamen", "Muskatnuss", "Zimt", "Nelken", "Kardamom",
+    "Salz", "Meersalz", "Pfeffer", "Olivenöl", "Rapsöl", "Sonnenblumenöl",
+    "Sesamöl", "Kokosöl", "Essig", "Balsamico", "Weißweinessig", "Apfelessig",
+    "Zitronensaft", "Paprikapulver", "Currypulver", "Kurkuma", "Kreuzkümmel",
+    "Kümmel", "Koriandersamen", "Muskatnuss", "Zimt", "Nelken", "Kardamom",
     "Lorbeerblatt", "Wacholderbeeren", "Senfkörner", "Chiliflocken",
     "Cayennepfeffer", "Getrockneter Oregano", "Getrockneter Thymian",
     "Getrockneter Rosmarin", "Majoran", "Italienische Kräuter",
@@ -130,5 +126,10 @@ export const INGREDIENTS = {
   haushalt: [
     "Backpapier", "Alufolie", "Frischhaltefolie", "Küchenrolle", "Gefrierbeutel",
     "Zahnstocher", "Küchengarn", "Müllbeutel", "Spülmittel",
+  ],
+  sonstiges: [
+    "Currypaste", "Senf", "Dijonsenf", "Ketchup", "Mayonnaise", "Sojasauce",
+    "Fischsauce", "Worcestershiresauce", "Tabasco", "Sriracha", "Harissa",
+    "Tahini",
   ],
 };

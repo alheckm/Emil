@@ -32,13 +32,15 @@ import { CloseIcon, MinusIcon, PlusIcon } from "@/components/icons";
 // Häkchen noch wahrzunehmen, kurz genug, um nicht wie ein Hänger zu wirken.
 const CHECKED_SECTION_DELAY_MS = 500;
 
-// Gewürze und Brühe: fast immer schon ein Rest davon da. Die bekommen einen
-// eigenen Abschnitt direkt über „Eingekauft" statt zwischen den übrigen
-// offenen Zeilen zu stehen — ein kurzer Blick in den Vorrat, bevor man sie
-// dem Wocheneinkauf zuschlägt. Von Hand ergänzt landet trotzdem oben im
-// Hauptteil (siehe `openEntries`/`stockCheckEntries` unten): wer „Salz" oder
-// „Curry" von Hand einträgt, meint das jetzt, nicht „vielleicht ist noch was da".
-const STOCK_CHECK_CATEGORY_ID = "noch-vorraetig";
+// Die Abteilung „Gewürze und Öle" (Gewürze, Öle, Essig, Brühe — nicht aber
+// Saucen, die unter „Sonstiges" laufen, siehe ingredient-seed-data.mjs) bekommt
+// einen eigenen Abschnitt direkt über „Eingekauft" statt zwischen den übrigen
+// offenen Zeilen zu stehen — ein kurzer Blick in den Vorrat, bevor man sie dem
+// Wocheneinkauf zuschlägt. Von Hand ergänzt landet trotzdem oben im Hauptteil
+// (siehe `openEntries`/`stockCheckEntries` unten): wer „Salz" oder „Curry" von
+// Hand einträgt, meint das jetzt, nicht „vielleicht ist noch was da". Keine
+// eigene Abteilung dafür — nur diese eine wird unter anderer Überschrift gezeigt.
+const STOCK_CHECK_CATEGORY_ID = "gewuerze";
 
 /**
  * Die Einkaufsliste, wie sie im Supermarkt benutzt wird.
@@ -62,10 +64,11 @@ const STOCK_CHECK_CATEGORY_ID = "noch-vorraetig";
  * - **Ein Raster, nach Abteilung geordnet — ohne Überschriften.** Die
  *   Abteilung entscheidet nur die Reihenfolge der Kacheln, nicht ob dazwischen
  *   eine Zeile mit ihrem Namen steht. Die Liste besteht ausschließlich aus
- *   Kacheln — mit einer Ausnahme: Zutaten der Abteilung „Noch vorrätig?"
- *   (Gewürze, Brühe) stehen in einem eigenen Abschnitt direkt über
- *   „Eingekauft", weil man die eher noch im Schrank hat als den Rest der
- *   Liste. Von Hand ergänzt umgeht das bewusst — siehe `STOCK_CHECK_CATEGORY_ID`.
+ *   Kacheln — mit einer Ausnahme: Zutaten der Abteilung „Gewürze und Öle"
+ *   stehen in einem eigenen Abschnitt direkt über „Eingekauft", unter der
+ *   Überschrift „Noch vorrätig?" — weil man die eher noch im Schrank hat als
+ *   den Rest der Liste. Von Hand ergänzt umgeht das bewusst — siehe
+ *   `STOCK_CHECK_CATEGORY_ID`.
  * - **Details per Longpress.** Gehalten (500 ms) öffnet eine Leiste vom
  *   unteren Bildschirmrand mit Mengen-Stepper, Herkunft, Abteilung (für jede
  *   Zutat änderbar, nicht nur eigene — Migration 0019) und „von der Liste
