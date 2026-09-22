@@ -204,10 +204,18 @@ def main() -> int:
     for name, hex_code in colors.items():
         slug = slugify(name)
         src = RAW / f"{slug}.png"
-        if not src.exists():
-            missing.append(name)
-            continue
         dst = OUT / f"{slug}.webp"
+        if not src.exists():
+            # Kein Rohbild (mehr) da — z. B. waehrend eines Teil-Neulaufs, bei
+            # dem raw/ erst nach und nach wieder befuellt wird. Ein frueher
+            # Chip bleibt dann gueltig und darf nicht aus der Tabelle fallen,
+            # nur weil gerade kein Rohbild vorliegt.
+            if dst.exists():
+                total_bytes += dst.stat().st_size
+                written.append((name, slug))
+            else:
+                missing.append(name)
+            continue
         target = hex_to_rgb(hex_code)
         to_chip(Image.open(src), target).save(dst, "WEBP", quality=QUALITY, method=6)
         total_bytes += dst.stat().st_size
