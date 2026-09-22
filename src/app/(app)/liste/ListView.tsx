@@ -26,7 +26,7 @@ import { Section, Notice } from "@/components/ui";
 // Wie lange eine frisch abgehakte Kachel an ihrem Platz stehen bleibt, bevor
 // sie in den Abschnitt „Eingekauft" wandert — lang genug, um das eigene
 // Häkchen noch wahrzunehmen, kurz genug, um nicht wie ein Hänger zu wirken.
-const CHECKED_SECTION_DELAY_MS = 1500;
+const CHECKED_SECTION_DELAY_MS = 3000;
 
 /**
  * Die Einkaufsliste, wie sie im Supermarkt benutzt wird.
@@ -89,16 +89,16 @@ export function ListView({
     {},
   );
 
-  // Läuft vor jedem erneuten Aufsetzen (also bei jedem neuen `entries` von
-  // Server, direkt nachdem der Render-Zweig unten `sectionChecked` schon
-  // zurückgesetzt hat) und beim Unmount — nie während des Renderns selbst,
-  // das verbietet der `react-hooks/refs`-Lint.
+  // Nur beim Unmount aufräumen — nicht bei jedem neuen `entries` von Server:
+  // Ein Refresh (eigener Toggle, Realtime, Outbox-Sync — davon laufen pro
+  // Antippen mehrere) darf den laufenden Timer nicht kappen, sonst wandert
+  // die Kachel nie in den Abschnitt „Eingekauft".
   useEffect(() => {
+    const timers = sectionTimers.current;
     return () => {
-      Object.values(sectionTimers.current).forEach(clearTimeout);
-      sectionTimers.current = {};
+      Object.values(timers).forEach(clearTimeout);
     };
-  }, [entries]);
+  }, []);
 
   // Longpress statt „⋯"-Knopf: gehalten öffnet die Details, kurz angetippt
   // hakt ab. `longPressed` unterscheidet die beiden — der native Klick, der
@@ -156,14 +156,19 @@ export function ListView({
   // bevor die frischen Daten da sind — und die abgehakte Zeile blitzte für
   // einen Moment wieder auf. Hier fällt der vorgezogene Stand erst, wenn die
   // neuen Daten wirklich anliegen.
+  // `sectionChecked`/`checkedAtNow` werden hier bewusst NICHT zurückgesetzt:
+  // Sobald der Server den Toggle bestätigt (meist deutlich vor Ablauf der
+  // Verzögerung), stünde `entry.checked` sonst schon auf `true`, und die
+  // Kachel würde sofort in den Abschnitt springen statt die Verzögerung
+  // abzuwarten. Beide Zustände tragen für jede angefasste Zeile immer einen
+  // expliziten Wert (siehe `scheduleSection`), sind also nie von frischen
+  // Serverdaten abhängig.
   const [shownEntries, setShownEntries] = useState(entries);
   if (shownEntries !== entries) {
     setShownEntries(entries);
     setCheckedNow({});
     setRemoved(new Set());
     setAdding([]);
-    setSectionChecked({});
-    setCheckedAtNow({});
   }
 
   const online = useOnlineStatus();
@@ -238,13 +243,16 @@ export function ListView({
       clearTimeout(existing);
       delete sectionTimers.current[entryId];
     }
+    // Sofort explizit offen setzen, in beiden Fällen: beim Abwählen bleibt es
+    // dabei, beim Abhaken hält es die Kachel an ihrem Platz, bis der Timer
+    // unten sie freigibt. Ohne dieses explizite `false` würde die Kachel
+    // sofort springen, sobald der Server den Toggle bestätigt.
+    setSectionChecked((current) => ({ ...current, [entryId]: false }));
     if (next) {
       sectionTimers.current[entryId] = setTimeout(() => {
         delete sectionTimers.current[entryId];
         setSectionChecked((current) => ({ ...current, [entryId]: true }));
       }, CHECKED_SECTION_DELAY_MS);
-    } else {
-      setSectionChecked((current) => ({ ...current, [entryId]: false }));
     }
   }
 
