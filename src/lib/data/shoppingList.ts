@@ -43,8 +43,13 @@ export interface ListEntry {
   categoryId: string | null;
   categoryName: string;
   categorySortOrder: number;
-  /** Nur eigene Zutaten sind umsortierbar — der globale Seed gehört allen. */
-  categoryEditable: boolean;
+  /**
+   * Ob die Zutat dem eigenen Haushalt gehört (sonst globaler Seed) —
+   * entscheidet nur noch, welcher Weg beim Ändern der Abteilung greift
+   * (direktes Update vs. `household_ingredient_categories`), nicht mehr, ob
+   * sich die Abteilung überhaupt ändern lässt (Migration 0019).
+   */
+  categoryOwnedByHousehold: boolean;
   sources: ListSource[];
 }
 
@@ -97,55 +102,87 @@ interface EntryRow {
   }[];
 }
 
+interface CategoryOverrideRow {
+  ingredient_id: string;
+  categories: { id: string; name: string; sort_order: number } | null;
+}
+
 /**
  * Alle Zeilen der Liste, sortiert wie der Weg durch den Supermarkt:
  * Abteilung, dann Name. Das ist die Grundordnung — ListView schiebt
  * Abgehaktes danach ans Ende, ohne diese Reihenfolge sonst anzutasten.
  * Mehr als 20 Abgehakte gibt es serverseitig ohnehin nicht: `set_entry_checked`
  * löscht die ältesten, sobald ein 21. dazukommt (Migration 0016).
+ *
+ * Die Abteilung einer Zeile kommt normalerweise von ihrer Zutat
+ * (`ingredients.category_id`) — außer der Haushalt hat für genau diese Zutat
+ * eine eigene Wahl in `household_ingredient_categories` hinterlegt
+ * (Migration 0019, für globale Zutaten aus dem Seed: die gehören allen
+ * Haushalten, ihre Abteilung ändert sich also nicht direkt). Diese Wahl
+ * überlagert die Grundabteilung hier beim Lesen, bevor sortiert wird.
  */
 export async function listEntries(
   supabase: SupabaseClient,
   listId: string,
+  householdId: string,
 ): Promise<Result<ListEntry[]>> {
-  const { data, error } = await supabase
-    .from("shopping_list_entry_totals")
-    .select(
-      `id, ingredient_id, merge_unit, total_amount::text, has_unquantified,
-       checked, checked_at, note, is_manual, updated_at,
-       ingredients ( display_name, household_id, category_id,
-                     categories ( name, sort_order ) ),
-       shopping_list_sources ( recipe_id, servings, amount_base::text,
-                               recipes ( title ) )`,
-    )
-    .eq("list_id", listId);
+  const [entriesResult, overridesResult] = await Promise.all([
+    supabase
+      .from("shopping_list_entry_totals")
+      .select(
+        `id, ingredient_id, merge_unit, total_amount::text, has_unquantified,
+         checked, checked_at, note, is_manual, updated_at,
+         ingredients ( display_name, household_id, category_id,
+                       categories ( name, sort_order ) ),
+         shopping_list_sources ( recipe_id, servings, amount_base::text,
+                                 recipes ( title ) )`,
+      )
+      .eq("list_id", listId),
+    supabase
+      .from("household_ingredient_categories")
+      .select("ingredient_id, categories ( id, name, sort_order )")
+      .eq("household_id", householdId),
+  ]);
 
-  if (error) return fail(dataErrorMessage(error));
+  if (entriesResult.error) return fail(dataErrorMessage(entriesResult.error));
+  if (overridesResult.error) return fail(dataErrorMessage(overridesResult.error));
 
-  const entries = ((data ?? []) as unknown as EntryRow[]).map((row) => ({
-    id: row.id,
-    ingredientId: row.ingredient_id,
-    name: row.ingredients?.display_name ?? "Unbekannte Zutat",
-    mergeUnit: row.merge_unit,
-    amount: row.total_amount,
-    hasUnquantified: row.has_unquantified,
-    checked: row.checked,
-    checkedAt: row.checked_at,
-    note: row.note,
-    isManual: row.is_manual,
-    updatedAt: row.updated_at,
-    categoryId: row.ingredients?.category_id ?? null,
-    categoryName: row.ingredients?.categories?.name ?? FALLBACK_CATEGORY.name,
-    categorySortOrder:
-      row.ingredients?.categories?.sort_order ?? FALLBACK_CATEGORY.sortOrder,
-    categoryEditable: row.ingredients?.household_id != null,
-    sources: (row.shopping_list_sources ?? []).map((source) => ({
-      recipeId: source.recipe_id,
-      recipeTitle: source.recipes?.title ?? null,
-      servings: source.servings,
-      amount: source.amount_base,
-    })),
-  }));
+  const overrides = new Map(
+    ((overridesResult.data ?? []) as unknown as CategoryOverrideRow[])
+      .filter((row) => row.categories !== null)
+      .map((row) => [row.ingredient_id, row.categories as NonNullable<CategoryOverrideRow["categories"]>]),
+  );
+
+  const entries = ((entriesResult.data ?? []) as unknown as EntryRow[]).map((row) => {
+    const override = overrides.get(row.ingredient_id);
+    return {
+      id: row.id,
+      ingredientId: row.ingredient_id,
+      name: row.ingredients?.display_name ?? "Unbekannte Zutat",
+      mergeUnit: row.merge_unit,
+      amount: row.total_amount,
+      hasUnquantified: row.has_unquantified,
+      checked: row.checked,
+      checkedAt: row.checked_at,
+      note: row.note,
+      isManual: row.is_manual,
+      updatedAt: row.updated_at,
+      categoryId: override?.id ?? row.ingredients?.category_id ?? null,
+      categoryName:
+        override?.name ?? row.ingredients?.categories?.name ?? FALLBACK_CATEGORY.name,
+      categorySortOrder:
+        override?.sort_order ??
+        row.ingredients?.categories?.sort_order ??
+        FALLBACK_CATEGORY.sortOrder,
+      categoryOwnedByHousehold: row.ingredients?.household_id != null,
+      sources: (row.shopping_list_sources ?? []).map((source) => ({
+        recipeId: source.recipe_id,
+        recipeTitle: source.recipes?.title ?? null,
+        servings: source.servings,
+        amount: source.amount_base,
+      })),
+    };
+  });
 
   entries.sort(
     (a, b) =>
@@ -303,6 +340,29 @@ export async function setIngredientCategory(
     .from("ingredients")
     .update({ category_id: categoryId })
     .eq("id", ingredientId);
+  return error ? fail(dataErrorMessage(error)) : ok(undefined);
+}
+
+/**
+ * Abteilung einer globalen Zutat nur für den eigenen Haushalt festlegen
+ * (Migration 0019) — das Gegenstück zu `setIngredientCategory` für Zutaten,
+ * die nicht dem Haushalt gehören und darum nicht direkt umgehängt werden
+ * dürfen. `upsert` statt `insert`: eine zweite Wahl ersetzt die erste, statt
+ * an der Primärschlüssel-Kollision zu scheitern.
+ */
+export async function setHouseholdIngredientCategory(
+  supabase: SupabaseClient,
+  householdId: string,
+  ingredientId: string,
+  categoryId: string,
+): Promise<Result> {
+  const { error } = await supabase
+    .from("household_ingredient_categories")
+    .upsert({
+      household_id: householdId,
+      ingredient_id: ingredientId,
+      category_id: categoryId,
+    });
   return error ? fail(dataErrorMessage(error)) : ok(undefined);
 }
 

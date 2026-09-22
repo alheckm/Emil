@@ -1,7 +1,7 @@
 "use client";
 
 import { startTransition, useEffect, useRef, useState } from "react";
-import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { formatAmount } from "@/lib/core/format";
 import { ingredientImage } from "@/lib/core/ingredientImages";
@@ -19,24 +19,13 @@ import {
   deleteEntry,
   setEntryAmount,
   setEntryChecked,
+  setHouseholdIngredientCategory,
   setIngredientCategory,
   type Category,
   type ListEntry,
 } from "@/lib/data/shoppingList";
 import { Section, Notice } from "@/components/ui";
-import {
-  ChevronRightIcon,
-  CloseIcon,
-  MinusIcon,
-  PlusIcon,
-  TrashIcon,
-} from "@/components/icons";
-
-/** Breite der Wischaktionen hinter der Kachel — CSS-Übergang und Geste
- * beziehen sich beide auf dieselbe Zahl (siehe `swipe-front` in globals.css). */
-const SWIPE_REVEAL_PX = 96;
-/** Ab dieser waagerechten Strecke zählt eine Bewegung als Wisch, nicht als Tipp. */
-const SWIPE_THRESHOLD_PX = 30;
+import { CloseIcon, MinusIcon, PlusIcon } from "@/components/icons";
 
 // Wie lange eine frisch abgehakte Kachel an ihrem Platz stehen bleibt, bevor
 // sie in den Abschnitt „Eingekauft" wandert — lang genug, um das eigene
@@ -66,13 +55,10 @@ const CHECKED_SECTION_DELAY_MS = 500;
  *   Abteilung entscheidet nur die Reihenfolge der Kacheln, nicht ob dazwischen
  *   eine Zeile mit ihrem Namen steht. Die Liste besteht ausschließlich aus
  *   Kacheln.
- * - **Wischen legt zwei Aktionen frei, kein Longpress.** Eine Kachel nach
- *   links gewischt schiebt sich vor eine schmale Fläche mit „Details" und
- *   „Löschen" — dieselbe Geste wie in nativen Listen (Mail, Erinnerungen).
- *   Ein kurzer Antipper hakt weiterhin ab; ist gerade eine Kachel
- *   aufgewischt, schließt ein Antippen sie nur, statt zusätzlich zu wirken.
- *   „Details" öffnet eine Leiste vom unteren Bildschirmrand mit Mengen-
- *   Stepper, Herkunft und — bei eigenen Zutaten — der Abteilung.
+ * - **Details per Longpress.** Gehalten (500 ms) öffnet eine Leiste vom
+ *   unteren Bildschirmrand mit Mengen-Stepper, Herkunft, Abteilung (für jede
+ *   Zutat änderbar, nicht nur eigene — Migration 0019) und „von der Liste
+ *   nehmen". Ein kurzer Antipper hakt weiterhin ab, wie gehabt.
  */
 export function ListView({
   householdId,
@@ -87,11 +73,7 @@ export function ListView({
 }) {
   const router = useRouter();
   const [error, setError] = useState("");
-  // Welche Kachel gerade nach links gewischt ist (Details/Löschen sichtbar) —
-  // immer höchstens eine, eine neu gewischte schließt die vorige.
-  const [swiped, setSwiped] = useState<string | null>(null);
-  // Welche Zeile die Detailleiste zeigt. Getrennt von `swiped`: „Details"
-  // schließt die Wischaktion sofort, die Leiste bleibt danach für sich.
+  // Welche Zeile die Detailleiste zeigt — geöffnet per Longpress (`startPress`).
   const [openSheet, setOpenSheet] = useState<string | null>(null);
   const [checkedNow, setCheckedNow] = useState<Record<string, boolean>>({});
   // Menge, wie sie der Stepper in der Detailleiste zuletzt gesetzt hat, noch
@@ -125,46 +107,35 @@ export function ListView({
     };
   }, []);
 
-  // Wischen statt Longpress: eine laufende Geste merkt sich nur, wo sie
-  // begonnen hat — ausgewertet wird erst beim Loslassen (`endSwipe`), nicht
-  // laufend während der Bewegung. Das reicht für eine Wischaktion, die nur
-  // zwischen „offen" und „zu" umschaltet, und bleibt robuster als ein Wert,
-  // der dem Finger 1:1 folgt (kein Pointer-Capture, keine Sonderfälle beim
-  // Verlassen der Kachel).
-  const swipeRef = useRef<{
+  // Longpress statt „⋯"-Knopf: gehalten öffnet die Detailleiste, kurz
+  // angetippt hakt ab. `longPressed` unterscheidet die beiden — der native
+  // Klick, der nach dem Loslassen kommt, hakt nur ab, wenn der Timer nicht
+  // schon ausgelöst hat.
+  const pressRef = useRef<{
     id: string | null;
-    startX: number;
-    startY: number;
-  }>({ id: null, startX: 0, startY: 0 });
+    timer: ReturnType<typeof setTimeout> | null;
+    longPressed: boolean;
+  }>({ id: null, timer: null, longPressed: false });
 
-  function startSwipe(entryId: string, event: ReactPointerEvent) {
-    swipeRef.current = {
-      id: entryId,
-      startX: event.clientX,
-      startY: event.clientY,
-    };
+  function startPress(entryId: string) {
+    pressRef.current.id = entryId;
+    pressRef.current.longPressed = false;
+    pressRef.current.timer = setTimeout(() => {
+      pressRef.current.longPressed = true;
+      setOpenSheet(entryId);
+    }, 500);
   }
 
-  function endSwipe(entry: ListEntry, event: ReactPointerEvent) {
-    const gesture = swipeRef.current;
-    swipeRef.current = { id: null, startX: 0, startY: 0 };
-    if (gesture.id !== entry.id) return;
-
-    const dx = event.clientX - gesture.startX;
-    const dy = event.clientY - gesture.startY;
-    const horizontal = Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD_PX;
-
-    if (horizontal) {
-      if (dx < 0) setSwiped(entry.id);
-      else if (swiped === entry.id) setSwiped(null);
-      return;
+  function cancelPress() {
+    if (pressRef.current.timer) {
+      clearTimeout(pressRef.current.timer);
+      pressRef.current.timer = null;
     }
+  }
 
-    // Kein Wisch, sondern ein Tipp: ist gerade irgendeine Kachel aufgewischt
-    // (diese oder eine andere), schließt der Tipp nur — er hakt nicht
-    // zusätzlich ab. Wer wirklich abhaken will, tippt danach noch einmal.
-    if (swiped !== null) {
-      setSwiped(null);
+  function tap(entry: ListEntry) {
+    if (pressRef.current.longPressed) {
+      pressRef.current.longPressed = false;
       return;
     }
     void toggle(entry);
@@ -514,132 +485,89 @@ export function ListView({
     ]
       .filter(Boolean)
       .join(" ");
-    const isSwiped = swiped === entry.id;
 
     return (
-      <li key={entry.id} className="relative overflow-hidden rounded-tile">
-        {/* Die Wischaktionen liegen fest hinter der Kachel, in derselben
-            Fläche — nicht als eigene Box daneben. Sichtbar wird die Fläche
-            erst, wenn die Kachel davor nach links wegrutscht. */}
-        <div
-          className="absolute inset-y-0 right-0 flex items-center justify-center gap-1 bg-well"
-          style={{ width: SWIPE_REVEAL_PX }}
-        >
+      <li key={entry.id} className="relative">
+        <div className="flex h-full flex-col overflow-hidden rounded-tile bg-chip">
           <button
             type="button"
-            aria-label={`Details zu ${entry.name}`}
-            onClick={() => {
-              setSwiped(null);
-              setOpenSheet(entry.id);
-            }}
-            className="flex h-11 w-11 items-center justify-center press tap-target"
+            aria-pressed={checked}
+            onPointerDown={() => startPress(entry.id)}
+            onPointerUp={cancelPress}
+            onPointerLeave={cancelPress}
+            onPointerCancel={cancelPress}
+            onContextMenu={(event) => event.preventDefault()}
+            onClick={() => tap(entry)}
+            className="flex select-none flex-col press-flat tap-target touch-manipulation"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-pill bg-soft text-muted">
-              <ChevronRightIcon className="h-4 w-4" />
-            </span>
-          </button>
-          <button
-            type="button"
-            aria-label={`${entry.name} von der Liste nehmen`}
-            onClick={() => {
-              setSwiped(null);
-              removeEntry(entry);
-            }}
-            className="flex h-11 w-11 items-center justify-center press tap-target"
-          >
-            <span className="flex h-9 w-9 items-center justify-center rounded-pill bg-danger/10 text-danger">
-              <TrashIcon className="h-4 w-4" />
-            </span>
-          </button>
-        </div>
+            <span className="relative block aspect-square w-full p-3">
+              <span
+                className={
+                  "flex h-full w-full items-center justify-center overflow-hidden rounded-full " +
+                  // Abgehakt wird das Bild blass, das Häkchen
+                  // darüber bleibt kräftig — sonst verschwindet
+                  // genau die Rückmeldung mit, auf die man wartet.
+                  (checked ? "opacity-40" : "")
+                }
+              >
+                {src ? (
+                  /* Kein next/image: die Datei liegt schon in genau
+                     der Größe im public-Ordner, in der sie gebraucht
+                     wird. Der Optimierer hätte hier nichts zu tun
+                     und käme nur als zusätzliche Runde dazu. */
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={src}
+                    alt=""
+                    width={192}
+                    height={192}
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span
+                    aria-hidden
+                    className="text-[24px] font-medium text-muted"
+                  >
+                    {entry.name.slice(0, 1).toUpperCase()}
+                  </span>
+                )}
+              </span>
 
-        <div
-          role="button"
-          tabIndex={0}
-          aria-pressed={checked}
-          onPointerDown={(event) => startSwipe(entry.id, event)}
-          onPointerUp={(event) => endSwipe(entry, event)}
-          onPointerCancel={() => {
-            swipeRef.current = { id: null, startX: 0, startY: 0 };
-          }}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              if (swiped !== null) setSwiped(null);
-              else void toggle(entry);
-            }
-          }}
-          onContextMenu={(event) => event.preventDefault()}
-          className="swipe-front relative flex select-none flex-col press-flat tap-target touch-manipulation bg-chip"
-          style={{ transform: isSwiped ? `translateX(-${SWIPE_REVEAL_PX}px)` : "translateX(0)" }}
-        >
-          <span className="relative block aspect-square w-full p-3">
-            <span
-              className={
-                "flex h-full w-full items-center justify-center overflow-hidden rounded-full " +
-                // Abgehakt wird das Bild blass, das Häkchen
-                // darüber bleibt kräftig — sonst verschwindet
-                // genau die Rückmeldung mit, auf die man wartet.
-                (checked ? "opacity-40" : "")
-              }
-            >
-              {src ? (
-                /* Kein next/image: die Datei liegt schon in genau
-                   der Größe im public-Ordner, in der sie gebraucht
-                   wird. Der Optimierer hätte hier nichts zu tun
-                   und käme nur als zusätzliche Runde dazu. */
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={src}
-                  alt=""
-                  width={192}
-                  height={192}
-                  loading="lazy"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span
-                  aria-hidden
-                  className="text-[24px] font-medium text-muted"
-                >
-                  {entry.name.slice(0, 1).toUpperCase()}
+              {checked && (
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span
+                    aria-hidden
+                    className="flex h-9 w-9 items-center justify-center rounded-pill bg-accent text-[17px] text-accent-ink"
+                  >
+                    ✓
+                  </span>
                 </span>
               )}
             </span>
 
-            {checked && (
-              <span className="absolute inset-0 flex items-center justify-center">
-                <span
-                  aria-hidden
-                  className="flex h-9 w-9 items-center justify-center rounded-pill bg-accent text-[17px] text-accent-ink"
-                >
-                  ✓
-                </span>
+            <span className="w-full px-2 pb-2 pt-1 text-center">
+              <span
+                className={
+                  "block text-[13px] font-medium leading-tight " +
+                  (checked ? "text-muted line-through" : "")
+                }
+              >
+                {entry.name}
               </span>
-            )}
-          </span>
-
-          <span className="w-full px-2 pb-2 pt-1 text-center">
-            <span
-              className={
-                "block text-[13px] font-medium leading-tight " +
-                (checked ? "text-muted line-through" : "")
-              }
-            >
-              {entry.name}
+              {/* Immer gerendert, notfalls unsichtbar: sonst wird
+                  eine Kachel ohne Menge einen Zeile kürzer als ihre
+                  Nachbarn in derselben Reihe. */}
+              <span
+                className={
+                  "mt-0.5 block text-[13px] leading-tight " +
+                  (menge ? "" : "invisible")
+                }
+              >
+                {menge || " "}
+              </span>
             </span>
-            {/* Immer gerendert, notfalls unsichtbar: sonst wird
-                eine Kachel ohne Menge einen Zeile kürzer als ihre
-                Nachbarn in derselben Reihe. */}
-            <span
-              className={
-                "mt-0.5 block text-[13px] leading-tight " +
-                (menge ? "" : "invisible")
-              }
-            >
-              {menge || " "}
-            </span>
-          </span>
+          </button>
         </div>
       </li>
     );
@@ -718,47 +646,59 @@ export function ListView({
               <p className="text-[13px] text-muted">Von Hand ergänzt.</p>
             )}
 
-            {entry.categoryEditable ? (
-              <label className="block">
-                <span className="text-[13px] text-muted">
-                  Abteilung
-                </span>
-                <select
-                  value={entry.categoryId ?? "sonstiges"}
-                  onChange={(event) =>
-                    run(() => {
-                      const supabase = getBrowserSupabase();
-                      if (!supabase) {
-                        return Promise.resolve({
-                          ok: false,
-                          error: "Supabase ist nicht konfiguriert.",
-                        });
-                      }
-                      return setIngredientCategory(
-                        supabase,
-                        entry.ingredientId,
-                        event.target.value,
-                      );
-                    })
-                  }
-                  className="mt-1 h-11 w-full appearance-none rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
-                >
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-                <span className="mt-1 block text-[13px] text-muted">
-                  Bleibt für diese Zutat gespeichert.
-                </span>
-              </label>
-            ) : (
-              <p className="text-[13px] text-muted">
-                Abteilung „{entry.categoryName}“ — aus der
-                Zutatenliste, für alle Haushalte gleich.
-              </p>
-            )}
+            <label className="block">
+              <span className="text-[13px] text-muted">Abteilung</span>
+              <select
+                value={entry.categoryId ?? "sonstiges"}
+                onChange={(event) =>
+                  run(() => {
+                    const supabase = getBrowserSupabase();
+                    if (!supabase) {
+                      return Promise.resolve({
+                        ok: false,
+                        error: "Supabase ist nicht konfiguriert.",
+                      });
+                    }
+                    // Eigene Zutaten werden direkt umgehängt; globale aus dem
+                    // Seed gehören allen Haushalten, ihre Abteilung ändert
+                    // sich darum nur für den eigenen Haushalt (Migration 0019).
+                    return entry.categoryOwnedByHousehold
+                      ? setIngredientCategory(
+                          supabase,
+                          entry.ingredientId,
+                          event.target.value,
+                        )
+                      : setHouseholdIngredientCategory(
+                          supabase,
+                          householdId,
+                          entry.ingredientId,
+                          event.target.value,
+                        );
+                  })
+                }
+                className="mt-1 h-11 w-full appearance-none rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
+              >
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-[13px] text-muted">
+                Bleibt für diese Zutat gespeichert.
+              </span>
+            </label>
+
+            <button
+              type="button"
+              onClick={() => {
+                setOpenSheet(null);
+                removeEntry(entry);
+              }}
+              className="h-11 w-full rounded-pill border border-danger text-[15px] text-danger press"
+            >
+              Von der Liste nehmen
+            </button>
           </div>
         </div>
       </div>

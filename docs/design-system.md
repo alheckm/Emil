@@ -392,33 +392,42 @@ steht als schmale, volle Zeile über der ersten Kachel, die zu ihr gehört, und
 die Kacheln danach laufen normal weiter — auch über eine unvollständige Reihe
 hinweg.
 
-**Details per Wischen, nicht per Longpress oder „⋯"-Menü.** Zwei frühere
-Durchgänge sind gescheitert: ein `⋯`-Knopf, der die Zusatzinfos *unter der
-ganzen Abteilung* aufklappte (zweimal indirekt — Zusatzknopf neben der
-Trefferfläche, Aufklapp-Ort fern der Kachel), und ein Longpress (500 ms), der
-die gehaltene Kachel per `row-span-2` in ihrer eigenen Spalte nach unten
-wachsen ließ. Beide zeigten die Details *in* der Kachel, an ihrem Platz im
-Raster — das sah neben unveränderten Nachbarn in derselben Reihe seltsam
-aus, und ein Longpress ist obendrein eine Geste ohne sichtbare Ankündigung.
+**Details per Longpress, nicht über ein „⋯"-Menü oder Wischen.** Ein erster
+Durchgang hatte oben rechts auf jeder Kachel einen kleinen `⋯`-Knopf, der die
+Zusatzinfos *unter der ganzen Abteilung* aufklappte — zweimal indirekt: ein
+Zusatzknopf neben der eigentlichen Trefferfläche, und ein Aufklapp-Ort, der
+nicht bei der gehaltenen Kachel lag. Ein Wisch-Durchgang (Details/Löschen
+hinter der nach links geschobenen Kachel, wie in Mail oder Erinnerungen) kam
+der Sache näher, wirkte aber als Geste selbst seltsam — ein Wisch auf einer
+schmalen Foto-Kachel statt einer vollen Listenzeile.
 
-Jetzt wischt man die Kachel wie in nativen Listen (Mail, Erinnerungen): nach
-links gewischt rutscht die Kachel vor eine schmale, feste Fläche
-(`bg-well`, 96 px) mit zwei Kreis-Knöpfen — Chevron-Rechts auf `bg-soft` für
-„Details", Papierkorb auf `bg-danger/10` für „von der Liste nehmen". Ein
-kurzer Antipper hakt weiterhin ab; ist gerade irgendeine Kachel gewischt
-offen, schließt ein Antippen nur sie, statt zusätzlich zu wirken — wer
-wirklich abhaken will, tippt danach noch einmal. „Details" öffnet eine Leiste
-vom unteren Bildschirmrand (`rounded-t-card`, `bg-card` auf einem
-`bg-text/40`-Scrim, kein zusätzlicher Schatten — Abschnitt 1 reserviert
-`--shadow-card` der Rezeptvorschau) mit Mengen-Stepper, Rezeptquellen bzw.
-„Von Hand ergänzt" und, bei eigenen Zutaten, der Abteilung. Der Mengen-Stepper
-folgt derselben Form wie `ServingStepper` (`− Menge +`), rechnet aber in der
-`mergeUnit` der Zeile statt in Portionen und setzt `amount_override`
-(Migration 0018) — die Zahl ersetzt die berechnete Summe aus Rezept- und
-Handanteilen, bis jemand sie erneut ändert. Bei mengenlosen Zeilen
-(`merge_unit = 'ohne'`) entfällt der Stepper, es gibt nichts zu zählen.
-Bekannte Lücke: Wischen und die Leiste sind damit nur per Touch/Maus
-erreichbar, ohne Tastatur-Entsprechung (siehe Abschnitt 12).
+Jetzt hält man die Kachel selbst (500 ms). Anders als in einem früheren
+Durchgang wächst dabei nichts mehr *in* der Kachel oder im Raster — der
+Longpress öffnet direkt eine Leiste vom unteren Bildschirmrand
+(`rounded-t-card`, `bg-card` auf einem `bg-text/40`-Scrim, kein zusätzlicher
+Schatten — Abschnitt 1 reserviert `--shadow-card` der Rezeptvorschau) mit
+Mengen-Stepper, Rezeptquellen bzw. „Von Hand ergänzt", der Abteilung — für
+jede Zutat, nicht nur eigene (siehe unten) — und „Von der Liste nehmen" als
+Kontur-Knopf in `--danger`. Der Mengen-Stepper folgt derselben Form wie
+`ServingStepper` (`− Menge +`), rechnet aber in der `mergeUnit` der Zeile
+statt in Portionen und setzt `amount_override` (Migration 0018) — die Zahl
+ersetzt die berechnete Summe aus Rezept- und Handanteilen, bis jemand sie
+erneut ändert. Bei mengenlosen Zeilen (`merge_unit = 'ohne'`) entfällt der
+Stepper, es gibt nichts zu zählen. Ein kurzer Antipper hakt weiterhin ab, wie
+zuvor — die ganze Kachel bleibt die einzige Trefferfläche. Bekannte Lücke:
+die Leiste ist damit nur per Touch/Maus-Halten erreichbar, ohne
+Tastatur-Entsprechung (siehe Abschnitt 12).
+
+**Die Abteilung lässt sich für jede Zutat ändern, nicht nur eigene.** Eine
+globale Zutat aus dem Seed gehört allen Haushalten gleichzeitig — ihre
+`category_id` direkt umzuhängen würde die Abteilung für jeden anderen
+Haushalt mitverstellen. `household_ingredient_categories` (Migration 0019)
+legt die Wahl stattdessen daneben: eine Abteilung pro Haushalt und Zutat, die
+beim Lesen die globale überlagert, ohne die geteilte Zutat selbst
+anzufassen. Für eigene Zutaten (`household_id` gesetzt) bleibt der direkte
+Weg von vorher (`ingredients.category_id`) — dort gibt es niemanden, dessen
+Abteilung mitrutschen könnte. Die Auswahlliste in der Detailleiste zeigt
+beide Fälle gleich, die Unterscheidung passiert nur beim Schreiben.
 
 ### Bildzuschnitt (ImageCropper)
 `src/app/(app)/rezepte/ImageCropper.tsx`, eingebettet in `RecipeImageField`.
@@ -632,12 +641,12 @@ Arbeitsliste, kein Ist-Zustand. Stand 19.09.2026:
    (`scripts/ingredient-images/`), sichtbar in der Einkaufsliste — dem
    einzigen Ort, an dem sie noch erscheinen (siehe „Zutatenkacheln — nur in
    der Einkaufsliste", Abschnitt 7).
-6. **Die Zusatzinfos einer Einkaufslisten-Zutat (Wischen) haben keine
+6. **Die Zusatzinfos einer Einkaufslisten-Zutat (Longpress) haben keine
    Tastatur-Entsprechung.** Kurzes Antippen hakt weiter über Enter/Leertaste
    ab, aber Menge ändern, Rezeptquellen, Abteilung ändern und „von der Liste
-   nehmen" sind nur per Wisch-Geste (Touch/Maus) erreichbar. Braucht noch
-   einen Weg ohne Zeigegerät — etwa eine Kontextmenü-Taste oder eine zweite,
-   per Tastatur fokussierbare Aktion.
+   nehmen" sind nur per Halten (Touch/Maus) erreichbar. Braucht noch einen
+   Weg ohne Zeigegerät — etwa eine Kontextmenü-Taste oder eine zweite, per
+   Tastatur fokussierbare Aktion.
 7. **Die „Saisonal"-Pille wartet auf den ersten Pflege-Lauf.**
    `recipes.season_months` (Migration 0013) wird jetzt von der automatischen
    Rezept-Pflege befüllt (`docs/plan-rezept-pflege.md`), aber bis der erste

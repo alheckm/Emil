@@ -66,7 +66,7 @@ async function List() {
   }
 
   const [entries, categories] = await Promise.all([
-    listEntries(context.supabase, list.listId),
+    listEntries(context.supabase, list.listId, context.household.id),
     loadCategories(),
   ]);
 
