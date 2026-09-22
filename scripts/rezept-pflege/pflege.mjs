@@ -138,6 +138,15 @@ function findeLuecken(recipe, ingredients) {
   if (unsicher.length > 0) {
     gefunden.push(`${unsicher.length} unsichere Zutatenzeile(n): ${unsicher.map((i) => i.position).join(", ")}`);
   }
+  // Grobe Prüfung: Steht irgendwo ein Mengenverweis? Welche Erwähnungen genau
+  // einen brauchen, entscheidet die Pflege inhaltlich (siehe SKILL.md) — hier
+  // wird nur erkannt, dass noch gar keiner gesetzt wurde, obwohl es bezifferte
+  // Zutaten gibt.
+  const hatBezifferteZutat = ingredients.some((i) => i.amount !== null);
+  const hatMengenverweis = (recipe.instructions ?? []).some((step) => /\{\{z:\d+\}\}/.test(step));
+  if (hatBezifferteZutat && !hatMengenverweis) {
+    gefunden.push("keine Mengenverweise in der Anleitung");
+  }
   return gefunden;
 }
 
