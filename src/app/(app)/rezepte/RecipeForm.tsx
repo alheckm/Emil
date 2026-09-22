@@ -506,7 +506,7 @@ export function RecipeForm({
           <Textarea
             label="Zubereitung"
             hint="Ein Schritt pro Zeile."
-            rows={6}
+            rows={12}
             value={instructions}
             onChange={(event) => setInstructions(event.target.value)}
           />
