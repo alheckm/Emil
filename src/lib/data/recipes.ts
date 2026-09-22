@@ -51,11 +51,20 @@ export interface RecipeIngredient {
   confidence: number;
 }
 
+export interface RecipeNutrition {
+  kcal: number;
+  proteinG: number;
+  carbsG: number;
+  fatG: number;
+}
+
 export interface Recipe extends RecipeSummary {
   sourceType: RecipeSource;
   notes: string | null;
   instructions: string[];
   ingredients: RecipeIngredient[];
+  /** Geschätzte Werte pro Portion (`baseServings`), von der Rezept-Pflege befüllt. */
+  nutrition: RecipeNutrition | null;
 }
 
 /** Eine Zutatenzeile, wie sie aus dem Formular kommt. */
@@ -198,7 +207,7 @@ export async function getRecipe(
   const { data, error } = await supabase
     .from("recipes")
     .select(
-      `${SUMMARY_COLUMNS}, source_type, notes, instructions,
+      `${SUMMARY_COLUMNS}, source_type, notes, instructions, nutrition,
        recipe_ingredients (
          id, position, group_label, raw_text, amount::text, amount_max::text,
          unit_code, ingredient_id, note, to_taste, parse_confidence::text,
@@ -215,6 +224,12 @@ export async function getRecipe(
     source_type: string;
     notes: string | null;
     instructions: unknown;
+    nutrition: {
+      kcal: number;
+      protein_g: number;
+      carbs_g: number;
+      fat_g: number;
+    } | null;
     recipe_ingredients: {
       id: string;
       position: number;
@@ -254,6 +269,14 @@ export async function getRecipe(
         toTaste: line.to_taste,
         confidence: Number(line.parse_confidence ?? 1),
       })),
+    nutrition: row.nutrition
+      ? {
+          kcal: row.nutrition.kcal,
+          proteinG: row.nutrition.protein_g,
+          carbsG: row.nutrition.carbs_g,
+          fatG: row.nutrition.fat_g,
+        }
+      : null,
   });
 }
 

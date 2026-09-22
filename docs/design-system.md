@@ -337,6 +337,17 @@ Galerie), aber ein Rezept liest man erst an den Zutaten entlang und dann an
 den Schritten; die Abfolge folgt der Kochlogik, nicht der Analogie zur
 Referenz.
 
+**Nährwerte-Chips** stehen als eigene, zweite Chip-Reihe direkt unter der
+Merkmal-Chips-Reihe (Zeit/Tags) — genau wie die Referenz ihre Fakten-Zeile auf
+dem „Property Details"-Screen selbst in zwei Zeilen aufteilt („1,200 sq ft ·
+3 Beds · 2 Washroom · Amenities" / „Furnishing · Balcony"). Gleicher Chip-Stil
+(Kontur in `--border`, 13 px/500, `rounded-pill`), vier Chips in der
+Reihenfolge kcal, Eiweiß, Kohlenhydrate, Fett — dieselbe Reihenfolge wie im
+`nutrition`-Feld (`scripts/rezept-pflege/pflege.mjs`). Kein Label „Pro
+Portion" davor: die Einheiten (kcal, g) sind so selbsterklärend wie „sq ft"
+oder „Beds" in der Referenz. Nur sichtbar, wenn `recipe.nutrition` gesetzt
+ist — kein Platzhalter, keine Null-Chips.
+
 Oben rechts steht bewusst **kein Herz**: Emil kennt keine Favoriten
 (Abschnitt 12), und ein Knopf ohne Wirkung ist keine Option.
 

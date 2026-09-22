@@ -105,6 +105,22 @@ async function RecipeDetail({ params }: { params: Params }) {
             ))}
           </ul>
         )}
+        {value.nutrition && (
+          <ul className="mt-2 flex flex-wrap gap-2">
+            <li className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium">
+              {value.nutrition.kcal} kcal
+            </li>
+            <li className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium">
+              {value.nutrition.proteinG} g Eiweiß
+            </li>
+            <li className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium">
+              {value.nutrition.carbsG} g Kohlenhydrate
+            </li>
+            <li className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium">
+              {value.nutrition.fatG} g Fett
+            </li>
+          </ul>
+        )}
       </div>
 
       <ListAwareIngredients recipe={value} />
