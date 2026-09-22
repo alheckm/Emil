@@ -34,21 +34,21 @@ import { startTransition, useOptimistic } from "react";
  * Skelett aus. Ein Tab-Wechsel, bei dem der halbe Bildschirm verschwindet,
  * fühlt sich langsamer an als einer, bei dem der alte Inhalt kurz blass wird.
  *
- * Drei Einträge: Einkauf, Rezepte — und jetzt auch Konto/Haushalt, das vorher
- * als runder Knopf oben rechts auf den beiden Haupt-Tabs saß. Zusammengelegt
- * in die Tab-Leiste, auf Wunsch, statt an zwei Stellen (Kopfzeile und Leiste)
+ * Vier Einträge: Einkauf, Rezepte, Todo — und Konto/Haushalt, das vorher als
+ * runder Knopf oben rechts auf den beiden Haupt-Tabs saß. Zusammengelegt in
+ * die Tab-Leiste, auf Wunsch, statt an zwei Stellen (Kopfzeile und Leiste)
  * nach Navigation zu suchen.
  */
 
 /**
  * Die Symbole.
  *
- * Bewusst inline und nicht aus einer Bibliothek: es sind drei Stück, und ein
- * Paket dafür wären ein paar hundert Kilobyte für drei Pfade. Einfarbig über
+ * Bewusst inline und nicht aus einer Bibliothek: es sind vier Stück, und ein
+ * Paket dafür wären ein paar hundert Kilobyte für vier Pfade. Einfarbig über
  * `currentColor`, damit der aktive Zustand allein über die Textfarbe läuft und
  * das Symbol nie gegen sein Label verrutscht.
  *
- * 24er-Raster wie bei iOS-Symbolen, damit alle drei optisch gleich schwer
+ * 24er-Raster wie bei iOS-Symbolen, damit alle vier optisch gleich schwer
  * wirken.
  */
 function BasketIcon() {
@@ -87,6 +87,30 @@ function BookIcon() {
   );
 }
 
+/**
+ * Zwei Häkchen-Zeilen — gefüllt wie Korb und Buch, keine Kontur (Abschnitt 8:
+ * Tab-Symbole sind die eine Ausnahme von der sonst konturierten Symbolsprache,
+ * eine dünne Linie wirkt bei 24 px in der Leiste zerbrechlich).
+ */
+function ChecklistIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden>
+      <path
+        fill="currentColor"
+        d="M4.4 6.4a1.6 1.6 0 1 1 3.2 0 1.6 1.6 0 0 1-3.2 0Zm5.4-1.1a1 1 0 0 1 1-1h8.8a1 1 0 1 1 0 2h-8.8a1 1 0 0 1-1-1Z"
+      />
+      <path
+        fill="currentColor"
+        d="M4.4 12a1.6 1.6 0 1 1 3.2 0 1.6 1.6 0 0 1-3.2 0Zm5.4-1.1a1 1 0 0 1 1-1h8.8a1 1 0 1 1 0 2h-8.8a1 1 0 0 1-1-1Z"
+      />
+      <path
+        fill="currentColor"
+        d="M4.4 17.6a1.6 1.6 0 1 1 3.2 0 1.6 1.6 0 0 1-3.2 0Zm5.4-1.1a1 1 0 0 1 1-1h8.8a1 1 0 1 1 0 2h-8.8a1 1 0 0 1-1-1Z"
+      />
+    </svg>
+  );
+}
+
 /** Kopf und Schultern — derselbe Weg wie vorher im Knopf oben rechts. */
 function PersonIcon() {
   return (
@@ -106,6 +130,7 @@ function PersonIcon() {
 const TABS = [
   { href: "/liste", label: "Einkauf", Icon: BasketIcon },
   { href: "/rezepte", label: "Rezepte", Icon: BookIcon },
+  { href: "/todo", label: "Todo", Icon: ChecklistIcon },
   { href: "/einstellungen", label: "Konto", Icon: PersonIcon },
 ] as const;
 

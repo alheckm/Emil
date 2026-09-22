@@ -463,10 +463,13 @@ Schritten 16 px.
 ### TabBar
 `src/app/(app)/TabBar.tsx`. Freistehende, vollgerundete Leiste (`--card` mit
 `--shadow-card`), mit sichtbarem `--bg`-Rand ringsum — keine bildschirmbreite,
-sticky Leiste mit Haarlinie mehr. **Drei Einträge:** Einkauf, Rezepte und
-Konto/Haushalt — der runde Knopf, der zuerst oben rechts auf der Kopfzeile
-saß, ist auf Wunsch hierher gewandert, damit Navigation an einer Stelle
-steht statt an zweien.
+sticky Leiste mit Haarlinie mehr. **Vier Einträge:** Einkauf, Rezepte, Todo
+und Konto/Haushalt — der runde Knopf, der zuerst oben rechts auf der
+Kopfzeile saß, ist auf Wunsch hierher gewandert, damit Navigation an einer
+Stelle steht statt an zweien. Todo kam als vierter dazu, zwischen Rezepte und
+Konto, ohne Vorbild in `docs/app_redesign.jpg` — dort gibt es keine
+Entsprechung, das Muster (freistehende Pille, gleich breite Spalten, Label
+immer sichtbar) trägt aber unverändert weiter.
 
 Der aktive Eintrag ist **nicht** vollflächig schwarz — das war ein erster,
 zu grober Durchgang. Die Referenz zeigt eine helle Kapsel in `--well`
@@ -476,7 +479,7 @@ braucht, um sich abzusetzen), und nur das Symbol darin sitzt in einem
 eigenen kleinen schwarzen Kreis (`bg-text text-card`, 32 px); das Label steht
 direkt auf der Kapsel, in `--text`.
 
-**Alle drei Einträge sind gleich breit** (`flex-1`) und zeigen ihr Label
+**Alle vier Einträge sind gleich breit** (`flex-1`) und zeigen ihr Label
 dauerhaft, nicht nur der aktive. Ein früherer Stand ließ den aktiven Eintrag
 die überschüssige Breite der Leiste einnehmen (`flex-1`) und die inaktiven
 auf Icongröße schrumpfen (`shrink-0`), ohne Label — das ließ die Symbole beim
@@ -490,6 +493,21 @@ Eintrag zeigt Symbol und Label in `--icon-muted` (`#98a0ad`) — heller als
 für den Kontrast auf der Grundfläche abgestimmt und wirkt auf Weiß zu
 dunkel/kräftig. Wechsel im selben Frame (`useOptimistic`), `data-pending`
 dimmt den Inhalt darüber.
+
+### Todo-Screen
+`src/app/(app)/todo/page.tsx`, `TodoView.tsx`. Redaktionelles Register wie
+Einkauf (Abschnitt 3): läuft auf `--bg` ohne Karte, keine bildschirmbreite
+Aktion. Aufbau von oben: ein Eingabefeld „Aufgabe ergänzen" (derselbe
+Baustein wie „Etwas ergänzen" auf der Einkaufsliste, `bg-soft`, kein
+sichtbarer Knopf daneben — Enter fügt hinzu), darunter die offenen Einträge
+als einspaltige Liste (`bg-soft`-Zeile, 56 px hoch, ganze Zeile ist
+Trefferfläche), danach ein Abschnitt „Erledigt". Ein Häkchen-Kreis links
+zeigt den Zustand: offen ein Umriss in `--border`, erledigt gefüllt in
+`--accent`/`--accent-ink` mit Häkchen, Text dann `line-through` in
+`--muted` — dieselbe Formensprache wie das Häkchen-Badge der
+Einkaufslisten-Kachel. „Erledigt" zeigt serverseitig höchstens die letzten
+zehn Einträge (`listDoneTodos`, sortiert nach Erledigt-Zeitpunkt) — ältere
+bleiben in der Tabelle stehen, es gibt (noch) keine Löschfunktion.
 
 ### RowLink / Field / Select / Textarea / Button / Notice
 `src/components/ui.tsx`. `RowLink`: mindestens 56 px hoch, `bg-soft` mit
@@ -517,9 +535,9 @@ Kontur `stroke-width: 1,75`, runde Enden, `currentColor`) —
 
 **Zwei Ausnahmen:**
 
-- Die Tab-Symbole (Korb, Buch, `TabBar.tsx`) sind gefüllt, nicht konturiert —
-  iOS-Tab-Leisten setzen gefüllte Glyphen, eine Kontur wirkt in 11–12 px
-  zerbrechlich.
+- Die Tab-Symbole (Korb, Buch, Häkchenliste, Person, `TabBar.tsx`) sind
+  gefüllt, nicht konturiert — iOS-Tab-Leisten setzen gefüllte Glyphen, eine
+  Kontur wirkt in 11–12 px zerbrechlich.
 - Icon-Badges auf Fotos und im Ziffernkasten stehen auf **gefüllter**
   `--accent`- oder `--soft`-Fläche; das Symbol selbst bleibt Kontur.
 
@@ -647,7 +665,8 @@ gegengeprüft:
 - [x] Alle Tabs gleich breit, Label immer sichtbar — nur Farbe/Kapsel
       wechseln aktiv, nie die Größe, damit kein Symbol beim Wechsel springt
 - [x] Inaktive Tab-Symbole in `--icon-muted`, nicht `--muted`
-- [x] Konto/Haushalt als dritter Tab-Eintrag statt Knopf in der Kopfzeile
+- [x] Konto/Haushalt als vierter Tab-Eintrag statt Knopf in der Kopfzeile,
+      Todo als dritter dazwischen
 - [x] Titelgröße nah an der gemessenen Umrechnung (32 px), nicht grob
       abgerundet
 - [x] `--accent` nie als dünne Linie oder Text direkt auf `--bg`
