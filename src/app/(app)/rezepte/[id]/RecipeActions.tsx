@@ -7,7 +7,11 @@ import { formatAmount } from "@/lib/core/format";
 import { scaleAmount } from "@/lib/core/scale";
 import { resolveSteps } from "@/lib/core/steps";
 import { getBrowserSupabase } from "@/lib/client/supabase";
-import { deleteRecipe, type Recipe } from "@/lib/data/recipes";
+import {
+  deleteRecipe,
+  type Recipe,
+  type RecipeNutrition,
+} from "@/lib/data/recipes";
 import { addRecipeToList, removeRecipeFromList } from "@/lib/data/shoppingList";
 import { CheckIcon, MinusIcon, PlusIcon } from "@/components/icons";
 import { Notice } from "@/components/ui";
@@ -192,8 +196,47 @@ export function RecipeIngredientsAndSteps({
       </ul>
       </section>
 
+      {recipe.nutrition && <NutritionTable nutrition={recipe.nutrition} />}
+
       {steps.length > 0 && <RecipeSteps steps={steps} />}
     </>
+  );
+}
+
+/**
+ * Die Nährwerttabelle — geschätzte Werte pro Portion (`baseServings`), von
+ * der automatischen Rezept-Pflege befüllt (`docs/plan-rezept-pflege.md`).
+ * Kein Kästchen, keine `--soft`-Fläche: läuft offen auf `--bg` wie Zutaten
+ * und Zubereitung, nur durch Haarlinien zwischen den Zeilen gegliedert —
+ * derselbe Abschnittstrenner wie in `RecipeForm.tsx` (design-system.md
+ * Abschnitt 7, RecipeHero).
+ */
+function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
+  const rows: [string, string][] = [
+    ["Kalorien", `${nutrition.kcal} kcal`],
+    ["Eiweiß", `${nutrition.proteinG} g`],
+    ["Kohlenhydrate", `${nutrition.carbsG} g`],
+    ["Fett", `${nutrition.fatG} g`],
+  ];
+
+  return (
+    <section className="px-5 pb-6">
+      <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
+        Nährwerte
+      </h2>
+      <p className="mt-1 text-[13px] text-muted">Pro Portion</p>
+      <dl className="mt-3">
+        {rows.map(([label, value]) => (
+          <div
+            key={label}
+            className="flex items-center justify-between border-t border-border py-3 text-[15px]"
+          >
+            <dt>{label}</dt>
+            <dd className="font-medium tabular-nums">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }
 

@@ -24,7 +24,7 @@ import {
 import { Section, Notice } from "@/components/ui";
 
 // Wie lange eine frisch abgehakte Kachel an ihrem Platz stehen bleibt, bevor
-// sie in den Abschnitt „Abgehakt" wandert — lang genug, um das eigene
+// sie in den Abschnitt „Eingekauft" wandert — lang genug, um das eigene
 // Häkchen noch wahrzunehmen, kurz genug, um nicht wie ein Hänger zu wirken.
 const CHECKED_SECTION_DELAY_MS = 1500;
 
@@ -37,7 +37,7 @@ const CHECKED_SECTION_DELAY_MS = 1500;
  *   kleines Kästchen — die App wird einhändig und in Bewegung bedient.
  * - **Abgehaktes wandert in einen eigenen Abschnitt.** Kurz nach dem Antippen
  *   (`CHECKED_SECTION_DELAY_MS`) — man soll das eigene Häkchen noch an seinem
- *   Platz sehen, bevor die Kachel unter „Abgehakt" auftaucht. Dort steht das
+ *   Platz sehen, bevor die Kachel unter „Eingekauft" auftaucht. Dort steht das
  *   zuletzt Abgehakte oben. Über 20 Abgehakte sammeln sich ohnehin nicht an —
  *   `set_entry_checked` löscht die ältesten, sobald ein 21. dazukommt
  *   (Migration 0016), unabhängig davon, welches Handy gerade offen ist.
@@ -72,7 +72,7 @@ export function ListView({
   const [error, setError] = useState("");
   const [open, setOpen] = useState<string | null>(null);
   const [checkedNow, setCheckedNow] = useState<Record<string, boolean>>({});
-  // Ob eine Zeile schon im Abschnitt „Abgehakt" steht. Folgt `checkedNow` mit
+  // Ob eine Zeile schon im Abschnitt „Eingekauft" steht. Folgt `checkedNow` mit
   // Verzögerung beim Abhaken (siehe `CHECKED_SECTION_DELAY_MS`), damit das
   // Häkchen erst kurz an seinem Platz zu sehen ist, bevor die Kachel wandert
   // — beim Abwählen sofort, da rutscht nichts weg, das man noch anschaut.
@@ -411,11 +411,11 @@ export function ListView({
     (entry) => !(checkedNow[entry.id] ?? entry.checked),
   ).length;
 
-  // Aufgeteilt in „offen" und „Abgehakt": `sectionChecked` folgt `checkedNow`
+  // Aufgeteilt in „offen" und „Eingekauft": `sectionChecked` folgt `checkedNow`
   // erst mit Verzögerung, darum bleibt eine frisch abgehakte Kachel kurz an
   // ihrem Platz stehen (siehe `scheduleSection`). Offene behalten die
   // Reihenfolge nach Abteilung und Name aus `listEntries`; im Abschnitt
-  // „Abgehakt" steht das zuletzt Abgehakte oben.
+  // „Eingekauft" steht das zuletzt Abgehakte oben.
   const openEntries: ListEntry[] = [];
   const checkedEntries: ListEntry[] = [];
   for (const entry of visibleEntries) {
@@ -680,7 +680,7 @@ export function ListView({
       {checkedEntries.length > 0 && (
         <section className="space-y-3">
           <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
-            Abgehakt
+            Eingekauft
           </h2>
           <ul className="grid grid-cols-3 items-start gap-x-2 gap-y-3">
             {checkedEntries.map(renderEntry)}
