@@ -155,32 +155,39 @@ bricht dabei zweizeilig statt abzuschneiden.
   als Vertrag schreiben — das ist Impeccables eigene Regel, siehe
   `reference/new-work.md`: „ein Regelwerk, das vor dem Bau geschrieben wird,
   verteidigt sich gegen die Realität, statt sie zu beschreiben").
-- Zum Abschluss: `impeccable-documenter`-Subagent spawnen, der DESIGN.md +
-  `.impeccable/design.json` aus dem fertigen Build schreibt (siehe
-  `reference/new-work.md` Abschnitt 7 „Inspect and finish").
-- Alte, jetzt überholte Doku existiert parallel: `docs/design-system.md`
-  (altes Fliederblau/Karten-System), eine lose `DESIGN.md` im Root
-  (Marktregal/Gold-Richtung, von Impeccable nicht als valide erkannt —
-  `designPath: null` bei `impeccable context`) und `.impeccable/design.json`
-  (ebenfalls Marktregal-Richtung). Alle drei sind Anti-Referenz für die neue
-  Richtung, nicht Autorität — sollten am Ende bereinigt/ersetzt werden.
+- ~~Alte, jetzt überholte Doku~~ — erledigt: `docs/design-system.md` und die
+  lose Marktregal-`DESIGN.md` sind gelöscht/ersetzt; `DESIGN.md` +
+  `.impeccable/design.json` sind jetzt aus dem fertigen Maison-Augé-Code
+  abgeleitet (`impeccable-documenter`, 2026-09-23).
 
-## Nächste konkrete Schritte
+## Stand: Phase 4 abgeschlossen
+
+Alle Schritte unten sind erledigt — dieser Abschnitt bleibt als
+Entstehungsprotokoll stehen. **`DESIGN.md` im Repo-Root ist ab jetzt die
+Quelle für Code-Entscheidungen**, nicht mehr diese Datei.
 
 1. ~~Zugriff prüfen~~ — erledigt.
 2. ~~`globals.new.css` übernehmen~~ — erledigt, Datei gelöscht.
 3. ~~Hanken Grotesk einbinden~~ — erledigt über `next/font/google`
    (`src/app/layout.tsx`), kein manuelles Hosting nötig, lädt zur Bauzeit
    von derselben Domain.
-4. **TabBar** auf Text+Punkt umstellen (Signature-Element, bisher noch
-   Icon-basierte Floating-Pill aus der alten Richtung) — `src/app/(app)/TabBar.tsx`.
-5. `src/components/ui.tsx`-Primitives (Button, Field, Select, Textarea,
-   Notice) auf die Komponenten-Specimen-Zustände umstellen (siehe oben) —
-   Button wird rechteckig/kein Pill mehr, Field wird Unterstrich statt Box,
-   Notice wird gerahmt statt gefüllt.
-6. `ListView.tsx` Stepper/Sheet/Swipe-Zeile gegen Artefakt 4 prüfen und
-   angleichen.
-7. Screenshots aller Screens gegenprüfen (Kritik-Schleife, Top-5-Schwächen
-   beheben, insbesondere: lange echte Rezepttitel bei 56pt/900/Versalien,
-   Trefferflächen der neuen Unterstrich-Felder/Stepper).
-8. `impeccable-documenter` spawnen → DESIGN.md + design.json schreiben.
+4. ~~TabBar auf Text+Punkt umstellen~~ — erledigt, `src/app/(app)/TabBar.tsx`.
+5. ~~`ui.tsx`-Primitives umstellen~~ — erledigt: Button rechteckig
+   (primär/sekundär/tertiär/danger, mit Lade-/Deaktiviert-Zuständen), Field
+   als Unterstrich, Notice gerahmt statt gefüllt. Wirkt automatisch in allen
+   30 Verbraucherdateien.
+6. ~~`ListView.tsx` Stepper/Sheet angleichen~~ — erledigt: bloße Ziffern/
+   Vorzeichen statt Kasten, Sheet mit Ziehgriff und Haarlinie statt Schatten.
+7. ~~Screenshots aller Screens gegenprüfen~~ — erledigt, live im Browser
+   gegen echte Daten verifiziert; Produktionsbuild und Lint sauber.
+8. ~~`impeccable-documenter` spawnen~~ — erledigt, siehe oben.
+
+## Offen (aus DESIGN.md/dem Dokumentierer-Lauf übernommen)
+
+- **Zwei Signature-Elemente der Richtung sind nirgends gebaut:** das
+  vertikal gestapelte Kategorie-Etikett (ein Buchstabe pro Zeile, linker
+  Bildschirmrand) und die kleine getrackte „EMIL"-Wordmark auf den
+  Root-Screens. Beide stehen nur in den Artefakten oben, nicht im Code.
+- `--muted` (`#B99C8E`) bleibt ein bestätigter, aber nicht erweiterbarer
+  Kontrast-Kompromiss (~2,4:1 auf `--bg`) — nicht versehentlich auf neue
+  Textrollen ausdehnen.
