@@ -1,0 +1,22 @@
+{
+  "gray": {
+    "hex": "E8E8E8",
+    "prompt": "a light neutral grey studio backdrop colour, hex #E8E8E8 — flat and even, no warm or cool colour cast, no pastel tint, matching the Marktregal redesign's field colour"
+  },
+  "gold": {
+    "hex": "F2F1B1",
+    "prompt": "a warm, soft golden-cream studio backdrop colour, hex #F2F1B1 — like pale butter or warm parchment, confidently warm but still light, filling the frame as a solid colour block. This must read as a warm pale gold: NOT a bright neon yellow, NOT a saturated lemon, NOT orange-leaning — keep it soft and buttery, closer to warm cream than to a vivid yellow"
+  },
+  "rot-orange": {
+    "hex": "BE9382",
+    "prompt": "a dusty, muted terracotta-rose studio backdrop colour, hex #BE9382 — like sun-baked clay, dried terracotta, or aged dusty rosewood, warm brownish-pink and desaturated, filling the frame as a solid colour block. This must read as a muted clay-brown rose tone: NOT a vivid magenta, NOT hot pink, NOT a bright crimson red — keep it dusty and earthy, closer to brown clay than to vivid pink"
+  },
+  "gruen": {
+    "hex": "84A087",
+    "prompt": "a dusty, muted sage-green studio backdrop colour, hex #84A087 — like dried sage leaves or weathered moss, greyish and desaturated, warm and earthy, filling the frame as a solid colour block. This must read as a warm grey-green: NOT a vivid emerald, NOT teal, NOT turquoise, NOT cyan-leaning — keep it muted and moss-like, closer to grey than to a bright leaf green"
+  },
+  "blau": {
+    "hex": "A5B4BB",
+    "prompt": "a dusty, muted slate-blue studio backdrop colour, hex #A5B4BB — like faded denim or a stone-grey sky, cool and desaturated, filling the frame as a solid colour block. This must read as a muted slate blue: NOT a vivid royal blue, NOT saturated periwinkle, NOT purple-leaning — keep it dusty and cool, closer to grey-blue stone than to a vivid blue"
+  }
+}

@@ -4,10 +4,16 @@ description: Fehlende Zutatenbilder für aktuell genutzte Zutaten (Rezepte +
   Einkaufsliste) lokal per mflux generieren und verarbeiten. Nutzen, wenn der
   Nutzer nach fehlenden/neuen Zutatenbildern fragt, "Zutatenbilder
   generieren/auffüllen" sagt, oder wenn Rezepte importiert wurden, die neue
-  Zutaten angelegt haben.
+  Zutaten angelegt haben. Auch einschlägig für die Design-Exploration der
+  "Marktregal"-Richtung (vollbild/grau/bold-Varianten, siehe unten).
 ---
 
-# Zutatenbilder auf Bedarf generieren
+# Zutatenbilder — zwei getrennte Modi
+
+Dieser Skill deckt zwei unabhängige Dinge ab, die beide mflux + `subjects.mjs`
+nutzen, aber unterschiedliche Ziele und Ausgabeorte haben. Nicht vermischen.
+
+## Modus 1: Produktion, auf Bedarf
 
 Erzeugt Fotos für Zutaten **nur auf Bedarf** — nicht im Voraus für alle ~350
 möglichen Zutaten, sondern nur für die, die gerade tatsächlich in einem Rezept
@@ -57,3 +63,43 @@ mflux-Installation unter `~/.mflux/venv`.
   Schatten müssen also schon im Rohbild aus `generate.py` stimmen — das klappt
   auch mit den schnellen 4 Schritten zuverlässig (siehe Kommentar bei `STEPS`
   in `generate.py`), mehr Schritte bringen kaum etwas.
+
+## Modus 2: Design-Exploration ("Marktregal"-Richtung)
+
+Für die noch nicht im echten App-Code umgesetzte Redesign-Richtung aus
+`DESIGN.md` (echte Zutatenfotografie in quadratischen Kacheln statt Pastell-
+Kreis-Chips). Erzeugt zu einzelnen, namentlich angegebenen Zutaten drei
+Bildvarianten zum Vergleich — **nicht** auf Bedarf für alle Zutaten, sondern
+gezielt für die, die gerade zur Diskussion stehen.
+
+```
+~/.mflux/venv/bin/python scripts/ingredient-images/design-variants.py --names "Erdbeeren,Brot"
+```
+
+Namen exakt wie die Schlüssel in `subjects.mjs` `SUBJECTS` (meist Plural bei
+zählbaren Zutaten: "Erdbeeren", nicht "Erdbeere"). Siehe
+`scripts/ingredient-images/design-variants.py` für die volle Herleitung;
+kurz:
+
+1. **vollbild** — Motiv füllt den ganzen Rahmen bis zum Rand, kein Hinter-
+   grund sichtbar (Kachel-Kandidat).
+2. **grau** — Motiv freigestellt auf hellgrauem Studio-Grund (`#E8E8E8`, das
+   Feld der Marktregal-Richtung).
+3. **bold** — Motiv freigestellt auf kräftigem Farbgrund, automatisch aus
+   genau vier Tönen gewählt (`scripts/ingredient-images/design-palette.json`),
+   passend zur Eigenfarben-Kategorie der Zutat (`subjects.mjs` `COLORS`).
+
+Ergebnis liegt unter `design/ingredients_directions/<slug>-{vollbild,grau,
+bold}.png` — ein reiner Design-Ordner, komplett getrennt von
+`public/zutaten/`. Nichts hier fließt automatisch in die Produktions-
+Pipeline; `subjects.mjs` wird nur lesend genutzt (Motivtext + Farbkategorie),
+`palette.json`/`buildPrompt`/`process.py` bleiben unberührt.
+
+**Danach prüfen:** vollbild — Zutat trotz Extrem-Crop erkennbar, wirklich
+kein Hintergrund an den Rändern sichtbar (bei Einzelstücken wie Brot der
+kritische Fall, bei Haufen-Zutaten wie Beeren einfacher). grau/bold — Farbe
+trifft die Zielfamilie (Eckpixel mit PIL/`~/.mflux/venv/bin/python`
+gegenprüfen lohnt sich, das Modell driftet bei bold-Farben gern Richtung der
+Eigenfarbe des Motivs, z. B. grüner Lauch → Teal statt gedecktes Salbeigrün —
+die Negativ-Constraints in `design-palette.json` federn das ab, aber nicht
+narrensicher).
