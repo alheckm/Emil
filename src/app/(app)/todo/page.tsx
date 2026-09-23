@@ -15,7 +15,7 @@ export const metadata = { title: "Todo" };
  */
 export default function TodoPage() {
   return (
-    <Screen title="Todo">
+    <Screen title="Todo" titleSize="display">
       <Suspense fallback={<ListSkeleton />}>
         <Todos />
       </Suspense>

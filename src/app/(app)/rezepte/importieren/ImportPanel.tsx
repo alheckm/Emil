@@ -210,8 +210,8 @@ export function ImportPanel({
               value={url}
               onChange={(event) => setUrl(event.target.value)}
             />
-            <Button onClick={importFromUrl} disabled={busy}>
-              {busy ? "Wird gelesen …" : "Rezept holen"}
+            <Button onClick={importFromUrl} disabled={busy} loading={busy}>
+              {busy ? "Wird gelesen" : "Rezept holen"}
             </Button>
           </div>
         </Section>
@@ -223,7 +223,7 @@ export function ImportPanel({
                 Für Kochbuch-Fotos und Screenshots aus anderen Apps:{" "}
                 {IMPORT_PROMPT_HINT}
               </p>
-              <Button variant="quiet" onClick={copyPrompt}>
+              <Button variant="secondary" onClick={copyPrompt}>
                 {copied ? "Prompt kopiert ✓" : "Prompt kopieren"}
               </Button>
             </div>
@@ -271,7 +271,7 @@ function TabButton({
         // aktive Schlagwort-Pille in RecipeBrowser.tsx, nicht `--accent` (das
         // ist jetzt die Markenfarbe für Aktionen, keine allgemeine
         // Hervorhebung) und nicht `--danger` (kein Fehlerzustand).
-        "min-h-11 flex-1 rounded-soft border px-4 text-[15px] font-medium " +
+        "min-h-11 flex-1 border px-4 text-[12px] font-bold tracking-[0.06em] uppercase " +
         (active
           ? "border-text bg-text text-card"
           : "border-border text-muted")

@@ -67,12 +67,19 @@ export function AccountActions() {
     <div className="space-y-6">
       {error && <Notice tone="error">{error}</Notice>}
 
-      <Button variant="quiet" disabled={busy !== null} onClick={() => void onSignOut()}>
-        {busy === "out" ? "Einen Moment …" : "Abmelden"}
+      <Button
+        variant="secondary"
+        disabled={busy !== null}
+        loading={busy === "out"}
+        onClick={() => void onSignOut()}
+      >
+        {busy === "out" ? "Einen Moment" : "Abmelden"}
       </Button>
 
-      <div className="space-y-3 rounded-soft border border-border p-5">
-        <h2 className="text-lg font-semibold">Konto löschen</h2>
+      <div className="space-y-3 border border-border p-5">
+        <h2 className="text-[13px] font-extrabold tracking-[0.1em] text-danger uppercase">
+          Konto löschen
+        </h2>
         <p className="text-[15px] leading-relaxed text-muted">
           Entfernt dein Konto und deine Mitgliedschaft. Bist du die letzte
           Person im Haushalt, verschwindet er mitsamt Rezepten, Einkaufslisten
@@ -89,9 +96,10 @@ export function AccountActions() {
         <Button
           variant="danger"
           disabled={busy !== null || confirmText.trim().toUpperCase() !== "LÖSCHEN"}
+          loading={busy === "delete"}
           onClick={() => void onDelete()}
         >
-          {busy === "delete" ? "Wird gelöscht …" : "Konto endgültig löschen"}
+          {busy === "delete" ? "Wird gelöscht" : "Konto endgültig löschen"}
         </Button>
       </div>
     </div>

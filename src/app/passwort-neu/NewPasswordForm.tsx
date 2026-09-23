@@ -70,7 +70,7 @@ export function NewPasswordForm() {
         minLength={8}
         required
       />
-      <Button type="submit" disabled={busy}>
+      <Button type="submit" disabled={busy} loading={busy}>
         {busy ? "Einen Moment …" : "Passwort speichern"}
       </Button>
     </form>

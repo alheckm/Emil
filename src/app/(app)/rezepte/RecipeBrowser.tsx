@@ -133,19 +133,26 @@ export function RecipeBrowser({
 
   return (
     <div className="space-y-6" data-pending={searching ? "" : undefined}>
-      <div className="space-y-3">
+      <div className="space-y-4">
         <label htmlFor={inputId} className="sr-only">
           Rezepte durchsuchen
         </label>
-        <input
-          id={inputId}
-          type="search"
-          inputMode="search"
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-          placeholder="Titel oder Zutat …"
-          className="min-h-12 w-full rounded-pill bg-soft px-5 text-base outline-none placeholder:text-muted/70"
-        />
+        {/* 16px Schrift trotz Vorlage (dort 13px) — Untergrenze fürs
+            Eingabefeld, sonst zoomt iOS beim Antippen hinein. */}
+        <div className="flex items-center gap-3 border-b-2 border-text pb-2.5">
+          <input
+            id={inputId}
+            type="search"
+            inputMode="search"
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            placeholder="Titel oder Zutat …"
+            className="min-w-0 flex-1 bg-transparent text-base font-bold tracking-[0.02em] text-text uppercase outline-none placeholder:text-muted/60"
+          />
+          <span aria-hidden className="shrink-0 text-[15px] font-extrabold">
+            →
+          </span>
+        </div>
 
         {/* Zwei feste Schnellfilter zuerst, danach die echten Schlagwörter —
             eine Reihe, derselbe Pillen-Stil (design-system.md, Abschnitt 7,
@@ -180,13 +187,30 @@ export function RecipeBrowser({
       <div className="dims-when-pending">
         {visible.length === 0 ? (
           <Section>
-            <p className="text-[15px] leading-[1.55] text-muted">
-              {currentQuery
-                ? "Nichts gefunden. Gesucht wird in Titeln und Zutaten — vielleicht heißt die Zutat im Rezept anders."
-                : activeFilter
-                  ? "Nichts gefunden. Kein Rezept passt gerade zu diesem Filter."
-                  : "Noch kein Rezept. Am schnellsten geht es über „Importieren“: die Adresse einer Rezeptseite einfügen, oder ein Kochbuch-Foto in claude.ai digitalisieren und das Ergebnis hier einsetzen."}
-            </p>
+            {currentQuery || activeFilter ? (
+              <p className="text-[15px] leading-[1.55] text-muted">
+                {currentQuery
+                  ? "Nichts gefunden. Gesucht wird in Titeln und Zutaten — vielleicht heißt die Zutat im Rezept anders."
+                  : "Nichts gefunden. Kein Rezept passt gerade zu diesem Filter."}
+              </p>
+            ) : (
+              <div className="py-6">
+                <h2 className="text-[24px] leading-[1.05] font-black text-text uppercase">
+                  Noch leer
+                </h2>
+                <p className="mt-2 max-w-[240px] text-[15px] leading-relaxed text-muted">
+                  Am schnellsten geht es über „Importieren“: die Adresse einer
+                  Rezeptseite einfügen, oder ein Kochbuch-Foto digitalisieren
+                  und das Ergebnis hier einsetzen.
+                </p>
+                <Link
+                  href="/rezepte/importieren"
+                  className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-extrabold tracking-[0.1em] text-text uppercase press-flat tap-target"
+                >
+                  Rezept importieren →
+                </Link>
+              </div>
+            )}
           </Section>
         ) : (
           /* Echte Karten mit Schatten — die Kehrtwende zur Vorgängerfassung
@@ -220,7 +244,10 @@ export function RecipeBrowser({
                     {/* Textinhalt trägt den vollen Seitenrand (20 px) — das
                         Foto darunter dagegen fast keinen, siehe unten. */}
                     <div className="px-5 pt-5">
-                      <h2 className="font-display text-[32px] font-bold leading-[1.15] [text-wrap:balance]">
+                      <h2
+                        lang="de"
+                        className="text-[28px] leading-[1.05] font-extrabold tracking-[-0.005em] text-text uppercase [hyphens:auto] [text-wrap:balance]"
+                      >
                         {recipe.title}
                       </h2>
 
@@ -230,7 +257,7 @@ export function RecipeBrowser({
                         {facts.map((fact) => (
                           <li
                             key={fact}
-                            className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium"
+                            className="border border-border px-3 py-1 text-[11px] font-bold tracking-[0.08em] uppercase"
                           >
                             {fact}
                           </li>
@@ -262,19 +289,16 @@ export function RecipeBrowser({
                              gesprochen wird — bewusst nicht `--accent`, damit
                              der Listenstatus nicht mit der CTA-Farbe
                              verwechselt wird. */
-                          <span className="absolute left-3 top-3 rounded-pill bg-card/70 px-3 py-1 text-[13px] font-medium text-text backdrop-blur-[8px]">
+                          <span className="absolute top-3 left-3 bg-card/70 px-3 py-1.5 text-[11px] font-bold tracking-[0.06em] text-text uppercase backdrop-blur-[8px]">
                             Auf der Liste · {servings}
                           </span>
                         ) : null}
 
-                        {/* „Details" in der Referenz: Gold-Pille mit einem
-                            eigenen, schwarzen Kreis-Badge am Ende, nicht nur
-                            ein Icon in Akzent-Tinte. Einzige Stelle, an der
-                            eine Gold-Fläche direkt auf einem Foto sitzt statt
-                            auf `--bg`. */}
-                        <span className="absolute bottom-3 right-3 flex items-center gap-2 rounded-pill bg-accent py-1.5 pl-4 pr-1.5 text-[13px] font-semibold text-accent-ink">
+                        {/* Einzige Stelle, an der eine Akzent-Fläche direkt
+                            auf einem Foto sitzt statt auf `--bg`. */}
+                        <span className="absolute right-3 bottom-3 flex items-center gap-2 bg-accent py-1.5 pr-1.5 pl-4 text-[11px] font-extrabold tracking-[0.08em] text-accent-ink uppercase">
                           Ansehen
-                          <span className="flex h-6 w-6 items-center justify-center rounded-pill bg-text text-card">
+                          <span className="flex h-6 w-6 items-center justify-center bg-text text-card">
                             <ChevronRightIcon className="h-3.5 w-3.5" />
                           </span>
                         </span>
@@ -312,7 +336,7 @@ function FilterPill({
       onClick={onClick}
       aria-pressed={active}
       className={
-        "min-h-11 rounded-pill px-4 text-[13px] press tap-target " +
+        "min-h-11 px-4 text-[11px] font-bold tracking-[0.06em] uppercase press tap-target " +
         (active ? "bg-text text-card" : "bg-soft text-muted")
       }
     >

@@ -62,7 +62,7 @@ export function ResetForm() {
         autoCapitalize="none"
         required
       />
-      <Button type="submit" disabled={busy}>
+      <Button type="submit" disabled={busy} loading={busy}>
         {busy ? "Einen Moment …" : "Link schicken"}
       </Button>
     </form>

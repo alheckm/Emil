@@ -65,7 +65,7 @@ export function LoginForm({ initialError }: { initialError?: string }) {
         autoComplete="current-password"
         required
       />
-      <Button type="submit" disabled={busy}>
+      <Button type="submit" disabled={busy} loading={busy}>
         {busy ? "Einen Moment …" : "Anmelden"}
       </Button>
     </form>

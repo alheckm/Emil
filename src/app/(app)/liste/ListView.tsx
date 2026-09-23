@@ -24,8 +24,8 @@ import {
   type Category,
   type ListEntry,
 } from "@/lib/data/shoppingList";
-import { Section, Notice } from "@/components/ui";
-import { CloseIcon, MinusIcon, PlusIcon } from "@/components/icons";
+import { Button, Section, Select, Notice } from "@/components/ui";
+import { CloseIcon } from "@/components/icons";
 
 // Wie lange eine frisch abgehakte Kachel an ihrem Platz stehen bleibt, bevor
 // sie in den Abschnitt „Eingekauft" wandert — lang genug, um das eigene
@@ -567,10 +567,10 @@ export function ListView({
               )}
             </span>
 
-            <span className="w-full px-2 pb-2 pt-1 text-center">
+            <span className="w-full px-2 pt-1 pb-2 text-center">
               <span
                 className={
-                  "block text-[13px] font-medium leading-tight " +
+                  "block text-[12px] font-bold tracking-[0.01em] uppercase leading-tight " +
                   (checked ? "text-muted line-through" : "")
                 }
               >
@@ -581,8 +581,9 @@ export function ListView({
                   Nachbarn in derselben Reihe. */}
               <span
                 className={
-                  "mt-0.5 block text-[13px] leading-tight " +
-                  (menge ? "" : "invisible")
+                  "mt-0.5 block text-[11px] font-bold uppercase tracking-[0.02em] text-muted leading-tight " +
+                  (menge ? "" : "invisible") +
+                  (checked ? " line-through" : "")
                 }
               >
                 {menge || " "}
@@ -618,10 +619,12 @@ export function ListView({
           aria-modal="true"
           aria-label={entry.name}
           onClick={(event) => event.stopPropagation()}
-          className="relative w-full max-w-md rounded-t-card bg-card px-5 pb-safe pt-4"
+          className="relative w-full max-w-md border-t border-border bg-card px-5 pt-2.5 pb-safe"
         >
+          <div aria-hidden className="mx-auto mb-3 h-1 w-9 bg-border" />
+
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-[17px] font-semibold leading-[1.3]">
+            <h2 className="text-[17px] font-extrabold uppercase">
               {entry.name}
             </h2>
             <button
@@ -634,10 +637,12 @@ export function ListView({
             </button>
           </div>
 
-          <div className="space-y-3 pb-6 pt-2 text-left">
+          <div className="space-y-4 pt-2 pb-6 text-left">
             {steppable && (
               <div className="flex items-center justify-between border-t border-border py-3">
-                <span className="text-[15px]">Menge</span>
+                <span className="text-[13px] font-bold tracking-[0.04em] uppercase">
+                  Menge
+                </span>
                 <AmountStepper
                   value={Number(amount ?? 0)}
                   mergeUnit={entry.mergeUnit}
@@ -667,59 +672,54 @@ export function ListView({
               <p className="text-[13px] text-muted">Von Hand ergänzt.</p>
             )}
 
-            <label className="block">
-              <span className="text-[13px] text-muted">Abteilung</span>
-              <select
-                value={entry.categoryId ?? "sonstiges"}
-                onChange={(event) =>
-                  run(() => {
-                    const supabase = getBrowserSupabase();
-                    if (!supabase) {
-                      return Promise.resolve({
-                        ok: false,
-                        error: "Supabase ist nicht konfiguriert.",
-                      });
-                    }
-                    // Eigene Zutaten werden direkt umgehängt; globale aus dem
-                    // Seed gehören allen Haushalten, ihre Abteilung ändert
-                    // sich darum nur für den eigenen Haushalt (Migration 0019).
-                    return entry.categoryOwnedByHousehold
-                      ? setIngredientCategory(
-                          supabase,
-                          entry.ingredientId,
-                          event.target.value,
-                        )
-                      : setHouseholdIngredientCategory(
-                          supabase,
-                          householdId,
-                          entry.ingredientId,
-                          event.target.value,
-                        );
-                  })
-                }
-                className="mt-1 h-11 w-full appearance-none rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
-              >
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-              <span className="mt-1 block text-[13px] text-muted">
-                Bleibt für diese Zutat gespeichert.
-              </span>
-            </label>
+            <Select
+              label="Abteilung"
+              hint="Bleibt für diese Zutat gespeichert."
+              value={entry.categoryId ?? "sonstiges"}
+              onChange={(event) =>
+                run(() => {
+                  const supabase = getBrowserSupabase();
+                  if (!supabase) {
+                    return Promise.resolve({
+                      ok: false,
+                      error: "Supabase ist nicht konfiguriert.",
+                    });
+                  }
+                  // Eigene Zutaten werden direkt umgehängt; globale aus dem
+                  // Seed gehören allen Haushalten, ihre Abteilung ändert
+                  // sich darum nur für den eigenen Haushalt (Migration 0019).
+                  return entry.categoryOwnedByHousehold
+                    ? setIngredientCategory(
+                        supabase,
+                        entry.ingredientId,
+                        event.target.value,
+                      )
+                    : setHouseholdIngredientCategory(
+                        supabase,
+                        householdId,
+                        entry.ingredientId,
+                        event.target.value,
+                      );
+                })
+              }
+            >
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </Select>
 
-            <button
+            <Button
               type="button"
+              variant="danger"
               onClick={() => {
                 setOpenSheet(null);
                 removeEntry(entry);
               }}
-              className="h-11 w-full rounded-pill border border-danger text-[15px] text-danger press"
             >
               Von der Liste nehmen
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -749,7 +749,7 @@ export function ListView({
           placeholder="Etwas ergänzen"
           autoCapitalize="sentences"
           enterKeyHint="done"
-          className="h-12 w-full rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
+          className="h-11 w-full border-0 border-b-2 border-text bg-transparent px-0 text-base font-semibold text-text outline-none placeholder:text-muted/50 focus:border-b-[3px]"
         />
       </Section>
 
@@ -761,9 +761,9 @@ export function ListView({
           </p>
         </Section>
       ) : (
-        <p className="text-[13px]">
+        <p className="text-[11px] font-bold tracking-[0.06em] text-muted uppercase">
           {openCount + adding.length === 0
-            ? "Alles abgehakt."
+            ? "Alles abgehakt"
             : `Noch ${openCount + adding.length} von ${
                 visibleEntries.length + adding.length
               }`}
@@ -772,14 +772,14 @@ export function ListView({
 
       {adding.length > 0 && (
         <section className="space-y-3">
-          <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
+          <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
             Wird ergänzt
           </h2>
           <ul className="grid grid-cols-3 gap-x-2 gap-y-3">
             {adding.map((item) => (
               <li key={item.id} className="flex flex-col items-center gap-2 opacity-50">
-                <span className="aspect-square w-full rounded-full bg-chip" />
-                <span className="w-full text-center text-[13px] font-medium leading-tight">
+                <span className="aspect-square w-full bg-chip" />
+                <span className="w-full text-center text-[12px] font-bold uppercase leading-tight">
                   {item.label}
                 </span>
               </li>
@@ -794,7 +794,7 @@ export function ListView({
 
       {stockCheckEntries.length > 0 && (
         <section className="space-y-3">
-          <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
+          <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
             Noch vorrätig?
           </h2>
           <ul className="grid grid-cols-3 items-start gap-x-2 gap-y-3">
@@ -805,7 +805,7 @@ export function ListView({
 
       {checkedEntries.length > 0 && (
         <section className="space-y-3">
-          <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
+          <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
             Eingekauft
           </h2>
           <ul className="grid grid-cols-3 items-start gap-x-2 gap-y-3">
@@ -841,24 +841,24 @@ function AmountStepper({
 }) {
   const { text } = formatAmount(String(value), mergeUnit);
   return (
-    <div className="flex items-center rounded-pill bg-soft">
+    <div className="flex items-center gap-1">
       <AmountStepperButton
         label="Weniger"
         disabled={value <= 0}
         onClick={() => onChange(Math.max(0, value - step))}
       >
-        <MinusIcon className="h-4 w-4" />
+        –
       </AmountStepperButton>
       <span
         aria-live="polite"
-        className="min-w-[4.5rem] text-center text-[13px] font-medium"
+        className="min-w-[3.5rem] text-center text-[15px] font-black tabular-nums"
       >
-        <span key={value} className="count-swap tabular-nums">
+        <span key={value} className="count-swap">
           {text || "0"}
         </span>
       </span>
       <AmountStepperButton label="Mehr" onClick={() => onChange(value + step)}>
-        <PlusIcon className="h-4 w-4" />
+        +
       </AmountStepperButton>
     </div>
   );
@@ -881,11 +881,9 @@ function AmountStepperButton({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="flex h-11 w-11 items-center justify-center press tap-target disabled:opacity-30"
+      className="flex h-11 w-11 items-center justify-center text-[19px] font-extrabold press-flat tap-target disabled:opacity-30"
     >
-      <span className="flex h-8 w-8 items-center justify-center rounded-pill bg-card">
-        {children}
-      </span>
+      {children}
     </button>
   );
 }

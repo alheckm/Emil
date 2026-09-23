@@ -29,7 +29,7 @@ export const metadata = { title: "Einkaufsliste" };
  */
 export default function ListPage() {
   return (
-    <Screen title="Einkaufsliste">
+    <Screen title="Einkaufsliste" titleSize="display">
       <Suspense fallback={<ListSkeleton />}>
         <List />
       </Suspense>

@@ -147,7 +147,9 @@ export function RecipeImageField({
 
   return (
     <div className="space-y-2">
-      <span className="block text-[13px] font-medium text-muted">Bild</span>
+      <span className="block text-[10px] font-extrabold tracking-[0.08em] text-muted uppercase">
+        Bild
+      </span>
 
       {cropSrc ? (
         <ImageCropper
@@ -176,10 +178,10 @@ export function RecipeImageField({
           <div className="flex gap-2">
             <label
               htmlFor={inputId}
-              className="flex min-h-11 flex-1 cursor-pointer items-center justify-center rounded-pill border border-border px-4 text-[15px] font-medium press"
+              className="flex h-13 flex-1 cursor-pointer items-center justify-center gap-2.5 border-2 border-text px-6 text-[13px] font-extrabold tracking-[0.1em] text-text uppercase press"
             >
               {busy
-                ? "Wird verkleinert …"
+                ? "Wird verkleinert"
                 : shown
                   ? "Bild ersetzen"
                   : "Bild wählen"}
@@ -187,19 +189,19 @@ export function RecipeImageField({
           </div>
 
           {shown && (
-            <div className="flex gap-2">
+            <div className="flex gap-5">
               <button
                 type="button"
                 onClick={() => void openCrop()}
                 disabled={cropLoading}
-                className="flex min-h-11 flex-1 items-center justify-center rounded-pill border border-border px-4 text-[15px] text-muted press disabled:opacity-50"
+                className="min-h-11 text-[13px] font-extrabold tracking-[0.1em] text-text uppercase press-flat tap-target disabled:opacity-30"
               >
-                {cropLoading ? "Wird geladen …" : "Zuschneiden"}
+                {cropLoading ? "Wird geladen" : "Zuschneiden"}
               </button>
               <button
                 type="button"
                 onClick={remove}
-                className="flex min-h-11 flex-1 items-center justify-center rounded-pill border border-border px-4 text-[15px] text-muted press"
+                className="min-h-11 text-[13px] font-extrabold tracking-[0.1em] text-muted uppercase press-flat tap-target"
               >
                 Entfernen
               </button>

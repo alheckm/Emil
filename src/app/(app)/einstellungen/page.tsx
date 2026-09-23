@@ -16,7 +16,7 @@ export const metadata = { title: "Einstellungen" };
  */
 export default function SettingsPage() {
   return (
-    <Screen title="Einstellungen">
+    <Screen title="Einstellungen" titleSize="display">
       <nav className="space-y-2">
         <RowLink href="/einstellungen/haushalt" prefetch>
           <span className="font-medium">Haushalt</span>

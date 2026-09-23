@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { Button } from "@/components/ui";
 
 /**
  * Ausschnitt eines Fotos wählen — fest auf 4:3, wie Karte, Hero und
@@ -200,22 +201,18 @@ export function ImageCropper({
         disabled={!ready}
       />
 
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex min-h-11 flex-1 items-center justify-center rounded-pill border border-border px-4 text-[15px] text-muted press"
-        >
+      <div className="flex gap-3">
+        <Button type="button" variant="secondary" onClick={onCancel}>
           Abbrechen
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => void confirm()}
           disabled={!ready || busy}
-          className="flex min-h-11 flex-1 items-center justify-center rounded-pill bg-accent px-4 text-[15px] font-medium text-accent-ink press disabled:opacity-50"
+          loading={busy}
         >
-          {busy ? "Wird zugeschnitten …" : "Übernehmen"}
-        </button>
+          {busy ? "Wird zugeschnitten" : "Übernehmen"}
+        </Button>
       </div>
     </div>
   );

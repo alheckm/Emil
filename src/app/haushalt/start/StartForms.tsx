@@ -50,7 +50,7 @@ export function StartForms() {
       {error && <Notice tone="error">{error}</Notice>}
 
       <Section>
-        <h2 className="text-lg font-semibold">Haushalt anlegen</h2>
+        <h2 className="text-[20px] font-extrabold uppercase">Haushalt anlegen</h2>
         <p className="mt-1 text-[15px] leading-relaxed text-muted">
           Du wirst Eigentümer und kannst danach jemanden einladen.
         </p>
@@ -73,14 +73,14 @@ export function StartForms() {
             placeholder="Zuhause"
             autoComplete="off"
           />
-          <Button type="submit" disabled={busy !== null}>
-            {busy === "create" ? "Einen Moment …" : "Anlegen"}
+          <Button type="submit" disabled={busy !== null} loading={busy === "create"}>
+            {busy === "create" ? "Einen Moment" : "Anlegen"}
           </Button>
         </form>
       </Section>
 
       <Section>
-        <h2 className="text-lg font-semibold">Einladung einlösen</h2>
+        <h2 className="text-[20px] font-extrabold uppercase">Einladung einlösen</h2>
         <p className="mt-1 text-[15px] leading-relaxed text-muted">
           Acht Zeichen vom anderen Handy. Groß- und Kleinschreibung egal.
         </p>
@@ -106,8 +106,8 @@ export function StartForms() {
             placeholder="ABCD2345"
             className="font-mono"
           />
-          <Button type="submit" variant="quiet" disabled={busy !== null}>
-            {busy === "join" ? "Einen Moment …" : "Beitreten"}
+          <Button type="submit" variant="secondary" disabled={busy !== null} loading={busy === "join"}>
+            {busy === "join" ? "Einen Moment" : "Beitreten"}
           </Button>
         </form>
       </Section>

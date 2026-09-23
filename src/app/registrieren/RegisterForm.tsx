@@ -80,7 +80,7 @@ export function RegisterForm() {
         required
         hint="Mindestens acht Zeichen."
       />
-      <Button type="submit" disabled={busy}>
+      <Button type="submit" disabled={busy} loading={busy}>
         {busy ? "Einen Moment …" : "Konto anlegen"}
       </Button>
     </form>

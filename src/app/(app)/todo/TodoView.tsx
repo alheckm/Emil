@@ -136,7 +136,7 @@ export function TodoView({
           placeholder="Aufgabe ergänzen"
           autoCapitalize="sentences"
           enterKeyHint="done"
-          className="h-12 w-full rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
+          className="h-11 w-full border-0 border-b-2 border-text bg-transparent px-0 text-base font-semibold text-text outline-none placeholder:text-muted/50 focus:border-b-[3px]"
         />
       </Section>
 
@@ -156,7 +156,7 @@ export function TodoView({
 
       {doneItems.length > 0 && (
         <section className="space-y-3">
-          <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
+          <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
             Erledigt
           </h2>
           <ul className="space-y-2">

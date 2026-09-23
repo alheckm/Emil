@@ -377,7 +377,7 @@ export function RecipeForm({
       </Section>
 
       <Section>
-        <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
+        <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
           Zutaten
         </h2>
 
@@ -387,17 +387,14 @@ export function RecipeForm({
             return (
               <div
                 key={row.key}
-                className={
-                  "rounded-soft border p-3 " +
-                  (unsure ? "border-warn bg-warn/10" : "border-border bg-soft")
-                }
+                className={"p-3 " + (unsure ? "border border-warn" : "bg-soft")}
               >
                 {row.groupLabel && (
-                  <p className="mb-2 text-[13px] font-medium text-muted">
+                  <p className="mb-2 text-[11px] font-bold tracking-[0.06em] text-muted uppercase">
                     {row.groupLabel}
                   </p>
                 )}
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2 border-b-2 border-text pb-1.5">
                   <input
                     aria-label="Zutat"
                     value={row.name}
@@ -406,7 +403,7 @@ export function RecipeForm({
                     }
                     placeholder="Zutat"
                     autoCapitalize="sentences"
-                    className="h-11 min-w-0 flex-1 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
+                    className="min-w-0 flex-1 bg-transparent text-base font-semibold text-text outline-none placeholder:text-muted/50"
                   />
                   <button
                     type="button"
@@ -416,12 +413,12 @@ export function RecipeForm({
                         current.filter((other) => other.key !== row.key),
                       )
                     }
-                    className="h-11 w-11 shrink-0 rounded-pill border border-border text-muted press"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center text-muted press-flat tap-target"
                   >
                     ✕
                   </button>
                 </div>
-                <div className="mt-2 flex gap-2">
+                <div className="mt-3 flex gap-3">
                   <input
                     aria-label="Menge"
                     value={row.amount}
@@ -430,7 +427,7 @@ export function RecipeForm({
                     }
                     placeholder="Menge"
                     inputMode="decimal"
-                    className="h-11 w-24 shrink-0 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
+                    className="h-11 w-20 shrink-0 border-0 border-b-2 border-text bg-transparent text-base font-semibold text-text outline-none placeholder:text-muted/50"
                   />
                   <select
                     aria-label="Einheit"
@@ -438,7 +435,7 @@ export function RecipeForm({
                     onChange={(event) =>
                       updateRow(row.key, { unitCode: event.target.value })
                     }
-                    className="h-11 w-28 shrink-0 appearance-none rounded-soft border border-border bg-soft px-2 text-base outline-none focus:border-text"
+                    className="h-11 w-24 shrink-0 appearance-none border-0 border-b-2 border-text bg-transparent text-base font-semibold text-text outline-none"
                   >
                     <option value="">ohne</option>
                     {UNITS.map((unit) => (
@@ -454,7 +451,7 @@ export function RecipeForm({
                       updateRow(row.key, { note: event.target.value })
                     }
                     placeholder="Notiz"
-                    className="h-11 min-w-0 flex-1 rounded-soft border border-border bg-soft px-3 text-base outline-none focus:border-text"
+                    className="h-11 min-w-0 flex-1 border-0 border-b-2 border-text bg-transparent text-base font-semibold text-text outline-none placeholder:text-muted/50"
                   />
                 </div>
                 {unsure && (
@@ -473,13 +470,15 @@ export function RecipeForm({
           })}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setRows((current) => [...current, emptyRow()])}
-          className="mt-3 h-11 w-full rounded-pill border border-border text-[15px] press"
-        >
-          Zeile hinzufügen
-        </button>
+        <div className="mt-3">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setRows((current) => [...current, emptyRow()])}
+          >
+            Zeile hinzufügen
+          </Button>
+        </div>
 
         <div className="mt-6 border-t border-border pt-4">
           <Textarea
@@ -491,13 +490,11 @@ export function RecipeForm({
             onChange={(event) => setBulk(event.target.value)}
             placeholder={"15 g Butterschmalz\n2 große Zwiebel(n) (gewürfelt)\nSalz und Pfeffer"}
           />
-          <button
-            type="button"
-            onClick={takeOverBulk}
-            className="mt-3 h-11 w-full rounded-pill border border-border text-[15px] press"
-          >
-            Zeilen übernehmen
-          </button>
+          <div className="mt-3">
+            <Button type="button" variant="secondary" onClick={takeOverBulk}>
+              Zeilen übernehmen
+            </Button>
+          </div>
         </div>
       </Section>
 
@@ -527,8 +524,8 @@ export function RecipeForm({
       </Section>
 
       <div className="space-y-2">
-        <Button onClick={() => void save()} disabled={busy}>
-          {busy ? "Wird gespeichert …" : "Speichern"}
+        <Button onClick={() => void save()} disabled={busy} loading={busy}>
+          {busy ? "Wird gespeichert" : "Speichern"}
         </Button>
         <p className="text-center text-[15px]">
           <Link

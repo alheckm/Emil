@@ -23,6 +23,7 @@ export default function RecipesPage(props: PageProps<"/rezepte">) {
   return (
     <Screen
       title="Rezepte"
+      titleSize="display"
       action={
         // Einziger Einstieg zu neuen Rezepten, deshalb in Markenfarbe wie
         // die „Bearbeiten"-Aktion auf dem Rezept-Screen. „Importieren" bleibt

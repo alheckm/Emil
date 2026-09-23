@@ -70,10 +70,7 @@ export function InviteSection({
       ) : (
         <ul className="space-y-3">
           {invites.map((invite) => (
-            <li
-              key={invite.code}
-              className="rounded-soft border border-border bg-soft p-4"
-            >
+            <li key={invite.code} className="bg-soft p-4">
               <p className="font-mono text-2xl tracking-[0.2em]">{invite.code}</p>
               <p className="mt-1 text-[13px] text-muted">
                 gültig bis{" "}
@@ -83,24 +80,24 @@ export function InviteSection({
                   year: "numeric",
                 })}
               </p>
-              <div className="mt-3 flex gap-2">
-                <button
+              <div className="mt-3 flex gap-3">
+                <Button
                   type="button"
+                  variant="secondary"
                   onClick={() => void copy(invite.code)}
-                  className="h-11 flex-1 rounded-soft border border-border text-[15px] press"
                 >
                   {copied === invite.code ? "Kopiert" : "Kopieren"}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="secondary"
                   disabled={busy}
                   onClick={() =>
                     void withSupabase((supabase) => revokeInvite(supabase, invite.code))
                   }
-                  className="h-11 flex-1 rounded-soft border border-border text-[15px] text-muted press disabled:opacity-50"
                 >
                   Zurücknehmen
-                </button>
+                </Button>
               </div>
             </li>
           ))}
@@ -108,13 +105,14 @@ export function InviteSection({
       )}
 
       <Button
-        variant="quiet"
+        variant="secondary"
         disabled={busy}
+        loading={busy}
         onClick={() =>
           void withSupabase((supabase) => createInvite(supabase, householdId))
         }
       >
-        {busy ? "Einen Moment …" : "Neuen Code erzeugen"}
+        {busy ? "Einen Moment" : "Neuen Code erzeugen"}
       </Button>
     </div>
   );

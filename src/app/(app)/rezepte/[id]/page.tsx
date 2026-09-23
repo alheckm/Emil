@@ -83,22 +83,27 @@ async function RecipeDetail({ params }: { params: Params }) {
       </RecipeHero>
 
       {/* Titel und Kenndaten stehen jetzt unter dem Foto, auf `--bg` — nicht
-          mehr darauf. Design-System, Abschnitt 7, RecipeHero. */}
+          mehr darauf. 44px statt der Root-Tab-Display-Größe (56px): eigene,
+          etwas kleinere Stufe für den Rezept-Screen, der darunter noch
+          Stepper, Zutaten und Zubereitung unterbringen muss. */}
       <div className="px-5 pt-5">
-        <h1 className="font-display text-[32px] font-bold leading-[1.15] [text-wrap:balance]">
+        <h1
+          lang="de"
+          className="font-display text-[44px] leading-[1.02] font-black tracking-[-0.01em] text-text uppercase [hyphens:auto] [text-wrap:balance]"
+        >
           {value.title}
         </h1>
         {(value.totalTimeMin || value.tags.length > 0) && (
           <ul className="mt-3 flex flex-wrap gap-2">
             {value.totalTimeMin && (
-              <li className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium">
+              <li className="border border-border px-3 py-1 text-[11px] font-bold tracking-[0.08em] uppercase">
                 {value.totalTimeMin} Min
               </li>
             )}
             {value.tags.map((tag) => (
               <li
                 key={tag}
-                className="rounded-pill border border-border px-3 py-1 text-[13px] font-medium"
+                className="border border-border px-3 py-1 text-[11px] font-bold tracking-[0.08em] uppercase"
               >
                 {tag}
               </li>
@@ -111,7 +116,7 @@ async function RecipeDetail({ params }: { params: Params }) {
 
       {value.notes && (
         <section className="px-5 pb-6">
-          <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
+          <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
             Notizen
           </h2>
           <p className="mt-3 whitespace-pre-line text-[15px] leading-[1.55]">

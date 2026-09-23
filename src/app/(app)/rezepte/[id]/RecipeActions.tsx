@@ -13,8 +13,8 @@ import {
   type RecipeNutrition,
 } from "@/lib/data/recipes";
 import { addRecipeToList, removeRecipeFromList } from "@/lib/data/shoppingList";
-import { CheckIcon, MinusIcon, PlusIcon } from "@/components/icons";
-import { Notice } from "@/components/ui";
+import { CheckIcon, PlusIcon } from "@/components/icons";
+import { Button, Notice } from "@/components/ui";
 
 /**
  * Der Zutaten-Abschnitt der Rezeptkarte: Portionen, Zutaten, Einkaufsliste.
@@ -140,25 +140,22 @@ export function RecipeIngredientsAndSteps({
         </div>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-        <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
-          Zutaten
-        </h2>
-        <div className="flex flex-wrap items-center gap-3">
-          <ServingStepper
-            value={servings}
-            label={recipe.servingsLabel}
-            onChange={setServings}
-          />
-          <ShoppingListButton
-            state={!onList ? "off" : changed ? "stale" : "on"}
-            disabled={!listId}
-            onClick={onList && !changed ? onRemove : onAdd}
-          />
-        </div>
+      <div className="flex items-center justify-between gap-4 border-b-2 border-text pb-3">
+        <span className="text-[10.5px] font-extrabold tracking-[0.1em] uppercase">
+          Portionen
+        </span>
+        <ServingStepper
+          value={servings}
+          label={recipe.servingsLabel}
+          onChange={setServings}
+        />
       </div>
 
-      <ul className="mt-6 space-y-2">
+      <h2 className="mt-6 text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
+        Zutaten
+      </h2>
+
+      <ul className="mt-3 divide-y divide-border">
         {recipe.ingredients.map((line, index) => {
           const previous = recipe.ingredients[index - 1];
           const showGroup =
@@ -172,28 +169,39 @@ export function RecipeIngredientsAndSteps({
           return (
             <li key={line.id}>
               {showGroup && (
-                <p className="mb-2 mt-4 font-display text-[15px] font-semibold leading-[1.3]">
+                <p className="pt-4 pb-1 text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
                   {line.groupLabel}
                 </p>
               )}
-              <div className="flex gap-3 text-[15px] leading-[1.55]">
-                {/* Die Menge steht rechtsbündig in einer eigenen Spalte:
-                    untereinander gelesen sind so alle Zahlen an derselben
-                    Kante, und beim Umrechnen springt nichts. */}
-                <span className="w-20 shrink-0 text-right font-medium tabular-nums">
-                  {text || (line.toTaste ? "etwas" : "")}
-                </span>
-                <span className="min-w-0">
+              {/* Der Name steht links in Versalien, die Menge rechtsbündig
+                  gedeckt — untereinander gelesen sind so alle Zahlen an
+                  derselben Kante, und beim Umrechnen springt nichts. */}
+              <div className="flex items-baseline justify-between gap-3 py-2.5">
+                <span className="min-w-0 text-[14.5px] font-bold tracking-[0.01em] uppercase">
                   {line.ingredientName ?? line.rawText}
                   {line.note && (
-                    <span className="text-muted"> ({line.note})</span>
+                    <span className="text-[13px] font-normal text-muted normal-case">
+                      {" "}
+                      ({line.note})
+                    </span>
                   )}
+                </span>
+                <span className="shrink-0 text-[12.5px] font-extrabold tracking-[0.02em] text-muted uppercase tabular-nums">
+                  {text || (line.toTaste ? "etwas" : "")}
                 </span>
               </div>
             </li>
           );
         })}
       </ul>
+
+      <div className="mt-6">
+        <ShoppingListButton
+          state={!onList ? "off" : changed ? "stale" : "on"}
+          disabled={!listId}
+          onClick={onList && !changed ? onRemove : onAdd}
+        />
+      </div>
       </section>
 
       {recipe.nutrition && <NutritionTable nutrition={recipe.nutrition} />}
@@ -221,7 +229,7 @@ function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
 
   return (
     <section className="px-5 pb-6">
-      <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
+      <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
         Nährwerte
       </h2>
       <p className="mt-1 text-[13px] text-muted">Pro Portion</p>
@@ -232,7 +240,9 @@ function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
             className="flex items-center justify-between border-t border-border py-3 text-[15px]"
           >
             <dt>{label}</dt>
-            <dd className="font-medium tabular-nums">{value}</dd>
+            <dd className="font-extrabold tracking-[0.02em] uppercase tabular-nums">
+              {value}
+            </dd>
           </div>
         ))}
       </dl>
@@ -257,7 +267,7 @@ function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
 function RecipeSteps({ steps }: { steps: string[] }) {
   return (
     <section className="px-5 pb-6">
-      <h2 className="font-display text-[15px] font-semibold leading-[1.3]">
+      <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
         Zubereitung
       </h2>
       <ol className="mt-4 space-y-4">
@@ -280,11 +290,10 @@ function RecipeSteps({ steps }: { steps: string[] }) {
 /**
  * Der Portionswähler.
  *
- * Bewusst klein: er ist eine Nebenfunktion und darf nicht mit dem Rezepttitel
- * konkurrieren. Sichtbar sind 32-px-Kreise in einer Pille, die Trefferfläche
- * ist mit 44 px aber deutlich größer als das, was man sieht. Sichtbare Größe
- * und Trefferfläche sind zwei verschiedene Maße — der Daumen tippt im Stehen,
- * und unter 44 px trifft er daneben.
+ * Kein Kasten mehr — bloße Ziffern und Vorzeichen wie im Komponenten-
+ * Specimen, die Trefferfläche kommt über Padding (44 px), nicht über eine
+ * sichtbare Fläche. Sichtbare Größe und Trefferfläche sind zwei verschiedene
+ * Maße — der Daumen tippt im Stehen, und unter 44 px trifft er daneben.
  *
  * `aria-live="polite"` an der Zahl: wer den Knopf per VoiceOver drückt, hört
  * sonst nur „Plus", aber nie das Ergebnis.
@@ -299,21 +308,21 @@ function ServingStepper({
   onChange: (next: number) => void;
 }) {
   return (
-    <div className="flex items-center rounded-pill bg-soft">
+    <div className="flex items-center gap-1">
       <StepperButton
         label="Eine Portion weniger"
         disabled={value <= 1}
         onClick={() => onChange(Math.max(1, value - 1))}
       >
-        <MinusIcon className="h-4 w-4" />
+        –
       </StepperButton>
       <span
         aria-live="polite"
-        className="min-w-[4.5rem] text-center text-[13px] font-medium"
+        className="min-w-[4.5rem] text-center text-[15px] font-medium"
       >
         {/* `key` sorgt dafür, dass die neue Zahl kurz aufblendet statt hart
             umzuspringen — 150 ms, mehr wäre eine Animation. */}
-        <span key={value} className="count-swap tabular-nums">
+        <span key={value} className="count-swap text-[19px] font-black tabular-nums">
           {value}
         </span>{" "}
         {label}
@@ -322,7 +331,7 @@ function ServingStepper({
         label="Eine Portion mehr"
         onClick={() => onChange(value + 1)}
       >
-        <PlusIcon className="h-4 w-4" />
+        +
       </StepperButton>
     </div>
   );
@@ -345,22 +354,17 @@ function StepperButton({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="flex h-11 w-11 items-center justify-center press tap-target disabled:opacity-30"
+      className="flex h-11 w-11 items-center justify-center text-[19px] font-extrabold press-flat tap-target disabled:opacity-30"
     >
-      <span className="flex h-8 w-8 items-center justify-center rounded-pill bg-card">
-        {children}
-      </span>
+      {children}
     </button>
   );
 }
 
 /**
- * „Auf die Einkaufsliste“ — eine schmale, aber wichtige Sekundäraktion.
- *
- * Ruhezustand jetzt in `--accent`: die Markenfarbe aus docs/app_redesign.jpg
- * trägt genau diese Art Aktion dort auch („Details"-Knopf). Sobald das Rezept
- * auf der Liste liegt, wechselt die Fläche auf `--soft` und der Text auf
- * `--text` — kein Grün, kein zweites Signal neben Gold.
+ * „Auf die Einkaufsliste" — der eine Primärknopf dieses Screens, wie im
+ * Komponenten-Specimen bildschirmbreit unter den Zutaten statt als schmale
+ * Pille daneben.
  *
  * Drei Zustände statt zwei: liegt das Rezept mit einer **anderen**
  * Portionszahl auf der Liste, ist der Knopf wieder offen und beschriftet mit
@@ -369,6 +373,8 @@ function StepperButton({
  *
  * Im Zustand „on" nimmt derselbe Knopf das Rezept wieder von der Liste —
  * kein eigener Knopf dafür, sonst zwei Wege zum selben Ziel auf engem Raum.
+ * Dafür wechselt er auf `secondary`: Entfernen ist hier keine Aktion, die
+ * genauso laut auftreten soll wie das Hinzufügen.
  */
 function ShoppingListButton({
   state,
@@ -382,20 +388,13 @@ function ShoppingListButton({
   const on = state === "on";
 
   return (
-    <button
+    <Button
       type="button"
+      variant={on ? "secondary" : "primary"}
       onClick={onClick}
       disabled={disabled}
       aria-label={on ? "Von der Liste nehmen" : undefined}
       aria-live="polite"
-      className={
-        "inline-flex h-9 items-center gap-2 rounded-pill px-3.5 text-[13px] " +
-        "font-medium transition-colors duration-200 ease-out press tap-target " +
-        "disabled:cursor-default " +
-        (on
-          ? "bg-soft text-text"
-          : "bg-accent text-accent-ink disabled:opacity-40")
-      }
     >
       {on ? <CheckIcon className="h-4 w-4" /> : <PlusIcon className="h-4 w-4" />}
       {on
@@ -403,7 +402,7 @@ function ShoppingListButton({
         : state === "stale"
           ? "Liste aktualisieren"
           : "Einkaufsliste"}
-    </button>
+    </Button>
   );
 }
 
@@ -469,7 +468,7 @@ export function DeleteRecipe({
           disabled={deleting}
           onClick={() => (ask ? void onDelete() : setAsk(true))}
           className={
-            "min-h-11 rounded-soft px-4 text-[13px] press tap-target " +
+            "min-h-11 px-4 text-[13px] font-bold tracking-[0.04em] uppercase press tap-target " +
             "disabled:opacity-50 " +
             // Leise über Größe und Position, nicht über Blässe: `--muted`
             // wäre hier korrekt lesbar, zöge aber die Aufmerksamkeit auf
