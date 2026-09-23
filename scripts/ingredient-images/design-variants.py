@@ -78,14 +78,17 @@ CENTERED_BASE = (
 )
 
 FULLSCREEN_TEMPLATE = (
-    "Extreme close-up macro photograph of {subject}, cropped so tightly "
-    "that it fills the entire frame edge to edge — the subject extends "
-    "past all four edges of the frame, so absolutely no background or "
-    "backdrop is visible anywhere, not even a sliver at the corners. "
-    "Photographed from a slightly elevated angle with natural studio "
-    "lighting, sharp focus, high detail, realistic colours and textures, "
-    "no text, no labels, no hands, no props, no other objects, no frame, "
-    "no border, no vignette."
+    "Extreme close-up macro photograph of {subject}. Show several of them "
+    "together, piled up and overlapping in a densely packed cluster that "
+    "fills the entire frame edge to edge — pieces of the subject must "
+    "reach into and fill all four corners of the frame. A single isolated "
+    "item surrounded by background is wrong even if cropped close: this "
+    "must be several pieces packed tightly enough that absolutely no "
+    "background or backdrop is visible anywhere in the frame, not even a "
+    "sliver at the corners or edges. Photographed from a slightly elevated "
+    "angle with natural studio lighting, sharp focus, high detail, "
+    "realistic colours and textures, no text, no labels, no hands, no "
+    "props, no other objects, no frame, no border, no vignette."
 )
 
 
