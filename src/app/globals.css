@@ -1,55 +1,46 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Die Farben stammen aus docs/app_redesign.jpg — und zwar von **innerhalb**
-   der Geraete (docs/design-system.md, Abschnitt 2).
+   Maison Augé (2026-09-23, siehe HANDOFF-maison-auge.md): bewusste, vom
+   Nutzer bestaetigte Abweichung von der aelteren "Fliederblau/Karten"-
+   Richtung. Referenz ist https://maisonauge.com/, keine App — Farben 1:1 aus
+   deren computed style extrahiert, seither in drei Artefakten abgestimmt
+   (Screens, Typografie-System, Komponenten-Specimen; Links im Handoff).
 
-   Anders als beim vorigen Bild gibt es diesmal dort tatsaechlich zwei
-   Flaechen, keine Fehllesung: ein fliederblaues `--bg` traegt Kopfzeile,
-   Begruessung, Filterzeile und den kompletten Rezept-Screen; `--card` (Weiss,
-   mit Schatten) ist die Ausnahme und erscheint nur als Rezeptvorschau in der
-   Uebersicht.
+   `--card` fällt bewusst mit `--bg` zusammen: Flächen trennen sich über
+   `--border` (Haarlinie), nicht über Schatten — `--shadow-card` ist deshalb
+   `none`. `--accent` fällt bewusst mit `--text` zusammen: CTAs sind Navy-
+   Flächen, kein separater Markenton (Unterschied zur alten Gold-Richtung).
 
-   `--accent` ist jetzt die Markenfarbe (ein warmes Gold), keine Warnfarbe
-   mehr — sie traegt CTA-Pillen, Icon-Badges auf Fotos und den Ziffernkasten.
-   Fehler und Loeschen laufen ueber `--danger`, das eigene Token des alten
-   `--accent`-Warntons, nachgedunkelt fuer die neue, kuehlere Flaeche.
+   Radius ueberall 0 — das Signature-Element dieser Richtung. Einzige
+   Ausnahme bleibt die native Segmented Control (System-Control, nicht neu
+   gezeichnet).
 
-   Was eine sichtbare Bedienflaeche auf `--bg` braucht, ohne Aktion zu sein,
-   nimmt `--soft` — nicht `--accent`, sonst verliert Gold seine Signalwirkung.
-
-   Kein Dark Mode in dieser Fassung: die Referenz zeigt nur Hell, und aus der
-   neuen, kuehlen Farbfamilie laesst sich ohne dunkle Referenz nichts sauber
-   ableiten (design-system.md, Abschnitt 13).
+   Kein Dark Mode: die Referenz zeigt nur Hell.
 --------------------------------------------------------------------------- */
 :root {
-  --bg: #c9d2e3;
-  --card: #ffffff;
-  --chip: #ffffff;
-  --soft: #bcc4d6;
-  --border: #a8b2c9;
-  --text: #0b0b10;
-  --muted: #4d5770;
-  --accent: #f6ce8f;
-  --accent-ink: #0b0b10;
-  --danger: #93331f;
-  --ok: #28583d;
-  --warn: #7a4f18;
+  --bg: #fef5f9;
+  --card: #fef5f9;
+  --chip: #f3efec;
+  --soft: #f3efec;
+  --border: #e4d9d3;
+  --text: #222a36;
+  --muted: #b99c8e;
+  --accent: #222a36;
+  --accent-ink: #fef5f9;
+  --danger: #a2283a;
+  /* Kein Erfolgs-/Warnton in den drei Maison-Augé-Artefakten entschieden —
+     eigene, zur Palette passende Ergaenzung: gedecktes Waldgruen bzw.
+     gebranntes Ocker statt Systemgruen/-gelb. */
+  --ok: #3f5d42;
+  --warn: #8a5a2b;
   /* Das Bett, auf dem ein Rezeptfoto liegt, solange die signierte Adresse
-     noch unterwegs ist, oder wenn ein Rezept keins hat. Kein eigener dunkler
-     Ton mehr: der Titel steht nicht mehr auf dem Foto, es muss also nichts
-     mehr darauf lesbar bleiben — deshalb schlicht `--soft`. */
-  --photo: #bcc4d6;
-  --shadow-card: 0 16px 32px -14px rgba(23, 25, 40, 0.28);
-  /* Eigener, deutlich hellerer Ton als `--soft`: die Kapsel um den aktiven
-     Tab sitzt auf der weissen Tab-Leiste (`--card`), nicht auf `--bg` — dort
-     braucht es nur einen Hauch Abhebung, kein Blaugrau. Exakt gemessen. */
-  --well: #f3f4f9;
-  /* Inaktive Symbole in der Tab-Leiste: heller als `--muted`, weil sie auf
-     `--card` (Weiss) stehen statt auf `--bg` — `--muted` ist fuer den
-     Kontrast auf der Grundflaeche abgestimmt und waere hier zu dunkel/kraeftig.
-     Exakt gemessen, nicht von `--muted` abgeleitet. */
-  --icon-muted: #98a0ad;
+     noch unterwegs ist, oder wenn ein Rezept keins hat — dieselbe Flaeche
+     wie `--soft`. */
+  --photo: #f3efec;
+  --shadow-card: none;
+  --well: #f3efec;
+  --icon-muted: #b99c8e;
 }
 
 @theme inline {
@@ -71,16 +62,11 @@
   --shadow-card: var(--shadow-card);
   --font-display: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-sans: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --radius-pill: 999px;
-  /* Die Rezeptvorschau-Karte in der Uebersicht — die einzige Flaeche mit
-     eigenem Schatten (design-system.md, Abschnitt 6). Auch das Rezeptfoto auf
-     der Detailseite und in der Karte selbst teilen sich diesen Radius: beide
-     sitzen mit sehr kleinem Rand nah an ihrer jeweiligen Aussenkante. */
-  --radius-card: 32px;
-  /* Zutatenkacheln, Foto in der Karte: abgerundetes Rechteck, keine Kreise
-     mehr. */
-  --radius-tile: 14px;
-  --radius-soft: 12px;
+  /* Alle Radien 0 — Signature-Element der Maison-Augé-Richtung. */
+  --radius-pill: 0px;
+  --radius-card: 0px;
+  --radius-tile: 0px;
+  --radius-soft: 0px;
 }
 
 html {
@@ -200,7 +186,7 @@ select,
 }
 
 @utility placeholder-box {
-  border-radius: 12px;
+  border-radius: var(--radius-soft);
   background: color-mix(in oklab, var(--muted) 12%, transparent);
   animation: platzhalter-auf 240ms ease-out 320ms backwards;
 }

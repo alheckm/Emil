@@ -1,69 +1,56 @@
 ---
 name: design
 description: Emils Gestaltung — verbindliche Regeln für Farbe, Schrift, Maß,
-  Radius, Schatten, Bewegung, Zustände und Ladeverhalten. Vor JEDER Änderung an
-  der Oberfläche zu laden: Screens unter src/app/, Bausteine in
-  src/components/, Tokens in src/app/globals.css, jede neue Komponente, jede
-  Änderung an Abständen, Größen oder Animationen. Auch laden, wenn eine Aufgabe
-  nur beiläufig etwas Sichtbares berührt — etwa ein Ladezustand, eine
+  Radius, Bewegung, Zustände und Ladeverhalten. Vor JEDER Änderung an der
+  Oberfläche zu laden: Screens unter src/app/, Bausteine in src/components/,
+  Tokens in src/app/globals.css, jede neue Komponente, jede Änderung an
+  Abständen, Größen oder Animationen. Auch laden, wenn eine Aufgabe nur
+  beiläufig etwas Sichtbares berührt — etwa ein Ladezustand, eine
   Fehlermeldung oder ein Knopf in einem Formular.
 ---
 
 # Emils Gestaltung
 
-`docs/app_redesign.jpg` ist die **Design-Spezifikation, nicht die
-Inspiration**. `docs/design-system.md` übersetzt sie in Regeln.
+**Aktuelle Richtung: „Maison Augé"** (entschieden 2026-09-23, über
+`/app-art-director`, Referenz https://maisonauge.com/). Bewusste Abweichung
+von der älteren Fliederblau/Karten-Richtung — `docs/app_redesign.jpg` und
+`docs/design-system.md` sind gelöscht, nicht mehr gültig.
 
-**Lies `docs/design-system.md`, bevor du Oberflächen-Code schreibst.** Die
-Abschnitte, die du je nach Aufgabe brauchst:
-
-| Aufgabe | Abschnitt |
-|---|---|
-| Irgendetwas messen oder Größen wählen | 2 (Maßstab) und 5 (Skala) |
-| Knopf, Aktion, Formular | 3 (Zwei Register) und 7 |
-| Farbe wählen | 4 |
-| Neue Komponente | 6, 7, 10 |
-| Symbol zeichnen | 8 |
-| Animation, Ladezustand, Platzhalter | 9 |
-| Kontrast, Tastatur, Screenreader | 11 |
-| Was noch offen ist | 12 |
-| Fertig? | 13 (Prüfliste) |
+**Lies `HANDOFF-maison-auge.md` im Repo-Root, bevor du Oberflächen-Code
+schreibst.** Es trägt Tokens, Signature-Elemente, Navigation und die
+Artefakt-Links (Screens, Typografie-System, Komponenten-Specimen), bis
+`impeccable-documenter` am Ende von Phase 4 ein `DESIGN.md` bzw.
+`.impeccable/design.json` aus dem fertigen Code schreibt — danach ist das
+die Quelle, nicht mehr die Handoff-Datei.
 
 ## Nicht verhandelbar
 
-1. **Nur Tokens.** Farben, Radien und Schatten stehen in `src/app/globals.css`.
-   Kein Hex-Wert im Komponentencode. Kein Maß außerhalb der Skala in
-   Abschnitt 5 — und wenn eines fehlt, kommt es erst ins Dokument, dann in den
-   Code.
-2. **Die Referenz nicht mit dem Lineal auslesen.** Sie ist ein Mockup, die
-   Handyfläche darin ~291 px gegen 390 pt auf dem Gerät (Faktor ≈ 1,34).
-   Übertragen werden Proportionen. Untergrenzen: 16 px in Eingabefeldern,
-   44 px Trefferfläche, 15 px Fließtext.
-3. **Karten nur in der Rezeptübersicht.** `--card` mit `--shadow-card` fasst
-   dort jede Rezeptvorschau. Überall sonst (Rezept-Screen, Einkauf, Werkzeug)
-   läuft `--bg` ohne Karte durch. Braucht ein Bedienelement auf `--bg` eine
-   Fläche, nimmt es `--soft`, nicht `--card`.
-4. **`--accent` ist Markenfarbe**, kein Warnton. CTA-Pillen, Ziffernkasten,
-   Icon-Badges auf Fotos. Fehler und Löschen laufen über `--danger`.
-   `--accent` nie als dünne Linie oder Text direkt auf `--bg` — der Kontrast
-   reicht dafür nicht (Abschnitt 4).
-5. **Zwei Register.** Rezept und Einkauf: leise Aktionen neben dem Inhalt, kein
-   bildschirmbreiter Knopf — eine schmale Gold-Pille ist erlaubt. Anmelden,
-   Formulare, Einstellungen: eindeutiger breiter Knopf. Nie vermischen.
-6. **Sichtbare Größe ≠ Trefferfläche.** Ein 32-px-Kreis bekommt seine 44 px
+1. **Nur Tokens.** Farben und Radien stehen in `src/app/globals.css`. Kein
+   Hex-Wert im Komponentencode.
+2. **Radius überall 0px** — das Signature-Element. Einzige Ausnahme: native
+   Segmented Control (8px, Systemcontrol).
+3. **`--card` = `--bg`.** Flächen trennen sich über `--border` (Haarlinie),
+   nicht über Schatten. `--shadow-card` ist `none`. Braucht ein Bedienelement
+   auf `--bg` eine Fläche, nimmt es `--soft`, nicht `--card`.
+4. **`--accent` = `--text`.** Kein separater Markenton — CTAs sind
+   Navy-Flächen. Fehler und Löschen laufen über `--danger`.
+5. **Eine einzige Schriftfamilie** (Hanken Grotesk). Hierarchie nur über
+   Gewicht/Größe, nie über Genre oder Kursive.
+6. Untergrenzen unabhängig von der Richtung: 16 px in Eingabefeldern
+   (sonst zoomt iOS hinein), 44 px Trefferfläche, 15 px Fließtext.
+7. **Sichtbare Größe ≠ Trefferfläche.** Ein kleines Symbol bekommt seine 44 px
    über Padding, nicht über mehr Durchmesser.
-7. **Kein Text auf einem Foto**, außer kleinen Icon-Badges (Zurück, Bearbeiten,
+8. **Kein Text auf einem Foto**, außer kleinen Icon-Badges (Zurück, Bearbeiten,
    „Auf der Liste"). Titel stehen daneben oder darunter.
-8. **Keine Web-Muster.** Kein pulsierendes Skelett, kein Emoji als Symbol,
+9. **Keine Web-Muster.** Kein pulsierendes Skelett, kein Emoji als Symbol,
    kein Versalsatz mit Sperrsatz als Überschrift, kein Standard-Fokusring des
    Browsers.
-9. **Jede Animation braucht `prefers-reduced-motion: reduce`.**
+10. **Jede Animation braucht `prefers-reduced-motion: reduce`.**
+11. **Kein Dark Mode.** Die Referenz zeigt nur Hell.
 
 ## Wenn du abweichen willst
 
 Das kann berechtigt sein — aber dann ändert sich **zuerst
-`docs/design-system.md`** und danach der Code, mit Begründung im selben Commit.
-Eine Abweichung, die nur im Code steht, ist keine Entscheidung, sondern Drift.
-
-Abschnitt 12 führt die Stellen, an denen die App dem System noch nicht
-entspricht. Wer eine davon anfasst, streicht sie dort.
+`HANDOFF-maison-auge.md`** (bzw. `DESIGN.md`, sobald es existiert) und danach
+der Code, mit Begründung im selben Commit. Eine Abweichung, die nur im Code
+steht, ist keine Entscheidung, sondern Drift.

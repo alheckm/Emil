@@ -1,38 +1,29 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "./ServiceWorkerRegistration";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 /**
- * Die eine Schrift aus docs/app_redesign.jpg.
+ * Die eine Schrift der Maison-Augé-Richtung (HANDOFF-maison-auge.md).
  *
- * Der Entwurf setzt an keiner Stelle eine Serife — Titel, Abschnitte,
- * Fließtext und Kleinschrift laufen alle in derselben geometrisch-
- * humanistischen Grotesk, nur in unterschiedlichem Schnitt und Gewicht. Das
- * ist der Bruch mit der vorigen Fassung, die zwei Familien gegeneinander
- * setzte (Playfair Display + Poppins) — design-system.md, Abschnitt 5 und 12.
+ * Die Referenz (maisonauge.com) setzt PP Neue Montreal Bold — kostenpflichtig
+ * (Pangram Pangram, ab 40$), nicht lizenziert. **Hanken Grotesk** ist der
+ * gewählte freie Ersatz (SIL OFL), Option A von drei verglichenen
+ * Kandidaten (B=Archivo, C=Schibsted Grotesk verworfen): dieselbe kantige,
+ * hochgezogene x-Höhe, ein enges Rastermaß, das auch in schwerem Schnitt bei
+ * großer Displaygröße nicht ausfranst.
  *
- * **Plus Jakarta Sans**: geometrisches Grundgerüst mit leicht humanistischer
- * Abrundung, ein enges, niedriges „a" und eine kräftige, nicht überzogene
- * Kursive für die Namens-Betonung in der Begrüßung — das trifft den Entwurf
- * deutlich näher als etwa Inter (zu neo-grotesk) oder Manrope (zu rund im
- * Auge).
+ * Eine einzige Familie, Hierarchie nur über Gewicht/Größe (Signature-Element,
+ * kein Genrewechsel zu einer Serife). Variable Font, kein Kursivschnitt —
+ * in der neuen Richtung trägt keine Stelle mehr eine Betonung über Kursive.
  *
- * Zwei CSS-Variablen für dieselbe Schrift, nicht weil es zwei Familien gäbe,
- * sondern weil `font-display` im Code an vielen Stellen steht (Rezepttitel,
- * Abschnittsüberschriften, Ziffernkasten) und ein Massenumbenennen auf
- * `font-sans` nur Fehlerrisiko ohne Nutzen wäre — beide Tokens zeigen jetzt
- * auf dieselbe Instanz.
- *
- * `next/font` lädt zur Bauzeit herunter und liefert von der eigenen Domain —
- * kein Aufruf zu Google zur Laufzeit, und datenschutzseitig die einzige
- * saubere Variante.
+ * `next/font/google` lädt zur Bauzeit herunter und liefert von der eigenen
+ * Domain — kein Aufruf zu Google zur Laufzeit, kein manuelles
+ * Font-Hosting nötig.
  */
-const sans = Plus_Jakarta_Sans({
+const sans = Hanken_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
   display: "swap",
   variable: "--font-sans-ui",
 });
@@ -59,10 +50,10 @@ export const viewport: Viewport = {
   // Randlos bis unter Notch und Home-Indikator; die Screens halten über
   // die *-safe-Utilities Abstand. Zoom bleibt bewusst erlaubt.
   viewportFit: "cover",
-  // Der Ton der Fläche ganz oben am Bildschirm — durchgehend das fliederblaue
-  // `--bg` aus docs/app_redesign.jpg. Kein `dark`-Eintrag mehr: die Referenz
-  // zeigt nur Hell (design-system.md, Abschnitt 4, „Dunkel").
-  themeColor: "#c9d2e3",
+  // Der Ton der Fläche ganz oben am Bildschirm — durchgehend das Blush-Weiß
+  // `--bg` der Maison-Augé-Richtung. Kein `dark`-Eintrag mehr: die Referenz
+  // zeigt nur Hell.
+  themeColor: "#fef5f9",
 };
 
 export default function RootLayout({

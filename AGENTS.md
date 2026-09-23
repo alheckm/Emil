@@ -2,37 +2,37 @@
 
 ## Gestaltung — vor jeder Änderung an der Oberfläche
 
-`docs/design-system.md` ist verbindlich. `docs/app_redesign.jpg` ist die
-**Spezifikation, nicht die Inspiration**: Weicht eine Umsetzung ab, wird die
-Umsetzung korrigiert und nicht die Abweichung zur Designentscheidung erklärt.
+**Aktuelle Richtung: „Maison Augé"** (entschieden 2026-09-23, über
+`/app-art-director`). Das ist eine bewusste, vom Nutzer bestätigte Abweichung
+von der älteren Fliederblau/Karten-Richtung. `docs/design-system.md` und
+`docs/app_redesign.jpg` sind deshalb gelöscht — sie beschrieben die alte
+Richtung und wären als Referenz irreführend.
 
-Wer etwas unter `src/app/`, `src/components/` oder an `src/app/globals.css`
-anfasst, liest das Dokument vorher — der Skill `design` lädt es.
+**Solange kein `DESIGN.md` bzw. `.impeccable/design.json` die neue Richtung
+trägt** (das schreibt `impeccable-documenter` erst am Ende von Phase 4 des
+`app-art-director`-Skills, aus dem fertigen Code), ist `HANDOFF-maison-auge.md`
+im Repo-Root die verbindliche Quelle: Tokens, Signature-Elemente, Navigation,
+Artefakt-Links. Wer etwas unter `src/app/`, `src/components/` oder an
+`src/app/globals.css` anfasst, liest das vorher — der Skill `design` verweist
+darauf.
 
 Die Regeln, die am schnellsten verloren gehen:
 
-- **Nur Tokens.** Farbe, Radius, Schatten kommen aus `globals.css`. Kein
-  Hex-Wert im Komponentencode, keine Maße außerhalb der Skala in Abschnitt 5.
-- **Die Referenz nicht abmessen.** Das JPEG ist ein Mockup im Maßstab ~1:1,34.
-  Untergrenzen: 16 px Schrift in Eingabefeldern (sonst zoomt iOS hinein),
-  44 px Trefferfläche, 15 px Fließtext.
-- **Das Grau im JPEG ist nicht die App.** Es ist die Fläche, auf der die beiden
-  iPhone-Screenshots liegen. Gemessen wird *innerhalb* der Gerätekanten — dort
-  gibt es zwei Flächen: `--bg` (Grund) und `--card` (Rezeptvorschau-Karte).
-- **Karten nur in der Rezeptübersicht.** `--card` mit `--shadow-card` fasst
-  dort jede Rezeptvorschau. Überall sonst (Rezept-Screen, Einkauf, Werkzeug)
-  läuft `--bg` ohne Karte durch. Was eine Bedienfläche auf `--bg` braucht,
-  nimmt `--soft`, nicht `--card`.
-- **`--accent` ist Markenfarbe**, kein Warnton — CTA-Pillen, Ziffernkasten,
-  Icon-Badges. Fehler/Löschen laufen über `--danger`. `--accent` nie als
-  dünne Linie oder Text direkt auf `--bg` (Kontrast, siehe design-system.md
-  Abschnitt 4).
-- **Keine bildschirmbreiten CTA-Knöpfe auf Rezept- und Einkaufsscreens.** Dort
-  stehen Aktionen leise neben dem Inhalt — auch als gefüllte Gold-Pille erlaubt,
-  solange sie nicht bildschirmbreit ist. Breite Knöpfe gehören in Formulare
-  (Abschnitt 3, „Zwei Register").
+- **Nur Tokens.** Farbe, Radius kommen aus `globals.css`. Kein Hex-Wert im
+  Komponentencode.
+- **Radius überall 0px** — das Signature-Element dieser Richtung. Einzige
+  Ausnahme: native Segmented Control (8px, Systemcontrol).
+- **`--card` fällt mit `--bg` zusammen.** Flächen trennen sich über
+  `--border` (Haarlinie), nicht über Schatten — `--shadow-card` ist `none`.
+- **`--accent` fällt mit `--text` zusammen** — kein separater Markenton mehr.
+  CTAs sind Navy-Flächen. Fehler/Löschen laufen über `--danger`.
+- **Eine einzige Schriftfamilie** (Hanken Grotesk), Hierarchie nur über
+  Gewicht/Größe, nicht über Genre oder Kursive.
 - **Kein Dark Mode.** Die Referenz zeigt nur Hell.
 - **Keine pulsierenden Skelette, keine Emojis als Symbole, keine Systemschrift.**
+- 16 px Schrift in Eingabefeldern (sonst zoomt iOS hinein), 44 px
+  Trefferfläche, 15 px Fließtext — diese Untergrenzen gelten unabhängig von
+  der Design-Richtung.
 
 Bewegung: 120–250 ms, `ease-out`, `prefers-reduced-motion` immer mitbedacht.
 

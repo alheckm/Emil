@@ -12,11 +12,11 @@ export default function manifest(): MetadataRoute.Manifest {
     // mit Adressleiste — dann fühlt sie sich nicht wie eine App an.
     display: "standalone",
     orientation: "portrait",
-    // `--bg` aus docs/app_redesign.jpg. Das ist die Fläche, die iOS beim
+    // `--bg` der Maison-Augé-Richtung. Das ist die Fläche, die iOS beim
     // Start zeigt, bevor das erste Pixel der App da ist — steht hier etwas
     // anderes, blitzt beim Öffnen ein fremder Ton auf.
-    background_color: "#c9d2e3",
-    theme_color: "#c9d2e3",
+    background_color: "#fef5f9",
+    theme_color: "#fef5f9",
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
       { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
