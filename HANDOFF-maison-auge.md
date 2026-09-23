@@ -64,33 +64,87 @@ Detail-/Push-Screens (dort Zurück-Chevron statt Tab-Bar, iOS-Konvention).
    gewählt), verankert in echtem Code (`ListView.tsx` renderSheet):
    https://claude.ai/artifact/8GGAvyviEPanjui5jNfirj
 
-## Blocker — WICHTIG, zuerst klären
+## Blocker — GELÖST (2026-09-23, Folgesession)
 
-Ab einem bestimmten Punkt in der Session konnte ich `src/app/` und zuletzt
-auch `docs/` nicht mehr lesen/beschreiben — `ls`/`cat`/Read-Tool liefern
-„Operation not permitted", obwohl `stat`/`ls -la` normale Unix-Rechte zeigen
-(`0644`, eigener User). `xattr -l` scheitert ebenfalls mit „Operation not
-permitted" → sieht nach einer macOS-Zugriffssperre aus (com.apple.macl-artig,
-typisch wenn eine sandboxte App wie Xcode die Datei/das Verzeichnis mal
-angefasst hat), NICHT nach einem Claude-Code-Sandbox-Thema — ein
-`dangerouslyDisableSandbox`-Override half nicht. Der Zugriffsverlust hat sich
-während der Session ausgebreitet (erst nur `globals.css`, dann ganz `src/app/`,
-dann `docs/`) — Ursache unklar, evtl. ein Tool/Prozess auf dem Rechner des
-Nutzers, das gerade läuft (iCloud-Sync? Time Machine? Editor mit App-Sandbox?).
+Der Zugriff auf `src/app/` und `docs/` war in der Folgesession wieder normal
+(`ls`/`Read`/`Edit` funktionieren). Ursache blieb ungeklärt, war aber
+session-lokal — kein Handlungsbedarf mehr.
 
-**Vor dem Weitermachen prüfen:** ob der Zugriff in einer neuen Session wieder
-da ist. Falls nicht: Nutzer muss auf seiner Seite schauen (z. B. Terminal/die
-App, die Claude Code ausführt, unter Systemeinstellungen → Datenschutz &
-Sicherheit → Vollzugriff auf Festplatte freigeben, oder prüfen was die
-Sperre gesetzt hat).
+`globals.new.css` wurde übernommen und danach wie vorgesehen gelöscht.
 
-## Workaround-Datei liegt bereit
+## Nachträglich geklärt (Folgesession, 2026-09-23)
 
-`globals.new.css` im Projekt-Root enthält den fertigen `@theme`-Token-Block
-für `src/app/globals.css` (Tailwind-v4-Konvention `--color-*`/`--radius-*`/
-`--font-*`, abgeleitet aus den Tailwind-Klassen in `ListView.tsx`) — muss
-manuell übernommen werden, sobald der Zugriff wieder da ist. Datei danach
-löschen.
+- **Fotos bleiben** in Rezeptübersicht und Einkaufsliste — die Mockups zeigen
+  reinen Text, das war aber eine Sketch-Vereinfachung, keine Entscheidung.
+  Nutzer bestätigt: Fotos behalten, **aber ohne Rahmen/Haarlinie um Foto oder
+  Karte** — das Foto selbst grenzt sich ab, keine zusätzliche Border. Passt
+  zum parallelen Marktregal-Bildprojekt in diesem Repo (nicht hinfällig).
+- **`--muted`/`--icon-muted` bleiben `#B99C8E`** wie in den Artefakten, trotz
+  nur ~2.4:1 Kontrast auf `#FEF5F9` (unter WCAG-AA 4.5:1). Nutzer bestätigt
+  explizit: Optik vor Kontrast-Optimierung an dieser Stelle.
+- `/todo` existierte bereits im Code (nicht neu, wie ursprünglich vermutet).
+- Regel „kein Versalsatz mit Sperrsatz als Überschrift" aus dem `design`-Skill
+  entfernt — widersprach der Richtung (Wordmark, Überschriften, Navigation
+  sind bewusst Versalsatz + Tracking).
+
+## Typo-Skala (System A — Hanken Grotesk, aus Artefakt 3)
+
+| Ebene | Größe | Zeilenhöhe | Tracking | Gewicht | Versalien |
+|---|---|---|---|---|---|
+| Display | 56pt | 1.02 | -0.01em | 900 | ja |
+| Titel | 28pt | 1.05 | -0.005em | 800 | ja |
+| Überschrift | 12pt | 1.3 | 0.12em | 800, `--muted` | ja |
+| Fließtext | 16pt | 1.5 | 0 | 400 | **nein** |
+| Caption | 11pt | 1.4 | 0.08em | 700 | ja |
+| Zahlen | 15pt | 1.2 | 0.02em | 800, tabular-nums | ja |
+| Button-Label | 13pt | 1.0 | 0.10em | 800 | ja |
+| Navigation | 10.5pt | 1.0 | 0.08em | 700 / 900 aktiv | ja |
+
+Dynamic Type: Display bleibt bis „Groß" gekoppelt, dann gedeckelt (sonst
+sprengt die Riesenüberschrift das Layout bei realen, langen Rezepttiteln —
+`hyphens: auto` nutzen, `lang="de"` ist gesetzt). Fließtext, Caption, Zahlen,
+Button, Navigation skalieren voll bis Accessibility-Stufen; Button-Label
+bricht dabei zweizeilig statt abzuschneiden.
+
+## Komponenten-Zustände (aus Artefakt 4, Phase 3b)
+
+- **Buttons**: keine Pillen mehr — rechteckig, 52px hoch, Button-Label-Skala.
+  Primär (Navy-Fläche), Sekundär (2px Navy-Outline), Tertiär (Text + „→",
+  kein sichtbarer Rahmen), Destruktiv (2px Danger-Outline, **nicht** gefüllt).
+  Gedrückt: Primär dunkler (`#3B4552`) + `scale(.97)`, Sekundär 8%-Navy-Tint,
+  Destruktiv `--danger-tint`-Fläche. Deaktiviert: 32% Opazität. Lädt: Spinner
+  + Label. **Nur ein Primärbutton pro Screen.**
+- **Textfeld**: kein Kasten mehr — Unterstrich (2px Navy), Label darüber in
+  Überschrift-Skala (`--muted`, Versalien). Fokus: 3px Unterstrich. Fehler:
+  Unterstrich + Text in `--danger`, Fehlertext darunter. Deaktiviert: helle
+  Töne. `font-size: 16px` Pflicht (iOS-Zoom).
+- **Select/Menü**: eigene Liste statt natives Dropdown-Styling — Trigger mit
+  1px-Navy-Rahmen, offenes Menü mit hairline-getrennten Zeilen, ausgewählte
+  Zeile navy-gefüllt.
+- **Segmented Control**: bleibt Systemcontrol, eigener Radius (8–10px), aktiv
+  navy-gefüllt — einzige Rundungs-Ausnahme.
+- **Zahlentastatur**: bleibt vollständig System-Grau, keine Markenfarben.
+- **Stepper**: kein Kasten — Unterstrich 2px, `–`/`+` ohne sichtbaren
+  Rahmen (44px Trefferfläche über Padding), Wert zentriert, tabular-nums.
+- **Listenzeile**: Name Versalien 14.5px/700, Meta darunter Caption-Skala
+  `--muted`, Menge rechtsbündig `--muted` tabular-nums. Abgehakt:
+  durchgestrichen, `#C9BEB6`. Swipe: rote Fläche „Entfernen" rechts,
+  Zeile verschiebt sich `translateX(-96px)`.
+- **Sheet**: kein Radius oben (Token ist 0), nur `border-top` Haarlinie statt
+  Schatten, zentrierter Griff, Kopfzeile mit `×`-Schließen, Zeilen
+  hairline-getrennt, Herkunftszeile klein/nicht-versal, Danger-Button
+  bildschirmbreit unten.
+- **Notice/Hinweis**: **nicht gefüllt** — 1px-Rahmen in Tonfarbe
+  (`--text`/`--danger`), Hintergrund bleibt `--card`. Kein `bg-danger/10`
+  mehr wie im alten `ui.tsx`.
+- **Leerzustand**: große Versal-Headline (24px/900), Beschreibung `--muted`,
+  Text-Link „→" als CTA.
+- **Toast**: navy-gefüllt, Haken-Icon, Versal-Label.
+- **Radius, alle Belege konsistent**: 0px ist die bewusste Entscheidung,
+  keine Restunsicherheit — Artefakt 4 vergleicht explizit eckig vs.
+  abgerundet und empfiehlt eckig.
+- `--danger-tint: #F5DEE1` ist ein eigener, entschiedener Token (Druckzustand
+  Destruktiv-Button, o.ä.) — bisher nicht in `globals.css` übernommen.
 
 ## Offen — Projekt-eigenes Setup, das noch geprüft werden muss
 
@@ -111,16 +165,22 @@ löschen.
   (ebenfalls Marktregal-Richtung). Alle drei sind Anti-Referenz für die neue
   Richtung, nicht Autorität — sollten am Ende bereinigt/ersetzt werden.
 
-## Nächste konkrete Schritte nach Neustart
+## Nächste konkrete Schritte
 
-1. Zugriff auf `src/app/` und `docs/` prüfen.
-2. `globals.new.css` → `src/app/globals.css` übernehmen (siehe Datei-Kopf).
-3. Hanken-Grotesk-Dateien selbst hosten (nicht Google-Fonts-CDN, siehe
-   Begründung in `globals.new.css`) — Download-Hinweis steht dort.
-4. Echte Screens bauen: Rezeptübersicht, Rezept-Detail, Einkaufsliste
-   (3-Spalten), Tab-Bar (Liste/Rezepte/Todos/Konto) — Vorlage sind die vier
-   Artefakte oben, Komponenten-Zustände aus Artefakt 4.
-5. Mit Screenshots gegenprüfen (Kritik-Schleife, Top-5-Schwächen beheben).
-6. `impeccable-documenter` spawnen → DESIGN.md + design.json schreiben.
-7. Alte Doku (`docs/design-system.md`, lose `DESIGN.md`, altes
-   `.impeccable/design.json`) aufräumen/ersetzen.
+1. ~~Zugriff prüfen~~ — erledigt.
+2. ~~`globals.new.css` übernehmen~~ — erledigt, Datei gelöscht.
+3. ~~Hanken Grotesk einbinden~~ — erledigt über `next/font/google`
+   (`src/app/layout.tsx`), kein manuelles Hosting nötig, lädt zur Bauzeit
+   von derselben Domain.
+4. **TabBar** auf Text+Punkt umstellen (Signature-Element, bisher noch
+   Icon-basierte Floating-Pill aus der alten Richtung) — `src/app/(app)/TabBar.tsx`.
+5. `src/components/ui.tsx`-Primitives (Button, Field, Select, Textarea,
+   Notice) auf die Komponenten-Specimen-Zustände umstellen (siehe oben) —
+   Button wird rechteckig/kein Pill mehr, Field wird Unterstrich statt Box,
+   Notice wird gerahmt statt gefüllt.
+6. `ListView.tsx` Stepper/Sheet/Swipe-Zeile gegen Artefakt 4 prüfen und
+   angleichen.
+7. Screenshots aller Screens gegenprüfen (Kritik-Schleife, Top-5-Schwächen
+   beheben, insbesondere: lange echte Rezepttitel bei 56pt/900/Versalien,
+   Trefferflächen der neuen Unterstrich-Felder/Stepper).
+8. `impeccable-documenter` spawnen → DESIGN.md + design.json schreiben.

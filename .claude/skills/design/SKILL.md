@@ -43,8 +43,9 @@ die Quelle, nicht mehr die Handoff-Datei.
 8. **Kein Text auf einem Foto**, außer kleinen Icon-Badges (Zurück, Bearbeiten,
    „Auf der Liste"). Titel stehen daneben oder darunter.
 9. **Keine Web-Muster.** Kein pulsierendes Skelett, kein Emoji als Symbol,
-   kein Versalsatz mit Sperrsatz als Überschrift, kein Standard-Fokusring des
-   Browsers.
+   kein Standard-Fokusring des Browsers. Versalsatz mit Sperrsatz IST hier
+   Teil der Richtung (Wordmark, Überschriften, Caption, Navigation,
+   Button-Label) — siehe Typo-Skala unten, keine Web-Pattern-Ausnahme.
 10. **Jede Animation braucht `prefers-reduced-motion: reduce`.**
 11. **Kein Dark Mode.** Die Referenz zeigt nur Hell.
 

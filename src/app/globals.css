@@ -29,6 +29,9 @@
   --accent: #222a36;
   --accent-ink: #fef5f9;
   --danger: #a2283a;
+  /* Gedrückt-Fläche für den Destruktiv-Button (Outline, keine Füllung im
+     Ruhezustand) — entschiedener Wert aus dem Komponenten-Specimen. */
+  --danger-tint: #f5dee1;
   /* Kein Erfolgs-/Warnton in den drei Maison-Augé-Artefakten entschieden —
      eigene, zur Palette passende Ergaenzung: gedecktes Waldgruen bzw.
      gebranntes Ocker statt Systemgruen/-gelb. */
@@ -39,8 +42,6 @@
      wie `--soft`. */
   --photo: #f3efec;
   --shadow-card: none;
-  --well: #f3efec;
-  --icon-muted: #b99c8e;
 }
 
 @theme inline {
@@ -53,12 +54,11 @@
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-danger: var(--danger);
+  --color-danger-tint: var(--danger-tint);
   --color-border: var(--border);
   --color-ok: var(--ok);
   --color-warn: var(--warn);
   --color-photo: var(--photo);
-  --color-well: var(--well);
-  --color-icon-muted: var(--icon-muted);
   --shadow-card: var(--shadow-card);
   --font-display: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-sans: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
