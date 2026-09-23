@@ -23,7 +23,7 @@ import { ChevronRightIcon } from "@/components/icons";
  *   Mechanismus, sind aber keine Schlagwörter: „≤ 30 Min" prüft
  *   `totalTimeMin`, „Saisonal" den aktuellen Monat gegen `seasonMonths` — bis
  *   die geplante automatische Verschlagwortung `seasonMonths` befüllt, findet
- *   die Pille nichts (design-system.md, Abschnitt 12).
+ *   die Pille nichts.
  * - **Der Suchtext** bleibt auf dem Server. Gesucht wird per Volltext über
  *   Titel *und* Zutaten; das im Browser nachzubauen hieße, alle Zutaten aller
  *   Rezepte mitzuschicken und die Suche trotzdem anders aussehen zu lassen als
@@ -155,10 +155,10 @@ export function RecipeBrowser({
         </div>
 
         {/* Zwei feste Schnellfilter zuerst, danach die echten Schlagwörter —
-            eine Reihe, derselbe Pillen-Stil (design-system.md, Abschnitt 7,
-            FilterRow). Die festen Pillen stehen immer da, auch ohne
-            passende Rezepte — anders als die Tag-Liste darunter, die nur
-            zeigt, was es wirklich gibt. */}
+            eine Reihe, derselbe Chip-Stil (radiuslos wie der Rest der
+            Richtung, trotz Funktionsname FilterPill). Die festen Chips
+            stehen immer da, auch ohne passende Rezepte — anders als die
+            Tag-Liste darunter, die nur zeigt, was es wirklich gibt. */}
         <div className="flex flex-wrap gap-2">
           <FilterPill active={isZeitFilter} onClick={() => toggleFilter(QUICK_ZEIT)}>
             ≤ 30 Min
@@ -213,12 +213,10 @@ export function RecipeBrowser({
             )}
           </Section>
         ) : (
-          /* Echte Karten mit Schatten — die Kehrtwende zur Vorgängerfassung
-             (design-system.md, Abschnitt 4 und 7): `docs/app_redesign.jpg`
-             zeigt die Rezeptvorschau innerhalb der Gerätekante als weiße
-             Fläche mit Schatten, keine Fehllesung wie beim alten Bild. Eine
-             Spalte, 20 px Abstand zwischen den Karten; Inhaltsbreite bleibt
-             `max-w-md`. */
+          /* Kein Kartenrahmen, kein Schatten (DESIGN.md, "Flach-Regel"):
+             Titel und Foto laufen offen auf `--bg`, nur der Zeilenabstand
+             (20 px zwischen den Rezepten) trennt sie voneinander. Eine
+             Spalte, Inhaltsbreite bleibt `max-w-md`. */
           <ul className="space-y-5">
             {visible.map((recipe) => {
               const servings = planned[recipe.id];
@@ -316,10 +314,10 @@ export function RecipeBrowser({
 }
 
 /**
- * Eine Pille in der Filterreihe — für die zwei festen Schnellfilter und die
- * echten Schlagwörter gleichermaßen (design-system.md, Abschnitt 7,
- * FilterRow): aktiv `--text`-gefüllt mit `--card`-weißem Text, inaktiv
- * `--soft` mit `--muted`-Text, kein Rahmen in beiden Zuständen.
+ * Ein Chip in der Filterreihe — für die zwei festen Schnellfilter und die
+ * echten Schlagwörter gleichermaßen: aktiv `--text`-gefüllt mit
+ * `--card`-hellem Text, inaktiv `--soft` mit `--muted`-Text, radiuslos wie
+ * der Rest der Richtung, kein Rahmen in beiden Zuständen.
  */
 function FilterPill({
   active,

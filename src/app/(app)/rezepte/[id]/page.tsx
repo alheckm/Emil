@@ -10,10 +10,11 @@ import { RecipeIngredientsAndSteps } from "./RecipeActions";
 import { RecipeHero } from "./RecipeHero";
 
 /**
- * Das Rezept — ein Screen, eine Fläche, wie in docs/app_redesign.jpg.
+ * Das Rezept — ein Screen, eine Fläche (DESIGN.md: `--card` = `--bg`, keine
+ * eigene Kartenfläche).
  *
- * Oben das Foto über die volle Bildschirmbreite bis unter die Statusleiste,
- * ohne Titel darauf; darunter im fliederblauen `--bg` Titel, Merkmal-Chips,
+ * Oben das Foto (mit eigenem, kleinerem Seitenrand, bis unter die
+ * Statusleiste), ohne Titel darauf; darunter auf `--bg` Titel, Merkmal-Chips,
  * Zutaten und Zubereitung. Keine Kopfzeile über dem Bild, keine Karte darum:
  * der Screen **ist** die Fläche. Deshalb `bleed` — der Rahmen gibt seinen
  * Seitenrand ab, und die Abschnitte unter dem Foto setzen ihren eigenen

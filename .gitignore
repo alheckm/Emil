@@ -53,7 +53,7 @@ next-env.d.ts
 # erst hinab, eine Ausnahme darin bliebe sonst wirkungslos.
 /.claude/skills/*
 # `design` ist nicht installiert, sondern gehört zum Projekt. Ohne ihn liest
-# ein frischer Klon docs/design-system.md nie.
+# ein frischer Klon DESIGN.md nie.
 !/.claude/skills/design/
 # Ebenso `rezepte-pflegen`: treibt den headless-Lauf aus
 # scripts/rezept-pflege/lauf.sh an, siehe docs/plan-rezept-pflege.md.
@@ -63,3 +63,9 @@ next-env.d.ts
 !/.claude/skills/zutatenbilder/
 /.claude/helpers/
 .claude/settings.local.json
+
+# Impeccable: config.json und design.json sind Projektzustand (Design-
+# Sidecar zu DESIGN.md), gehören ins Repo. Rest ist lokaler/Session-Zustand.
+.impeccable/config.local.json
+.impeccable/hook.cache.json
+.impeccable/live/

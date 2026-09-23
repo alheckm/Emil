@@ -2,25 +2,22 @@ import Link from "next/link";
 import { ChevronLeftIcon, PencilIcon } from "@/components/icons";
 
 /**
- * Der obere Teil des Rezept-Screens: Foto und zwei runde Knöpfe — sonst
- * nichts. Titel und Kenndaten stehen darunter auf `--bg` (`page.tsx`).
+ * Der obere Teil des Rezept-Screens: Foto und zwei quadratische Knöpfe —
+ * sonst nichts. Titel und Kenndaten stehen darunter auf `--bg` (`page.tsx`).
  *
- * Drei Dinge, die hier nicht Geschmackssache sind:
+ * Zwei Dinge, die hier nicht Geschmackssache sind:
  *
- * - **Kein Titel auf dem Foto, kein Schleier.** Die Referenz
- *   (docs/app_redesign.jpg) legt den Titel in beiden Screens unter bzw. neben
- *   das Foto, nie darüber — design-system.md, Abschnitt 4, Regel 5.
- * - **Das Foto ist eingerückt und gerundet, nicht randlos.** Zweiter
- *   Screenshot der Referenz: das Foto sitzt mit demselben Seitenrand wie der
- *   restliche Inhalt (`px-safe`) und großzügig gerundeten Ecken
- *   (`--radius-card`) — läuft nicht unter die Statusleiste. Das war beim
- *   ersten Durchgang falsch übertragen (vom alten, randlosen System
- *   übernommen, ohne die neue Referenz an dieser Stelle noch einmal zu
- *   prüfen).
+ * - **Kein Titel auf dem Foto, kein Schleier.** Der Titel steht immer
+ *   darunter, nie darüber (DESIGN.md, „Don't ... einem Foto einen Rahmen
+ *   geben" gilt sinngemäß auch für Text: das Foto trägt nur seine zwei
+ *   Icon-Badges, sonst nichts).
  * - **Das Bett unter dem Foto ist immer da.** Die signierte Bildadresse ist
  *   eine eigene Netzrunde, und ein Rezept muss auch ganz ohne Foto gut
  *   aussehen. Deshalb liegt unter dem Bild `bg-photo` (= `--soft`) — und wenn
  *   das Foto nachkommt, springt nichts.
+ *
+ * Radius 0 wie überall in der Richtung — `rounded-card` löst über die Tokens
+ * in `globals.css` auf 0px auf, das Foto sitzt also eckig, nicht gerundet.
  *
  * Oben rechts steht bewusst **kein Herz**: Emil kennt keine Favoriten, und ein
  * Knopf, der nichts tut, ist schlimmer als keiner. An derselben Stelle sitzt
@@ -37,16 +34,15 @@ export function RecipeHero({
 }) {
   return (
     <div className="px-5 pt-safe">
-      {/* 4:3 (design-system.md, Abschnitt 7): an beiden Screens der Referenz
-          gemessen. Gerundet und eingerückt wie im zweiten Screenshot, nicht
-          randlos. */}
+      {/* 4:3, mit demselben Seitenrand wie der restliche Inhalt (`px-safe`)
+          — läuft nicht unter die Statusleiste. */}
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-card bg-photo">
         {children}
 
-        {/* p-3 statt p-4: die Trefferflaeche ist 44 px, der sichtbare Kreis
-            36 px — die 4 px Luft ringsum fehlen dem Abstand, sonst saesse der
-            Kreis 4 px zu weit innen. So stehen 16 px zwischen Fotorand und
-            sichtbarem Kreis, wie im Entwurf. */}
+        {/* p-3 statt p-4: die Trefferflaeche ist 44 px, das sichtbare Badge
+            36 px — die 4 px Luft ringsum fehlen dem Abstand, sonst saesse es
+            4 px zu weit innen. So stehen 16 px zwischen Fotorand und
+            sichtbarem Badge. */}
         <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
           <HeroButton href="/rezepte" label="Zurück zu den Rezepten">
             <ChevronLeftIcon />
@@ -67,15 +63,15 @@ export function RecipeHero({
 }
 
 /**
- * Einer der beiden runden Knöpfe auf dem Foto.
+ * Eines der beiden quadratischen Icon-Badges auf dem Foto (Radius 0 wie
+ * überall in der Richtung — `rounded-pill` löst auf 0px auf).
  *
- * Zurück bleibt Milchglas wie im Entwurf: 36 px sichtbar,
- * `rgba(255,255,255,.72)` mit `backdrop-filter: blur(8px)`, dunkles Symbol —
- * reine Navigation, keine Aktion. Bearbeiten ist eine Aktion und bekommt
- * `--accent` gefüllt, dunkles Symbol (`--accent-ink`) — dieselbe Rolle wie
- * die gold gefüllten Kontakt-Icons auf dem Foto der Referenz. Die
- * Trefferfläche ist in beiden Fällen 44 px, deutlich größer als der Kreis
- * (Design-System, Abschnitt 6).
+ * Zurück bleibt Milchglas: 36 px sichtbar, `rgba(255,255,255,.72)` mit
+ * `backdrop-filter: blur(8px)`, dunkles Symbol — reine Navigation, keine
+ * Aktion. Bearbeiten ist eine Aktion und bekommt `--accent` gefüllt (Navy,
+ * kein separater Markenton mehr), helles Symbol (`--accent-ink`). Die
+ * Trefferfläche ist in beiden Fällen 44 px, deutlich größer als das
+ * sichtbare Badge.
  */
 function HeroButton({
   href,

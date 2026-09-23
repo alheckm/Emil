@@ -26,7 +26,7 @@ export interface RecipeSummary {
   /**
    * Monate (1–12), in denen das Rezept Saison hat — vorbereitet für die
    * geplante automatische Verschlagwortung, die diese Spalte befüllt. Bis
-   * dahin leer, siehe design-system.md Abschnitt 12.
+   * dahin leer.
    */
   seasonMonths: number[];
   imagePath: string | null;

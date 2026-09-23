@@ -215,9 +215,7 @@ export function RecipeIngredientsAndSteps({
  * Die Nährwerttabelle — geschätzte Werte pro Portion (`baseServings`), von
  * der automatischen Rezept-Pflege befüllt (`docs/plan-rezept-pflege.md`).
  * Kein Kästchen, keine `--soft`-Fläche: läuft offen auf `--bg` wie Zutaten
- * und Zubereitung, nur durch Haarlinien zwischen den Zeilen gegliedert —
- * derselbe Abschnittstrenner wie in `RecipeForm.tsx` (design-system.md
- * Abschnitt 7, RecipeHero).
+ * und Zubereitung, nur durch Haarlinien zwischen den Zeilen gegliedert.
  */
 function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
   const rows: [string, string][] = [
@@ -253,13 +251,11 @@ function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
 /**
  * Die Zubereitung.
  *
- * Die Ziffer steht in einem Quadrat in `--accent` — die Markenfarbe aus
- * docs/app_redesign.jpg, nicht mehr der schwarze Ziffernkasten (Nutzer-
- * entscheidung, design-system.md Abschnitt 7 und 14.3). **Nicht kursiv**:
- * Kursiv ist jetzt ausschließlich dem Namen in der Begrüßung vorbehalten
- * (Abschnitt 5) — das ist genau die Stelle, an der ein bloßes `bg-panel` →
- * `bg-accent` das alte `italic` übersehen hätte. `aria-hidden`, weil eine
- * geordnete Liste die Nummer ohnehin ansagt und sie sonst doppelt käme.
+ * Die Ziffer steht in einem Quadrat in `--accent` (DESIGN.md: der
+ * Ziffernkasten ist das Signature-Component dieses Screens). `--accent`
+ * fällt in dieser Richtung mit `--text` zusammen — die Fläche ist Navy, kein
+ * separater Markenton. `aria-hidden`, weil eine geordnete Liste die Nummer
+ * ohnehin ansagt und sie sonst doppelt käme.
  *
  * Mengenverweise (`{{z:N}}`, siehe src/lib/core/steps.ts) sind hier bereits
  * aufgelöst — die Komponente selbst weiß nichts von ihnen.

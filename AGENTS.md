@@ -8,20 +8,21 @@ von der älteren Fliederblau/Karten-Richtung. `docs/design-system.md` und
 `docs/app_redesign.jpg` sind deshalb gelöscht — sie beschrieben die alte
 Richtung und wären als Referenz irreführend.
 
-**Solange kein `DESIGN.md` bzw. `.impeccable/design.json` die neue Richtung
-trägt** (das schreibt `impeccable-documenter` erst am Ende von Phase 4 des
-`app-art-director`-Skills, aus dem fertigen Code), ist `HANDOFF-maison-auge.md`
-im Repo-Root die verbindliche Quelle: Tokens, Signature-Elemente, Navigation,
-Artefakt-Links. Wer etwas unter `src/app/`, `src/components/` oder an
-`src/app/globals.css` anfasst, liest das vorher — der Skill `design` verweist
-darauf.
+**`DESIGN.md`** im Repo-Root ist die verbindliche Quelle (von
+`impeccable-documenter` aus dem fertigen Code abgeleitet, nicht aus Absicht) —
+Tokens, Typo-Skala, Komponenten-Zustände, Do's/Don'ts. `HANDOFF-maison-auge.md`
+bleibt als Entstehungsgeschichte und Artefakt-Links daneben stehen, ist aber
+nicht mehr die primäre Quelle. Wer etwas unter `src/app/`, `src/components/`
+oder an `src/app/globals.css` anfasst, liest `DESIGN.md` vorher — der Skill
+`design` verweist darauf.
 
 Die Regeln, die am schnellsten verloren gehen:
 
 - **Nur Tokens.** Farbe, Radius kommen aus `globals.css`. Kein Hex-Wert im
   Komponentencode.
-- **Radius überall 0px** — das Signature-Element dieser Richtung. Einzige
-  Ausnahme: native Segmented Control (8px, Systemcontrol).
+- **Radius überall 0px** — das Signature-Element dieser Richtung, ohne
+  Ausnahme im gebauten Code (auch der Web/Einfügen-Umschalter im
+  Import-Screen ist selbst gezeichnet, keine native Segmented Control).
 - **`--card` fällt mit `--bg` zusammen.** Flächen trennen sich über
   `--border` (Haarlinie), nicht über Schatten — `--shadow-card` ist `none`.
 - **`--accent` fällt mit `--text` zusammen** — kein separater Markenton mehr.

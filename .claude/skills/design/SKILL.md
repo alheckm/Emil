@@ -16,19 +16,20 @@ description: Emils Gestaltung — verbindliche Regeln für Farbe, Schrift, Maß,
 von der älteren Fliederblau/Karten-Richtung — `docs/app_redesign.jpg` und
 `docs/design-system.md` sind gelöscht, nicht mehr gültig.
 
-**Lies `HANDOFF-maison-auge.md` im Repo-Root, bevor du Oberflächen-Code
-schreibst.** Es trägt Tokens, Signature-Elemente, Navigation und die
-Artefakt-Links (Screens, Typografie-System, Komponenten-Specimen), bis
-`impeccable-documenter` am Ende von Phase 4 ein `DESIGN.md` bzw.
-`.impeccable/design.json` aus dem fertigen Code schreibt — danach ist das
-die Quelle, nicht mehr die Handoff-Datei.
+**Lies `DESIGN.md` im Repo-Root, bevor du Oberflächen-Code schreibst.** Es
+trägt Tokens, Typo-Skala, Komponenten-Zustände und Do's/Don'ts, aus dem
+fertigen Code abgeleitet (`impeccable-documenter`, Phase 4). Die
+Entstehungsgeschichte und Artefakt-Links (Screens, Typografie-System,
+Komponenten-Specimen) stehen weiter in `HANDOFF-maison-auge.md`, aber
+`DESIGN.md` ist die Quelle für Code-Entscheidungen.
 
 ## Nicht verhandelbar
 
 1. **Nur Tokens.** Farben und Radien stehen in `src/app/globals.css`. Kein
    Hex-Wert im Komponentencode.
-2. **Radius überall 0px** — das Signature-Element. Einzige Ausnahme: native
-   Segmented Control (8px, Systemcontrol).
+2. **Radius überall 0px** — das Signature-Element, ohne Ausnahme im gebauten
+   Code (auch Systemcontrol-Kandidaten wie der Web/Einfügen-Umschalter im
+   Import-Screen sind selbst gezeichnet, keine native Segmented Control).
 3. **`--card` = `--bg`.** Flächen trennen sich über `--border` (Haarlinie),
    nicht über Schatten. `--shadow-card` ist `none`. Braucht ein Bedienelement
    auf `--bg` eine Fläche, nimmt es `--soft`, nicht `--card`.
@@ -51,7 +52,6 @@ die Quelle, nicht mehr die Handoff-Datei.
 
 ## Wenn du abweichen willst
 
-Das kann berechtigt sein — aber dann ändert sich **zuerst
-`HANDOFF-maison-auge.md`** (bzw. `DESIGN.md`, sobald es existiert) und danach
-der Code, mit Begründung im selben Commit. Eine Abweichung, die nur im Code
-steht, ist keine Entscheidung, sondern Drift.
+Das kann berechtigt sein — aber dann ändert sich **zuerst `DESIGN.md`** und
+danach der Code, mit Begründung im selben Commit. Eine Abweichung, die nur
+im Code steht, ist keine Entscheidung, sondern Drift.

@@ -1,0 +1,140 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "nested-cards",
+        "value": "*",
+        "files": [
+          "public/design-preview/marktstand.html"
+        ],
+        "createdAt": "2026-09-22T14:02:11.880Z",
+        "reason": "Phone-bezel comparison scaffold (device mockup wrapping card UI), not shipped product markup; deleted once a direction is chosen"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "public/design-preview/marktstand.html"
+        ],
+        "createdAt": "2026-09-22T14:02:11.905Z",
+        "reason": "Outer .phone div is a device-bezel frame with no text of its own; all content children carry their own 18-22px padding"
+      },
+      {
+        "rule": "all-caps-body",
+        "value": "*",
+        "files": [
+          "public/design-preview/marktstand.html"
+        ],
+        "createdAt": "2026-09-22T14:02:11.926Z",
+        "reason": "devlabel is a scaffold-only caption above each phone frame for this A/B comparison, never shipped UI"
+      },
+      {
+        "rule": "nested-cards",
+        "value": "*",
+        "files": [
+          "public/design-preview/klassisch.html"
+        ],
+        "createdAt": "2026-09-22T14:02:19.092Z",
+        "reason": "Phone-bezel comparison scaffold (device mockup wrapping card UI), not shipped product markup; deleted once a direction is chosen"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "public/design-preview/klassisch.html"
+        ],
+        "createdAt": "2026-09-22T14:02:19.118Z",
+        "reason": "Outer .phone div is a device-bezel frame with no text of its own; all content children carry their own 20-24px padding"
+      },
+      {
+        "rule": "all-caps-body",
+        "value": "*",
+        "files": [
+          "public/design-preview/klassisch.html"
+        ],
+        "createdAt": "2026-09-22T14:02:19.143Z",
+        "reason": "devlabel is a scaffold-only caption above each phone frame for this A/B comparison, never shipped UI"
+      },
+      {
+        "rule": "wide-tracking",
+        "value": "*",
+        "files": [
+          "public/design-preview/klassisch.html"
+        ],
+        "createdAt": "2026-09-22T14:02:19.164Z",
+        "reason": "Same scaffold devlabel caption, letter-spacing on a short uppercase dev caption, not shipped body copy"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "public/design-preview/klassisch.html"
+        ],
+        "createdAt": "2026-09-22T14:02:19.184Z",
+        "reason": "Flagged color is the scaffold's outer comparison-canvas background (#E7E4DC) surrounding the phone mockup, not the app's own --bg token (#F7F5F1)"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "public/design-preview/unified.html"
+        ],
+        "createdAt": "2026-09-22T14:24:07.043Z",
+        "reason": "Outer .phone div is a device-bezel frame with no text of its own; all content children carry their own 18-20px padding"
+      },
+      {
+        "rule": "wide-tracking",
+        "value": "*",
+        "files": [
+          "public/design-preview/unified.html"
+        ],
+        "createdAt": "2026-09-22T14:24:07.069Z",
+        "reason": "devlabel is a scaffold-only caption above each phone frame for this comparison, never shipped UI"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": [
+          "public/design-preview/unified.html"
+        ],
+        "createdAt": "2026-09-22T15:01:08.430Z",
+        "reason": "User explicitly requested Inter by name for body text this turn"
+      },
+      {
+        "rule": "overused-font",
+        "value": "instrument serif",
+        "files": [
+          "public/design-preview/unified.html"
+        ],
+        "createdAt": "2026-09-22T15:01:08.453Z",
+        "reason": "User explicitly requested Instrument Serif by name for the headline this turn"
+      },
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "public/design-preview/unified.html"
+        ],
+        "createdAt": "2026-09-22T16:36:38.200Z",
+        "reason": "Detector reads text against the declared --thumb-bg fallback color; in the real render the caption sits over a full-bleed photo plus a dark bottom gradient scrim (rgba(10,9,7,.34-.62)), giving white text real contrast. Verified visually via screenshot."
+      },
+      {
+        "rule": "nested-cards",
+        "value": "*",
+        "files": [
+          "public/design-preview/unified.html"
+        ],
+        "createdAt": "2026-09-22T16:36:38.228Z",
+        "reason": "Flagged boxes are a photo-caption scrim and a status badge absolutely positioned over the tile image, not nested card containers; this is the requested overlay-caption pattern."
+      },
+      {
+        "rule": "design-system-font",
+        "value": "space mono",
+        "createdAt": "2026-09-23T09:44:09.299Z",
+        "reason": "user steer in live mode: explicit request to test Space Mono for headings/quantities on public/design-preview/unified.html; DESIGN.md already lists Space Mono as an open point under discussion"
+      }
+    ]
+  }
+}

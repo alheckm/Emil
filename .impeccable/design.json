@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-23T00:00:00Z",
+  "title": "Design System: Emil",
+  "extensions": {
+    "colorMeta": {
+      "bg": { "role": "neutral", "displayName": "Blush-Weiß", "canonical": "#fef5f9", "tonalRamp": ["#2a1015", "#4d1e28", "#7a3242", "#a85268", "#d493a5", "#eec5cf", "#f8e1e7", "#fef5f9"] },
+      "card": { "role": "neutral", "displayName": "Blush-Weiß (Karte, identisch zu bg)", "canonical": "#fef5f9", "tonalRamp": ["#2a1015", "#4d1e28", "#7a3242", "#a85268", "#d493a5", "#eec5cf", "#f8e1e7", "#fef5f9"] },
+      "soft": { "role": "neutral", "displayName": "Getöntes Beige", "canonical": "#f3efec", "tonalRamp": ["#211d19", "#3c352f", "#5f5449", "#847669", "#a99a8c", "#c7bdb2", "#e0dad3", "#f3efec"] },
+      "border": { "role": "neutral", "displayName": "Haarlinien-Braun", "canonical": "#e4d9d3", "tonalRamp": ["#221a15", "#402f26", "#654c3d", "#8b6e5b", "#b0937f", "#cdb6a7", "#e0cfc4", "#e4d9d3"] },
+      "text": { "role": "primary", "displayName": "Tinte / Navy", "canonical": "#222a36", "tonalRamp": ["#0c0f13", "#151a22", "#222a36", "#374357", "#57647a", "#8892a1", "#bcc3cd", "#e5e8ec"] },
+      "accent": { "role": "primary", "displayName": "Tinte / Navy (Markenfarbe = Textfarbe)", "canonical": "#222a36", "tonalRamp": ["#0c0f13", "#151a22", "#222a36", "#374357", "#57647a", "#8892a1", "#bcc3cd", "#e5e8ec"] },
+      "accent-ink": { "role": "neutral", "displayName": "Blush-Weiß auf Tinte", "canonical": "#fef5f9", "tonalRamp": ["#2a1015", "#4d1e28", "#7a3242", "#a85268", "#d493a5", "#eec5cf", "#f8e1e7", "#fef5f9"] },
+      "muted": { "role": "neutral", "displayName": "Gebranntes Rosébeige", "canonical": "#b99c8e", "tonalRamp": ["#251c17", "#43332a", "#6c5344", "#96745f", "#b99c8e", "#cfb8ab", "#e3d4cb", "#f2e9e4"] },
+      "danger": { "role": "tertiary", "displayName": "Editorial Crimson", "canonical": "#a2283a", "tonalRamp": ["#210a0f", "#3f131c", "#661f2c", "#902b3e", "#a2283a", "#c85f70", "#e0a1ab", "#f3d6db"] },
+      "danger-tint": { "role": "tertiary", "displayName": "Crimson-Tönung (Danger, gedrückt)", "canonical": "#f5dee1", "tonalRamp": ["#210a0f", "#3f131c", "#661f2c", "#902b3e", "#c85f70", "#e0a1ab", "#efd1d6", "#f5dee1"] },
+      "ok": { "role": "tertiary", "displayName": "Gedecktes Waldgrün (eigene Ergänzung, nicht aus Maison-Augé-Artefakten)", "canonical": "#3f5d42", "tonalRamp": ["#0e150f", "#1c281e", "#2c3f2f", "#3f5d42", "#577a5a", "#7d9c80", "#aec4b0", "#dce7dd"] },
+      "warn": { "role": "tertiary", "displayName": "Gebranntes Ocker (eigene Ergänzung, nicht aus Maison-Augé-Artefakten)", "canonical": "#8a5a2b", "tonalRamp": ["#1c1208", "#341f0f", "#573419", "#8a5a2b", "#af7c48", "#cc9f6f", "#e3c29c", "#f2ddc2"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Riesenversalie der vier Root-Tab-Screens (Rezeptübersicht, Einkaufsliste, Todo, Einstellungen)." },
+      "hero": { "displayName": "Rezept-Hero", "purpose": "Eigene, dritte Größe ausschließlich für den Rezept-Detail-Titel — zwischen Display und Title." },
+      "title": { "displayName": "Title", "purpose": "Formulare, Detail- und Unterseiten-Header." },
+      "section-label": { "displayName": "Abschnitts-Label", "purpose": "Die Section-Überschrift selbst (ZUTATEN, ZUBEREITUNG, NÄHRWERTE, PORTIONEN) — kein Kicker über einem eigenen Titel." },
+      "body": { "displayName": "Fließtext", "purpose": "Einzige normal-case Textrolle: Notices, Zubereitungsschritte, Beschreibungen." },
+      "caption-amount": { "displayName": "Menge/Caption", "purpose": "Rechtsbündige Zutatenmengen, Nährwerte, sekundäre Zahlen — tabular-nums." },
+      "button-label": { "displayName": "Button-Label", "purpose": "Beschriftung aller Button-Varianten." },
+      "nav-label": { "displayName": "Navigations-Label", "purpose": "Tab-Leisten-Beschriftung, Gewicht wechselt aktiv/inaktiv." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "press", "value": "opacity 120ms ease-out, transform 120ms ease-out (aktiv: 0ms, opacity 0.7, scale 0.98)", "purpose": "Sofortige Drück-Rückmeldung für Buttons/Kacheln; Übergang nur beim Loslassen." },
+      { "name": "press-flat", "value": "opacity 120ms ease-out (aktiv: 0ms, opacity 0.7)", "purpose": "Wie press, aber ohne Skalierung — für Teilflächen zusammengesetzter Zeilen (Tab-Leiste, Stepper-Buttons)." },
+      { "name": "dims-when-pending", "value": "opacity 150ms ease-out, opacity 0.5 während data-pending", "purpose": "Inhalt blasst während eines Übergangs, statt durch ein Skelett ersetzt zu werden." },
+      { "name": "count-swap", "value": "150ms ease-out, opacity 0.35 → 1", "purpose": "Portionsziffer blendet kurz auf statt hart umzuspringen." },
+      { "name": "placeholder-box", "value": "240ms ease-out, 320ms Verzögerung (animation-fill-mode: backwards), opacity 0 → 1", "purpose": "Ruhige, kein pulsierendes Skelett; erscheint nur, wenn ein Ladevorgang wirklich über ~300ms dauert." },
+      { "name": "reduced-motion", "value": "alle vier Animationen entfallen unter prefers-reduced-motion: reduce", "purpose": "Bewegungsreduktion durchgängig respektiert." }
+    ],
+    "breakpoints": [
+      { "name": "single-column-max", "value": "448px (max-w-md)" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Der eine gefüllte Button pro Screen — Navy-Fläche, Blush-Text, rechteckig.",
+      "html": "<button class=\"ds-btn-primary\">EINKAUFSLISTE</button>",
+      "css": ".ds-btn-primary { height: 52px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 24px; background: var(--color-accent, #222a36); color: var(--color-accent-ink, #fef5f9); font-weight: 800; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; border: none; border-radius: 0; transition: opacity 120ms ease-out, transform 120ms ease-out; } .ds-btn-primary:active { transition-duration: 0ms; opacity: 0.7; transform: scale(0.98); } .ds-btn-primary:disabled { opacity: 0.3; cursor: not-allowed; } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-text, #222a36); outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "2px Navy-Kontur, transparente Fläche, 8%-Navy-Tönung im gedrückten Zustand.",
+      "html": "<button class=\"ds-btn-secondary\">AUF DER LISTE</button>",
+      "css": ".ds-btn-secondary { height: 52px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 24px; background: transparent; color: var(--color-text, #222a36); border: 2px solid var(--color-text, #222a36); border-radius: 0; font-weight: 800; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; transition: opacity 120ms ease-out, transform 120ms ease-out, background 120ms ease-out; } .ds-btn-secondary:active { transition-duration: 0ms; opacity: 0.7; transform: scale(0.98); background: color-mix(in oklab, var(--color-text, #222a36) 8%, transparent); }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "2px Crimson-Kontur, nie gefüllt im Ruhezustand — Tönung nur beim Drücken.",
+      "html": "<button class=\"ds-btn-danger\">LÖSCHEN</button>",
+      "css": ".ds-btn-danger { height: 52px; width: 100%; display: inline-flex; align-items: center; justify-content: center; padding: 0 24px; background: transparent; color: var(--color-danger, #a2283a); border: 2px solid var(--color-danger, #a2283a); border-radius: 0; font-weight: 800; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; transition: background 120ms ease-out; } .ds-btn-danger:active { background: var(--color-danger-tint, #f5dee1); }"
+    },
+    {
+      "name": "Tertiary Button",
+      "kind": "button",
+      "refersTo": "button-tertiary",
+      "description": "Reiner Text, kein Rahmen, mit angehängtem Textzeichen '→' (kein SVG-Icon — Ausnahme im ansonsten SVG-basierten Icon-System, siehe Don't-Liste).",
+      "html": "<button class=\"ds-btn-tertiary\">REZEPT IMPORTIEREN <span aria-hidden=\"true\">→</span></button>",
+      "css": ".ds-btn-tertiary { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; background: none; border: none; color: var(--color-text, #222a36); font-weight: 800; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; transition: opacity 120ms ease-out; } .ds-btn-tertiary:active { transition-duration: 0ms; opacity: 0.7; } .ds-btn-tertiary:disabled { opacity: 0.3; }"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Kein Kasten — 2px Unterstrich, Label darüber in Section-Label-Skala, 16px Eingabetext (iOS-Zoom-Boden).",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">TITEL</span><input class=\"ds-field-input\" placeholder=\"Rezeptname\" /></label>",
+      "css": ".ds-field { display: block; } .ds-field-label { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-muted, #b99c8e); } .ds-field-input { margin-top: 6px; display: block; height: 44px; width: 100%; border: none; border-bottom: 2px solid var(--color-text, #222a36); background: transparent; padding: 0; font-size: 16px; font-weight: 600; color: var(--color-text, #222a36); outline: none; } .ds-field-input::placeholder { color: color-mix(in oklab, var(--color-muted, #b99c8e) 50%, transparent); } .ds-field-input:focus { border-bottom-width: 3px; }"
+    },
+    {
+      "name": "Notice",
+      "kind": "custom",
+      "refersTo": "notice",
+      "description": "Gerahmte, nicht gefüllte Meldung in Tonfarbe (error/ok/info) — bewusste Umkehr einer früheren gefüllten Fassung.",
+      "html": "<p class=\"ds-notice ds-notice-error\" role=\"alert\">Der Server war nicht erreichbar.</p>",
+      "css": ".ds-notice { border: 1px solid; padding: 12px 16px; font-size: 15px; line-height: 1.55; font-weight: 500; } .ds-notice-error { border-color: var(--color-danger, #a2283a); color: var(--color-danger, #a2283a); } .ds-notice-ok { border-color: var(--color-ok, #3f5d42); color: var(--color-ok, #3f5d42); } .ds-notice-info { border-color: var(--color-text, #222a36); color: var(--color-text, #222a36); }"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-bar",
+      "description": "Bildschirmbreite untere Navigation, Haarlinie oben, Text-only-Labels mit 4px Punkt statt Icons — bewusster Icon-Verzicht, in Übereinstimmung mit der Referenzseite.",
+      "html": "<nav class=\"ds-tabbar\" aria-label=\"Hauptbereiche\"><a class=\"ds-tab ds-tab-active\" aria-current=\"page\"><span class=\"ds-tab-dot ds-tab-dot-active\"></span>Liste</a><a class=\"ds-tab\"><span class=\"ds-tab-dot\"></span>Rezepte</a></nav>",
+      "css": ".ds-tabbar { display: flex; width: 100%; border-top: 1px solid var(--color-border, #e4d9d3); background: var(--color-bg, #fef5f9); } .ds-tab { flex: 1; height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-muted, #b99c8e); text-decoration: none; } .ds-tab-active { font-weight: 900; color: var(--color-text, #222a36); } .ds-tab-dot { height: 4px; width: 4px; border-radius: 9999px; background: transparent; } .ds-tab-dot-active { background: var(--color-text, #222a36); }"
+    },
+    {
+      "name": "Shopping Tile",
+      "kind": "card",
+      "refersTo": "tile",
+      "description": "3-Spalten-Kachel der Einkaufsliste: quadratische Fläche in --soft mit einem echten Fotokreis darin — der einzige echte Kreis im System neben Tab-Punkt und Spinner.",
+      "html": "<div class=\"ds-tile\"><div class=\"ds-tile-photo\"><img src=\"\" alt=\"\" /></div><p class=\"ds-tile-name\">Zwiebel</p><p class=\"ds-tile-amount\">2 STK</p></div>",
+      "css": ".ds-tile { background: var(--color-soft, #f3efec); border-radius: 0; padding: 12px; display: flex; flex-direction: column; align-items: center; text-align: center; } .ds-tile-photo { height: 56px; width: 56px; border-radius: 9999px; overflow: hidden; } .ds-tile-name { margin-top: 8px; font-size: 12.5px; font-weight: 800; letter-spacing: 0.02em; text-transform: uppercase; color: var(--color-text, #222a36); } .ds-tile-amount { margin-top: 2px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; color: var(--color-muted, #b99c8e); }"
+    },
+    {
+      "name": "Zubereitungsschritt (Ziffernkasten)",
+      "kind": "custom",
+      "refersTo": "step-number",
+      "description": "24x24px Navy-Quadrat mit der Schrittziffer in Blush — Signature-Komponente der Zubereitung, ersetzt den früheren schwarzen Ziffernkasten der Vorgängerrichtung.",
+      "html": "<span class=\"ds-step-number\" aria-hidden=\"true\">1</span>",
+      "css": ".ds-step-number { display: inline-flex; align-items: center; justify-content: center; height: 24px; width: 24px; flex-shrink: 0; border-radius: 0; background: var(--color-accent, #222a36); color: var(--color-accent-ink, #fef5f9); font-size: 13px; font-weight: 700; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Das Atelierprotokoll",
+    "overview": "Emil dokumentiert Rezepte mit derselben Kälte, mit der ein Studio sein eigenes Corporate-Manual führt: eine Schrift, ein Gewicht als Hierarchie-Werkzeug (Größe und Fettung statt Farbe oder Zierrat), null Radius als bewusste Abgrenzung von generischen rounded-lg-SaaS-Defaults, Haarlinie statt Schatten. Das ist eine im September 2026 vollzogene, nutzerbestätigte Abkehr von einer früheren „Fliederblau/Karten“-Richtung — Gold-Akzent, Kartenschatten und bildschirmbreite Pillen-Buttons sind aus dem Code vollständig entfernt, nicht nur umbenannt. Referenzwelt ist https://maisonauge.com/, eine Branding-Agentur-Seite, keine App; Farbwerte sind 1:1 aus deren computed style übernommen. Die App bleibt trotz der redaktionellen Härte kein reiner Textkatalog: Fotos (Rezept-Hero, Rezeptliste, Einkaufs-Kacheln) bleiben — eine bewusste, nutzerbestätigte Entscheidung gegen die reine Text-Behandlung der Referenz-Mockups. Ein Foto trägt dafür nie einen Rahmen; seine eigene Kante ist die einzige Grenze.",
+    "keyCharacteristics": [
+      "Versal-Typografie (Großbuchstaben, getrackt) als primäres Hierarchie-Mittel; Fließtext ist die einzige bewusste Ausnahme und bleibt normal-case.",
+      "Radius 0 überall im eigenen Formvokabular; die einzigen Kreise im System sind zwei native Browser-Artefakte (Slider-Thumb, Fokusring) plus drei bewusst gerundete Ausnahmen (Foto-Kachel, Tab-Punkt, Lade-Spinner) — siehe Shapes.",
+      "Tiefe ausschließlich über --border-Haarlinien und Weißraum, nie über Schatten (--shadow-card: none).",
+      "--bg und --card sind identisch (#FEF5F9) — Flächen trennen sich nie über einen Farbsprung, nur über die Haarlinie.",
+      "--accent ist die Textfarbe selbst (Navy #222A36) — CTAs sind Tinten-Flächen, kein separater Markenton."
+    ],
+    "rules": [
+      { "name": "Die Flächen-Gleichheit-Regel", "body": "--bg und --card sind derselbe Wert. Kein Screen zeichnet eine Karte, indem er einen Farbsprung zur Umgebung erzeugt — Abgrenzung ist immer eine Haarlinie, nie ein Flächenwechsel.", "section": "colors" },
+      { "name": "Die Ein-Ton-Regel", "body": "--accent erscheint nur als gefüllte Fläche (Primär-Button, Ziffernkasten der Zubereitung) oder als Kontur/Text auf --bg/--soft, nie als dünne Linie und nie als reiner Fließtext direkt auf --bg — der Kontrast trägt das nicht.", "section": "colors" },
+      { "name": "Die Versal-Regel", "body": "Jede Überschrift und jedes Label ist uppercase mit positivem Tracking. Fließtext ist die einzige Ausnahme — er bleibt immer normal-case; keine Stelle darf Fließtext nachträglich in Versalien setzen.", "section": "typography" },
+      { "name": "Die Ein-Familie-Regel", "body": "Hierarchie kommt aus Gewicht und Größe derselben Schrift, nie aus einem Schriftwechsel oder Kursivschnitt (die Variable Font liefert bewusst keine Kursive).", "section": "typography" },
+      { "name": "Die Flach-Regel", "body": "Kein Element im eigenen Formvokabular erzeugt Tiefe über box-shadow. Wo eine Fläche sich von ihrer Umgebung absetzen muss, tut sie das über eine Haarlinie oder eine Tonwertänderung (--soft auf --bg), nie über Schatten.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do Radius 0 für jedes selbst gezeichnete Element verwenden; ein Kreis ist nur für Fotokacheln, den aktiven Tab-Punkt und den Lade-Spinner erlaubt.",
+      "Do Trennung über --border-Haarlinien und Weißraum lösen, nie über Schatten.",
+      "Do --accent nur als gefüllte Fläche oder als Kontur einsetzen, nie als dünne Linie oder Fließtext direkt auf --bg.",
+      "Do Eingabefeld-Text bei mindestens 16px halten, unabhängig davon, was eine Vorlage zeigt.",
+      "Do Inline-SVG-Icons (Kontur, 1,75px Strichstärke, currentColor, aria-hidden, aus src/components/icons.tsx) für alle neuen navigierenden/aktionsbezogenen Symbole verwenden, wie es ChevronRightIcon, CloseIcon, CheckIcon, PlusIcon bereits tun."
+    ],
+    "donts": [
+      "Don't eine Karten-Fläche mit Farbwechsel gegenüber --bg erzeugen — --card und --bg sind derselbe Wert, Trennung läuft über die Haarlinie.",
+      "Don't einen Schlagschatten, eine Pillen-Form für Buttons, ein umrahmtes/gefülltes Eingabefeld oder eine gefüllte Notice-Fläche einführen — alle vier sind bestätigt abgelehnte Muster der Vorgängerrichtung.",
+      "Don't einen goldenen oder warmen Markenakzent verwenden — --accent ist Navy, identisch mit --text.",
+      "Don't einem Foto oder seiner Fläche einen Rahmen geben — die Fotokante ist die einzige Grenze.",
+      "Don't --muted (2,4:1-Kontrast) auf weitere Textrollen ausdehnen, um es als allgemein einsetzbaren Grauton zu legitimieren — der Wert bleibt ein bestätigter, aber begrenzter Kompromiss an genau den Stellen, wo er heute steht."
+    ]
+  }
+}
