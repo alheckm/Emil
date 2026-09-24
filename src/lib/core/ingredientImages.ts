@@ -177,6 +177,7 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Hafermilch": "hafermilch",
   "Sojamilch": "sojamilch",
   "Mandelmilch": "mandelmilch",
+  "Dinkel-Mandel-Drink": "dinkel-mandel-drink",
   "Hummus": "hummus",
   "TK-Erbsen": "tk-erbsen",
   "TK-Spinat": "tk-spinat",
