@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import imageCompression from "browser-image-compression";
 import { getBrowserSupabase } from "@/lib/client/supabase";
-import { setDisplayName, uploadAvatar } from "@/lib/data/profiles";
+import { removeAvatar, setDisplayName, uploadAvatar } from "@/lib/data/profiles";
 import { Avatar, Button, Field, Notice } from "@/components/ui";
 import { PencilIcon } from "@/components/icons";
 
@@ -42,6 +42,7 @@ export function AccountProfile({
   const [name, setName] = useState(initialDisplayName);
   const [avatarPath, setAvatarPath] = useState(initialAvatarPath);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [removed, setRemoved] = useState(false);
   const [savingName, setSavingName] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [error, setError] = useState("");
@@ -92,6 +93,7 @@ export function AccountProfile({
       });
       const asFile = new File([compressed], file.name, { type: "image/jpeg" });
       setPreviewUrl(URL.createObjectURL(asFile));
+      setRemoved(false);
 
       const uploaded = await uploadAvatar(supabase, userId, asFile, avatarPath);
       if (!uploaded.ok) {
@@ -109,35 +111,73 @@ export function AccountProfile({
     }
   }
 
-  const shownAvatar = previewUrl ?? initialAvatarUrl;
+  async function removePhoto() {
+    if (!avatarPath) return;
+
+    setError("");
+    setUploadingPhoto(true);
+    const supabase = getBrowserSupabase();
+    if (!supabase) {
+      setError("Supabase ist nicht konfiguriert.");
+      setUploadingPhoto(false);
+      return;
+    }
+
+    const result = await removeAvatar(supabase, userId, avatarPath);
+    setUploadingPhoto(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setAvatarPath(null);
+    setPreviewUrl(null);
+    setRemoved(true);
+    router.refresh();
+  }
+
+  const shownAvatar = previewUrl ?? (removed ? null : initialAvatarUrl);
 
   return (
     <div className="space-y-5">
       {error && <Notice tone="error">{error}</Notice>}
 
       <div className="flex items-center gap-4">
-        <div className="relative shrink-0">
+        <label
+          htmlFor={inputId}
+          aria-label="Profilfoto ändern"
+          className="relative block shrink-0 rounded-full press-flat tap-target"
+        >
           <Avatar url={shownAvatar} initial={initial} size={72} />
-          <label
-            htmlFor={inputId}
-            aria-label="Profilfoto ändern"
-            className="absolute -right-0.5 -bottom-0.5 flex h-7 w-7 items-center justify-center rounded-full border-[2.5px] border-card bg-accent press-flat"
+          <span
+            aria-hidden
+            className="absolute -right-0.5 -bottom-0.5 flex h-7 w-7 items-center justify-center rounded-full border-[2.5px] border-card bg-accent"
           >
             <PencilIcon className="h-3.5 w-3.5 text-accent-ink" strokeWidth={2.4} />
-          </label>
-          <input
-            id={inputId}
-            type="file"
-            accept="image/*"
-            className="sr-only"
-            disabled={uploadingPhoto}
-            onChange={(event) => void pickPhoto(event.target.files?.[0])}
-          />
-        </div>
+          </span>
+        </label>
+        <input
+          id={inputId}
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          disabled={uploadingPhoto}
+          onChange={(event) => void pickPhoto(event.target.files?.[0])}
+        />
 
-        <p className="min-w-0 truncate font-display text-[17px] font-bold text-text">
-          {uploadingPhoto ? "Foto wird hochgeladen" : (email ?? " ")}
-        </p>
+        <div className="min-w-0 space-y-1">
+          <p className="min-w-0 truncate font-display text-[17px] font-bold text-text">
+            {uploadingPhoto ? "Foto wird hochgeladen" : (email ?? " ")}
+          </p>
+          {shownAvatar && !uploadingPhoto && (
+            <button
+              type="button"
+              onClick={() => void removePhoto()}
+              className="min-h-11 text-[13px] font-semibold text-muted press-flat tap-target"
+            >
+              Foto entfernen
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">

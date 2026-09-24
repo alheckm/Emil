@@ -28,7 +28,7 @@ export default function SettingsPage() {
         <RowLink href="/einstellungen/konto" prefetch>
           <span>Konto</span>
           <span className="block text-[13px] text-muted">
-            E-Mail, Abmelden, Konto löschen
+            Name, Foto, E-Mail, Abmelden, Konto löschen
           </span>
         </RowLink>
       </nav>
