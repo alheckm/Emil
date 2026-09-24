@@ -736,7 +736,7 @@ export function ListView({
           mehr darüber: er gehört zur selben Handlung wie das Ergänzen. */}
       <div className="space-y-1.5">
         <label htmlFor="add-item-input" className="sr-only">
-          Zutat hinzufügen
+          Etwas hinzufügen
         </label>
         <div className="relative">
           <PlusIcon
@@ -746,13 +746,13 @@ export function ListView({
           />
           <input
             id="add-item-input"
-            aria-label="Zutat hinzufügen"
+            aria-label="Etwas hinzufügen"
             value={entryText}
             onChange={(event) => setEntryText(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") addByHand();
             }}
-            placeholder="Zutat hinzufügen"
+            placeholder="Etwas hinzufügen"
             autoCapitalize="sentences"
             enterKeyHint="done"
             className="h-11 w-full rounded-pill bg-border pr-4 pl-11 text-base text-text outline-none placeholder:text-muted"

@@ -136,16 +136,22 @@ Kachelraster — bewusst kantig, wie bei Instagram).
   je ein Wert (kcal, Eiweiß, Fett, Kohlenhydrate) zentriert, Label darunter
   wie bei den Foto-Kreisen.
 - Farben fix, nicht gehasht — dieselben vier Nährwerte stehen immer in
-  derselben Reihenfolge. Die ersten drei sind exakt die drei Kategorien, die
-  der Design-Canvas durchfärbt (`Liste-Kreise.dc.html`): kcal Terrakotta
-  `#B3927A` (Trockenwaren), Eiweiß Salbeigrün `#8C9A7B` (Obst & Gemüse), Fett
-  Sandbeige `#C9BBA0` (Milchprodukte). Die vierte, Kohlenhydrate Salbeiblau
-  `#8FA3A8`, folgt nur der gedeckten Farbfamilie (`categoryColor.ts`) — der
-  Canvas färbt keine vierte Kategorie exakt durch.
-- Text dunkel (`text`), nicht Weiß — die Canvas-Töne sind pastellig, Weiß in
-  Fettschrift wäre darauf kaum lesbar (2026-09-24: erst abgedunkelte
-  Eigenfarben mit weißem Text versucht, auf Nutzerwunsch auf die
-  Canvas-Pastelltöne mit dunklem Text getauscht).
+  derselben Reihenfolge. Die vier Töne folgen derselben Farbfamilie wie die
+  drei Kategorien, die der Design-Canvas durchfärbt (`Liste-Kreise.dc.html`:
+  Terrakotta/Trockenwaren, Salbeigrün/Obst & Gemüse, Sandbeige/Milchprodukte)
+  plus Salbeiblau als vierter Ton, aber deutlich aufgehellt (`#D1BEAF`,
+  `#BAC2B0`, `#DFD6C6`, `#BCC8CB`) statt der dortigen Vollfarbe — auf
+  Nutzerwunsch (2026-09-24), nicht mehr die exakten Canvas-Hexwerte.
+- Text dunkel (`text`) und in Public Sans (`font-sans`), nicht Unbounded —
+  die Ziffer ist ein Messwert, kein Display-Titel. Weiß bleibt auf diesen
+  hellen Tönen zu kontrastarm (2026-09-24: erst abgedunkelte Eigenfarben mit
+  weißem Text versucht, dann Canvas-Pastelltöne mit dunklem Text, jetzt
+  aufgehellte Töne mit dunklem Text in Public Sans).
+- Farbiger Ring statt Haarlinie (2026-09-24): außen ein 3 px Ring in
+  derselben Farbe wie die Füllung, dann ein 2 px weißer Spalt, dann die
+  Füllung mit der Ziffer — dieselbe Ring/Spalt/Füllung-Mechanik wie bei den
+  Zutaten-Kreisen im Canvas (`Liste-Kreise.dc.html`), dort per verschachteltem
+  `padding` (Ring) und `border` (Spalt), hier genauso.
 
 **Tag/Chip**
 - Filter-Chip (Home): 34 px hoch, `line`-Rahmen, aktiver Zustand

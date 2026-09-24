@@ -209,19 +209,25 @@ export function RecipeIngredientsAndSteps({
  * der automatischen Rezept-Pflege befüllt (`docs/plan-rezept-pflege.md`).
  * Jeder Wert in einem farbigen Kreis — nimmt das Kreis-Schema der
  * Einkaufsliste noch einmal auf, statt eine dritte Darstellung für Zutaten-
- * Mengen zu erfinden. Die ersten drei Farben sind exakt die des
- * Design-Canvas (`Liste-Kreise.dc.html`: Obst & Gemüse, Milchprodukte,
- * Trockenwaren) — die vierte folgt derselben gedeckten Palette
- * (`categoryColor.ts`), da der Canvas nur drei Kategorien durchfärbt. Fix
- * statt gehasht: dieselben vier Werte stehen immer in derselben Reihenfolge.
- * Text dunkel: die Canvas-Töne sind pastellig, Weiß wäre darauf kaum lesbar.
+ * Mengen zu erfinden. Die vier Töne folgen derselben Farbfamilie wie die
+ * drei Kategorien im Design-Canvas (`Liste-Kreise.dc.html`), aber deutlich
+ * aufgehellt (auf Nutzerwunsch) statt der dortigen Vollfarbe — Fix statt
+ * gehasht: dieselben vier Werte stehen immer in derselben Reihenfolge.
+ * Text dunkel und in Public Sans (`font-sans`) statt Unbounded: die Ziffer
+ * ist hier ein Messwert, kein Display-Titel, und auf den hellen Tönen bleibt
+ * Weiß zu kontrastarm (siehe Commit-Historie). Farbiger Ring statt Rand: wie
+ * bei den Zutaten-Kreisen im Canvas (`Liste-Kreise.dc.html`) liegt außen ein
+ * Ring in derselben Farbe, dann ein dünner weißer Spalt, dann die Füllung —
+ * per verschachteltem `padding`/`border`, nicht per einzelnem `border`, weil
+ * ein einfacher Rand keinen weißen Spalt zwischen Ring und Füllung zeigen
+ * kann.
  */
 function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
   const stats: [string, string, string][] = [
-    [String(nutrition.kcal), "kcal", "#B3927A"],
-    [`${nutrition.proteinG} g`, "Eiweiß", "#8C9A7B"],
-    [`${nutrition.fatG} g`, "Fett", "#C9BBA0"],
-    [`${nutrition.carbsG} g`, "Kohlenhydrate", "#8FA3A8"],
+    [String(nutrition.kcal), "kcal", "#D1BEAF"],
+    [`${nutrition.proteinG} g`, "Eiweiß", "#BAC2B0"],
+    [`${nutrition.fatG} g`, "Fett", "#DFD6C6"],
+    [`${nutrition.carbsG} g`, "Kohlenhydrate", "#BCC8CB"],
   ];
 
   return (
@@ -231,12 +237,17 @@ function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
       <div className="mt-4 flex">
         {stats.map(([value, label, color]) => (
           <div key={label} className="flex flex-1 flex-col items-center gap-[7px]">
-            <span
-              className="tabular font-display flex h-[68px] w-[68px] items-center justify-center rounded-full text-[15px] font-bold text-text"
+            <div
+              className="flex h-[68px] w-[68px] items-center justify-center rounded-full p-[3px]"
               style={{ background: color }}
             >
-              {value}
-            </span>
+              <span
+                className="tabular font-sans flex h-full w-full items-center justify-center rounded-full border-2 border-white text-[15px] font-bold text-text"
+                style={{ background: color }}
+              >
+                {value}
+              </span>
+            </div>
             <span className="text-[11.5px] text-muted">{label}</span>
           </div>
         ))}

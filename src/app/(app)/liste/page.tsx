@@ -29,7 +29,7 @@ export const metadata = { title: "Einkaufsliste" };
  */
 export default function ListPage() {
   return (
-    <Screen title="Einkaufsliste">
+    <Screen title="Einkaufsliste" divider={false}>
       <Suspense fallback={<ShoppingListSkeleton />}>
         <List />
       </Suspense>

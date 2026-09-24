@@ -225,6 +225,7 @@ export function Screen({
   action,
   bleed,
   tabbar = true,
+  divider = true,
   children,
 }: {
   title?: ReactNode;
@@ -244,6 +245,13 @@ export function Screen({
    * den die schwebende Glas-Leiste sonst braucht.
    */
   tabbar?: boolean;
+  /**
+   * `false` blendet die Haarlinie unter dem Titel aus — auf Feed-Screens
+   * (Einkaufsliste, Aufgaben), wo direkt darunter die „Etwas hinzufügen"-
+   * Zeile folgt und die Linie nur eine zweite Trennung neben der eigenen
+   * Kartenkontur wäre.
+   */
+  divider?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -256,7 +264,7 @@ export function Screen({
         {title !== undefined && (
           <>
             <ScreenHeader title={title} lead={lead} action={action} />
-            <div className="h-px bg-border" />
+            {divider && <div className="h-px bg-border" />}
           </>
         )}
         <div className={bleed ? "" : "space-y-6 pt-5"}>{children}</div>

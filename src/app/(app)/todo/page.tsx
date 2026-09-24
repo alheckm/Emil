@@ -15,7 +15,7 @@ export const metadata = { title: "Aufgaben" };
  */
 export default function TodoPage() {
   return (
-    <Screen title="Aufgaben">
+    <Screen title="Aufgaben" divider={false}>
       <Suspense fallback={<TodoSkeleton />}>
         <Todos />
       </Suspense>
