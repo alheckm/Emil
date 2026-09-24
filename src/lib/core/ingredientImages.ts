@@ -201,6 +201,7 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Rote Linsen": "rote-linsen",
   "Berglinsen": "berglinsen",
   "getrocknete Aprikosen": "getrocknete-aprikosen",
+  "Kuchen": "kuchen",
   "Salz": "salz",
   "schwarzer Pfeffer": "schwarzer-pfeffer",
   "Currypulver": "currypulver",
