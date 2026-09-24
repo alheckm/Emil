@@ -165,6 +165,7 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Brie": "brie",
   "Halloumi": "halloumi",
   "Reibekäse": "reibekaese",
+  "Käse": "kaese",
   "Frische Hefe": "frische-hefe",
   "Tofu": "tofu",
   "Räuchertofu": "raeuchertofu",
