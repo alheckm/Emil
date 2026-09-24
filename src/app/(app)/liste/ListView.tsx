@@ -530,7 +530,12 @@ export function ListView({
           >
             {src ? (
               /* Kein next/image: die Datei liegt schon in genau der
-                 Größe im public-Ordner, in der sie gebraucht wird. */
+                 Größe im public-Ordner, in der sie gebraucht wird.
+                 scale-105: die Pipeline füllt den Pastellgrund nur bis 94 %
+                 des Kreisdurchmessers (process.py, COVER) — der leichte
+                 Farbsaum am äußersten Bildrand landet ungezoomt sichtbar im
+                 Kreis. Der Zoom schneidet genau diesen Rand weg, ohne das
+                 Motiv selbst anzuschneiden. */
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={src}
@@ -538,7 +543,7 @@ export function ListView({
                 width={192}
                 height={192}
                 loading="lazy"
-                className="h-full w-full object-cover"
+                className="h-full w-full scale-105 object-cover"
               />
             ) : (
               <span aria-hidden className="text-[24px] font-bold text-white/70">
