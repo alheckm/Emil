@@ -6,6 +6,7 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Rote Zwiebel": "rote-zwiebel",
   "Schalotte": "schalotte",
   "Frühlingszwiebel": "fruehlingszwiebel",
+  "Lauchzwiebel": "lauchzwiebel",
   "Knoblauch": "knoblauch",
   "Knoblauchzehe": "knoblauchzehe",
   "Karotte": "karotte",
