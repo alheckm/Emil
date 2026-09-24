@@ -37,15 +37,19 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: "emil", statusBarStyle: "default" },
   formatDetection: { telephone: false },
   icons: {
-    // `?v=2` zwingt Browser und Service Worker zu einer frischen Anfrage,
+    // `?v=3` zwingt Browser und Service Worker zu einer frischen Anfrage,
     // wenn sich der Bildinhalt unter demselben Dateinamen ändert — nötig,
     // weil `/icons/*.png` anders als `/_next/static/` keine Hashes im Namen
     // trägt. Bei der nächsten Icon-Änderung diese Zahl erhöhen.
     icon: [
-      { url: "/icons/icon-192.png?v=2", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512.png?v=2", sizes: "512x512", type: "image/png" },
+      { url: "/icons/icon-192.png?v=3", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png?v=3", sizes: "512x512", type: "image/png" },
     ],
-    apple: [{ url: "/icons/apple-touch-icon.png?v=2", sizes: "180x180" }],
+    // 1024×1024 statt der früher üblichen 180×180: direkt aus dem Vektor
+    // gerendert, damit iOS nie hochskalieren muss, egal welche Home-
+    // Bildschirm-Größe ein Gerät gerade verlangt (größere Icon-Einstellung,
+    // Spotlight-Vorschau, künftige Displays).
+    apple: [{ url: "/icons/apple-touch-icon.png?v=3", sizes: "1024x1024" }],
   },
 };
 

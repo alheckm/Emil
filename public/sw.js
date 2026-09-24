@@ -19,7 +19,7 @@
 // diesem String ist die einzige Änderung an dieser Datei, die einen Browser
 // dazu bringt, sie neu zu laden — erst dann verwirft `activate` unten die
 // alten, für immer zwischengespeicherten Icons.
-const VERSION = "emil-v2";
+const VERSION = "emil-v3";
 const PAGES = `${VERSION}-seiten`;
 const ASSETS = `${VERSION}-dateien`;
 
@@ -29,7 +29,7 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(ASSETS).then((cache) =>
-      cache.addAll(["/icons/icon-192.png?v=2", "/icons/apple-touch-icon.png?v=2"]),
+      cache.addAll(["/icons/icon-192.png?v=3", "/icons/apple-touch-icon.png?v=3"]),
     ),
   );
 });
