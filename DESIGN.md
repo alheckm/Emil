@@ -136,12 +136,16 @@ Kachelraster — bewusst kantig, wie bei Instagram).
   je ein Wert (kcal, Eiweiß, Fett, Kohlenhydrate) zentriert, Label darunter
   wie bei den Foto-Kreisen.
 - Farben fix, nicht gehasht — dieselben vier Nährwerte stehen immer in
-  derselben Reihenfolge. Die vier Töne folgen derselben Farbfamilie wie die
-  drei Kategorien, die der Design-Canvas durchfärbt (`Liste-Kreise.dc.html`:
-  Terrakotta/Trockenwaren, Salbeigrün/Obst & Gemüse, Sandbeige/Milchprodukte)
-  plus Salbeiblau als vierter Ton, aber deutlich aufgehellt (`#D1BEAF`,
-  `#BAC2B0`, `#DFD6C6`, `#BCC8CB`) statt der dortigen Vollfarbe — auf
-  Nutzerwunsch (2026-09-24), nicht mehr die exakten Canvas-Hexwerte.
+  derselben Reihenfolge. Die vier Töne sind direkt wiederverwendet aus der
+  echten `PALETTE` in `categoryColor.ts` — denselben Kräftigfarben, die auch
+  als Hintergrund der `-bold`-Zutatenfotos in der Einkaufsliste liegen
+  (Terrakotta/Trockenwaren, Salbeigrün/Obst & Gemüse, Sandbeige/Milchprodukte,
+  Salbeiblau als vierter Ton), statt eigens angenäherter Hex-Werte. `lightenTo`
+  hellt jede Farbe auf dieselbe Ziel-Helligkeit auf (2026-09-24, auf
+  Nutzerwunsch: „dunklere Farben entsprechend heller machen, dass dunkler Text
+  gut lesbar bleibt") — dunklere Ausgangstöne (Salbeigrün, Terrakotta)
+  bekommen dadurch automatisch mehr Weißanteil als hellere (Sandbeige, das
+  ohnehin schon hell ist).
 - Text dunkel (`text`) und in Public Sans (`font-sans`), nicht Unbounded —
   die Ziffer ist ein Messwert, kein Display-Titel. Weiß bleibt auf diesen
   hellen Tönen zu kontrastarm (2026-09-24: erst abgedunkelte Eigenfarben mit

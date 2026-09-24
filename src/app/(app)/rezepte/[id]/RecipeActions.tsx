@@ -13,6 +13,7 @@ import {
   type RecipeNutrition,
 } from "@/lib/data/recipes";
 import { addRecipeToList, removeRecipeFromList } from "@/lib/data/shoppingList";
+import { PALETTE, lightenTo } from "@/lib/core/categoryColor";
 import { CheckIcon, MinusIcon, PlusIcon } from "@/components/icons";
 import { Button, Notice } from "@/components/ui";
 
@@ -209,10 +210,15 @@ export function RecipeIngredientsAndSteps({
  * der automatischen Rezept-Pflege befüllt (`docs/plan-rezept-pflege.md`).
  * Jeder Wert in einem farbigen Kreis — nimmt das Kreis-Schema der
  * Einkaufsliste noch einmal auf, statt eine dritte Darstellung für Zutaten-
- * Mengen zu erfinden. Die vier Töne folgen derselben Farbfamilie wie die
- * drei Kategorien im Design-Canvas (`Liste-Kreise.dc.html`), aber deutlich
- * aufgehellt (auf Nutzerwunsch) statt der dortigen Vollfarbe — Fix statt
- * gehasht: dieselben vier Werte stehen immer in derselben Reihenfolge.
+ * Mengen zu erfinden. Die vier Töne sind dieselben Kräftigfarben, die auch
+ * hinter den `-bold`-Zutatenfotos der Einkaufsliste liegen (`PALETTE` in
+ * `categoryColor.ts`: Salbeigrün, Sandbeige, Terrakotta, Salbeiblau) — echte
+ * Wiederverwendung statt eigens angenäherter Hex-Werte. `lightenTo` hellt
+ * jede auf dieselbe Ziel-Helligkeit auf (2026-09-24, auf Nutzerwunsch):
+ * dunklere Ausgangstöne (Salbeigrün, Terrakotta) bekommen dadurch automatisch
+ * mehr Weißanteil als hellere (Sandbeige), damit der dunkle Text auf allen
+ * vier Kreisen gleich gut lesbar bleibt. Fix statt gehasht: dieselben vier
+ * Werte stehen immer in derselben Reihenfolge.
  * Text dunkel und in Public Sans (`font-sans`) statt Unbounded: die Ziffer
  * ist hier ein Messwert, kein Display-Titel, und auf den hellen Tönen bleibt
  * Weiß zu kontrastarm (siehe Commit-Historie). Farbiger Ring statt Rand: wie
@@ -222,12 +228,15 @@ export function RecipeIngredientsAndSteps({
  * ein einfacher Rand keinen weißen Spalt zwischen Ring und Füllung zeigen
  * kann.
  */
+const NUTRITION_TARGET_L = 0.8;
+const [SALBEIGRUEN, SANDBEIGE, TERRAKOTTA, , , , SALBEIBLAU] = PALETTE;
+
 function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
   const stats: [string, string, string][] = [
-    [String(nutrition.kcal), "kcal", "#D1BEAF"],
-    [`${nutrition.proteinG} g`, "Eiweiß", "#BAC2B0"],
-    [`${nutrition.fatG} g`, "Fett", "#DFD6C6"],
-    [`${nutrition.carbsG} g`, "Kohlenhydrate", "#BCC8CB"],
+    [String(nutrition.kcal), "kcal", lightenTo(TERRAKOTTA, NUTRITION_TARGET_L)],
+    [`${nutrition.proteinG} g`, "Eiweiß", lightenTo(SALBEIGRUEN, NUTRITION_TARGET_L)],
+    [`${nutrition.fatG} g`, "Fett", lightenTo(SANDBEIGE, NUTRITION_TARGET_L)],
+    [`${nutrition.carbsG} g`, "Kohlenhydrate", lightenTo(SALBEIBLAU, NUTRITION_TARGET_L)],
   ];
 
   return (

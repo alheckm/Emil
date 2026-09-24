@@ -11,7 +11,7 @@
  * viele Abteilungen — dieselbe Kategorie bekommt bei jedem Aufruf dieselbe
  * Farbe.
  */
-const PALETTE = [
+export const PALETTE = [
   "#8C9A7B", // Salbeigrün — Obst & Gemüse
   "#C9BBA0", // Sandbeige — Milchprodukte
   "#B3927A", // Terrakotta — Trockenwaren
@@ -33,4 +33,21 @@ function hash(value: string): number {
 export function categoryRingColor(categoryId: string | null): string {
   if (!categoryId) return PALETTE[0];
   return PALETTE[hash(categoryId) % PALETTE.length];
+}
+
+/**
+ * Hellt `hex` Richtung Weiß auf, bis die Helligkeit (HSL-`L`) `targetL`
+ * erreicht (0–1). Dunklere Ausgangsfarben bekommen dadurch automatisch einen
+ * größeren Weißanteil als hellere — alle Ergebnisse landen auf derselben
+ * Ziel-Helligkeit, egal wie dunkel die Quelle war.
+ */
+export function lightenTo(hex: string, targetL: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const l = (Math.max(r, g, b) + Math.min(r, g, b)) / 2 / 255;
+  const t = Math.max(0, Math.min(1, (targetL - l) / (1 - l)));
+  const mix = (channel: number) => Math.round(channel + t * (255 - channel));
+  const toHex = (channel: number) => channel.toString(16).padStart(2, "0");
+  return `#${toHex(mix(r))}${toHex(mix(g))}${toHex(mix(b))}`.toUpperCase();
 }
