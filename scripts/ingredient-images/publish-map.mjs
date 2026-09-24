@@ -1,9 +1,8 @@
 /**
  * Schreibt src/lib/core/ingredientImages.ts aus dem, was tatsaechlich unter
- * public/zutaten-marktregal/ liegt — analog zu process.py's Rolle in der
- * fruehers Pastell-Pipeline, aber fuer die Marktregal-Bilder: `ingredientImage()`
- * zeigt auf die -bold-Variante (Kreis-Foto in der Einkaufsliste). vollbild/grau
- * liegen mit bereit, sobald die Kachel-Oberflaeche sie braucht.
+ * public/zutaten-marktregal/ liegt: `ingredientImage()` zeigt auf die
+ * -bold-Variante (Kreis-Foto in der Einkaufsliste). vollbild/grau liegen mit
+ * bereit, sobald die Kachel-Oberflaeche sie braucht.
  *
  * Deckt jeden Namen aus subjects.mjs SUBJECTS ab, dazu jeden Alias-Quellnamen
  * aus aliases.json (z. B. "Gemüsebrühepulver" -> Bilder von "Gemüsebrühe") —

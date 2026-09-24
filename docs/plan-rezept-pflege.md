@@ -112,8 +112,9 @@ Exit-Code 1 ab, wenn etwas nicht stimmt.
 
 **Abweichung vom ursprünglichen Plan:** `steps.ts` wird NICHT importiert — Node
 löst relative `.ts`-Importe ohne Dateiendung nicht auf, auch nicht mit
-`--experimental-strip-types` (das griff nur bei `find-missing.mjs`, weil das
-importierte `ingredientImages.ts` keine weiteren TS-Module importiert).
+`--experimental-strip-types` (das griff nur bei Skripten wie
+`scripts/ingredient-images/find-missing-marktregal.mjs`, weil deren
+importierte `.ts`-Module keine weiteren TS-Module importieren).
 `pflege.mjs` bildet die Marker-Prüfung darum separat als reines Regex nach,
 mit einem Kommentar, dass `src/lib/core/steps.ts` die Quelle der Wahrheit für
 das *Auflösen* bleibt.

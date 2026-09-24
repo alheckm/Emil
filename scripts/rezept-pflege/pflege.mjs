@@ -9,7 +9,7 @@
  * noch Form und schreibt gezielt — nie über `save_recipe`, das beim Ändern
  * alle Zutatenzeilen ersetzt (supabase/migrations/0009_rezepte_speichern.sql).
  *
- * Auth wie scripts/ingredient-images/find-missing.mjs: SUPABASE_SECRET_KEY aus
+ * Auth wie scripts/ingredient-images/find-missing-marktregal.mjs: SUPABASE_SECRET_KEY aus
  * .env.local, umgeht RLS bewusst — ein Skript mit Zugriff auf alle Haushalte.
  *
  *   node scripts/rezept-pflege/pflege.mjs <befehl> [optionen]
