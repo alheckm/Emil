@@ -730,40 +730,41 @@ export function ListView({
         </Notice>
       )}
 
-      <p className="tabular text-[13px] text-muted">
-        {openCount + adding.length === 0
-          ? "Alles abgehakt"
-          : `Noch ${openCount + adding.length} von ${
-              visibleEntries.length + adding.length
-            } erledigt`}
-      </p>
-
-      {/* „Etwas hinzufügen"-Zeile (DESIGN.md): kein schwebender Button —
-          inline erste Zeile der Liste, gestricheltes „+", echtes <input> mit
-          zugehörigem <label>. */}
-      <div className="-mt-2 flex items-center gap-3.5">
-        <span
-          aria-hidden
-          className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-dashed border-inactive"
-        >
-          <PlusIcon className="h-[13px] w-[13px] text-muted" strokeWidth={2.4} />
-        </span>
+      {/* „Etwas hinzufügen"-Zeile (DESIGN.md): Pille wie das Suchfeld auf
+          Home — vertrautes Muster statt eigener Geste, echtes <input> mit
+          zugehörigem <label>. Der Fortschritt steht direkt darunter, nicht
+          mehr darüber: er gehört zur selben Handlung wie das Ergänzen. */}
+      <div className="space-y-1.5">
         <label htmlFor="add-item-input" className="sr-only">
           Zutat hinzufügen
         </label>
-        <input
-          id="add-item-input"
-          aria-label="Zutat hinzufügen"
-          value={entryText}
-          onChange={(event) => setEntryText(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") addByHand();
-          }}
-          placeholder="Zutat hinzufügen"
-          autoCapitalize="sentences"
-          enterKeyHint="done"
-          className="h-11 min-w-0 flex-1 bg-transparent text-base text-text outline-none placeholder:text-muted"
-        />
+        <div className="relative">
+          <PlusIcon
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 left-4 h-[15px] w-[15px] -translate-y-1/2 text-muted"
+            strokeWidth={2.4}
+          />
+          <input
+            id="add-item-input"
+            aria-label="Zutat hinzufügen"
+            value={entryText}
+            onChange={(event) => setEntryText(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") addByHand();
+            }}
+            placeholder="Zutat hinzufügen"
+            autoCapitalize="sentences"
+            enterKeyHint="done"
+            className="h-11 w-full rounded-pill bg-border pr-4 pl-11 text-base text-text outline-none placeholder:text-muted"
+          />
+        </div>
+        <p className="tabular pl-1 text-[13px] text-muted">
+          {openCount + adding.length === 0
+            ? "Alles abgehakt"
+            : `Noch ${openCount + adding.length} von ${
+                visibleEntries.length + adding.length
+              } erledigt`}
+        </p>
       </div>
 
       {visibleEntries.length + adding.length === 0 && (

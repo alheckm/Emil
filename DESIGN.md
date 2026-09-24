@@ -102,8 +102,11 @@ Kachelraster — bewusst kantig, wie bei Instagram).
 **Eingabefeld**
 - 16 px Schrift Pflicht (sonst zoomt iOS beim Fokussieren hinein).
 - Form folgt Funktion, nicht Zeilenlänge:
-  - **Suche** (nur Home): volle Pille, `border-radius: 999px` — iOS-Konvention
-    für „durchsuche Bestehendes", steht immer solo.
+  - **Suche** (Home) **und „etwas hinzufügen"** (Einkaufsliste, Aufgaben):
+    volle Pille, `border-radius: 999px`, `bg-border`, Icon links bei
+    `left-4` absolut positioniert — dieselbe Geste wie die Suche, bewusst
+    wiederverwendet statt einer eigenen Optik fürs Ergänzen (2026-09-24,
+    abgelöst das gestrichelte „+" + freistehendes `<input>` von vorher).
   - **Formular** (Link-Import, Mengen, Einstellungen): gerundetes Rechteck,
     `border-radius: 12–14px` — passt zu Nachbarfeldern wie einer Textarea, die
     selbst keine Pille sein kann, und wirkt in einer Liste nicht wie ein
@@ -127,6 +130,18 @@ Kachelraster — bewusst kantig, wie bei Instagram).
   äußersten Bildrand wird durch den Zoom aus dem sichtbaren Kreis
   herausgeschnitten statt als grauer Saum sichtbar zu bleiben.
 
+**Nährwert-Kreise** (Rezeptdetail)
+- Nimmt das Kreis-Schema der Einkaufsliste noch einmal auf, statt Zutaten-
+  Mengen als dritte Darstellung zu erfinden (2026-09-24). Vier Kreise, 68 px,
+  je ein Wert (kcal, Eiweiß, Fett, Kohlenhydrate) zentriert, Label darunter
+  wie bei den Foto-Kreisen.
+- Farben fix aus der gedeckten Palette von `categoryColor.ts`, nicht gehasht
+  — dieselben vier Nährwerte stehen immer in derselben Reihenfolge, jeder
+  bekommt eine feste Farbe (kcal Terrakotta `#B3927A`, Eiweiß Salbeigrün
+  `#8C9A7B`, Fett Ocker `#B79A6B`, Kohlenhydrate Salbeiblau `#8FA3A8`).
+- Text in `text` (dunkel), nicht Weiß — die Palette ist zu hell für weißen
+  Text in Fettschrift.
+
 **Tag/Chip**
 - Filter-Chip (Home): 34 px hoch, `line`-Rahmen, aktiver Zustand
   `accent`-gefüllt.
@@ -141,9 +156,14 @@ Kachelraster — bewusst kantig, wie bei Instagram).
 - Aktiver Tab: `accent`-Farbe am Icon plus 4-px-Punkt darunter.
 
 **„Etwas hinzufügen"-Zeile** (Einkaufsliste, Aufgaben)
-- Kein schwebender Button — inline erste Zeile der Liste, gestricheltes „+",
-  echtes `<input>` mit zugehörigem `<label>`. Scrollt mit der Liste weg,
-  blockiert keinen dauerhaften Platz über der Tabbar.
+- Kein schwebender Button — inline erste Zeile der Liste, echtes `<input>`
+  mit zugehörigem `<label>`. Scrollt mit der Liste weg, blockiert keinen
+  dauerhaften Platz über der Tabbar.
+- Pille wie das Suchfeld auf Home (siehe Eingabefeld oben), nicht mehr
+  gestricheltes „+" mit freistehendem Feld (2026-09-24).
+- Direkt darunter, nicht darüber: „Noch X von Y erledigt" / „Alles abgehakt"
+  bzw. „Alles erledigt" — gehört zur selben Handlung wie das Ergänzen, auf
+  beiden Screens gleich (Aufgaben hatte vorher gar keinen Fortschritt).
 
 **Leer-/Fehlerzustand**
 - Card auf `surface`-Hintergrund, 16 px Radius, Icon 34 px in

@@ -129,31 +129,42 @@ export function TodoView({
         </div>
       )}
 
-      {/* „Etwas hinzufügen"-Zeile (DESIGN.md): kein schwebender Button —
-          inline erste Zeile der Liste, gestricheltes „+". */}
-      <div className="flex items-center gap-3.5 border-b border-border py-3.5">
-        <span
-          aria-hidden
-          className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-dashed border-inactive"
-        >
-          <PlusIcon className="h-[13px] w-[13px] text-muted" strokeWidth={2.4} />
-        </span>
+      {/* „Etwas hinzufügen"-Zeile (DESIGN.md): Pille wie das Suchfeld auf
+          Home und das Pendant auf der Einkaufsliste — vertrautes Muster
+          statt eigener Geste. Der Fortschritt steht direkt darunter. */}
+      <div className="space-y-1.5 pb-3.5">
         <label htmlFor="add-task-input" className="sr-only">
           Aufgabe ergänzen
         </label>
-        <input
-          id="add-task-input"
-          aria-label="Aufgabe ergänzen"
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") addByHand();
-          }}
-          placeholder="Etwas hinzufügen"
-          autoCapitalize="sentences"
-          enterKeyHint="done"
-          className="h-11 min-w-0 flex-1 bg-transparent text-base text-text outline-none placeholder:text-muted"
-        />
+        <div className="relative">
+          <PlusIcon
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 left-4 h-[15px] w-[15px] -translate-y-1/2 text-muted"
+            strokeWidth={2.4}
+          />
+          <input
+            id="add-task-input"
+            aria-label="Aufgabe ergänzen"
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") addByHand();
+            }}
+            placeholder="Etwas hinzufügen"
+            autoCapitalize="sentences"
+            enterKeyHint="done"
+            className="h-11 w-full rounded-pill bg-border pr-4 pl-11 text-base text-text outline-none placeholder:text-muted"
+          />
+        </div>
+        <p className="tabular pl-1 text-[13px] text-muted">
+          {openItems.length === 0
+            ? doneItems.length === 0
+              ? "Nichts zu tun"
+              : "Alles erledigt"
+            : `Noch ${openItems.length} von ${
+                openItems.length + doneItems.length
+              } erledigt`}
+        </p>
       </div>
 
       {openItems.length === 0 ? (

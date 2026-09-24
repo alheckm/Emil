@@ -207,15 +207,18 @@ export function RecipeIngredientsAndSteps({
 /**
  * Die Nährwerttabelle — geschätzte Werte pro Portion (`baseServings`), von
  * der automatischen Rezept-Pflege befüllt (`docs/plan-rezept-pflege.md`).
- * Kein Kästchen, keine `--soft`-Fläche: läuft offen auf `--bg` wie Zutaten
- * und Zubereitung, nur durch Haarlinien zwischen den Zeilen gegliedert.
+ * Jeder Wert in einem farbigen Kreis — nimmt das Kreis-Schema der
+ * Einkaufsliste noch einmal auf, statt eine dritte Darstellung für Zutaten-
+ * Mengen zu erfinden. Farben aus derselben gedeckten Palette wie die
+ * Foto-Kreise (`categoryColor.ts`), fix statt gehasht: dieselben vier Werte
+ * stehen immer in derselben Reihenfolge.
  */
 function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
-  const stats: [string, string][] = [
-    [String(nutrition.kcal), "kcal"],
-    [`${nutrition.proteinG} g`, "Eiweiß"],
-    [`${nutrition.fatG} g`, "Fett"],
-    [`${nutrition.carbsG} g`, "Kohlenhydrate"],
+  const stats: [string, string, string][] = [
+    [String(nutrition.kcal), "kcal", "#B3927A"],
+    [`${nutrition.proteinG} g`, "Eiweiß", "#8C9A7B"],
+    [`${nutrition.fatG} g`, "Fett", "#B79A6B"],
+    [`${nutrition.carbsG} g`, "Kohlenhydrate", "#8FA3A8"],
   ];
 
   return (
@@ -223,9 +226,12 @@ function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
       <h2 className="font-display text-[15px] font-bold text-text">Nährwert</h2>
       <p className="mt-1 text-[12.5px] text-muted">Pro Portion</p>
       <div className="mt-4 flex">
-        {stats.map(([value, label]) => (
-          <div key={label} className="flex flex-1 flex-col items-center gap-[3px]">
-            <span className="tabular font-display text-[18px] font-bold text-text">
+        {stats.map(([value, label, color]) => (
+          <div key={label} className="flex flex-1 flex-col items-center gap-[7px]">
+            <span
+              className="tabular font-display flex h-[68px] w-[68px] items-center justify-center rounded-full text-[15px] font-bold text-text"
+              style={{ background: color }}
+            >
               {value}
             </span>
             <span className="text-[11.5px] text-muted">{label}</span>
