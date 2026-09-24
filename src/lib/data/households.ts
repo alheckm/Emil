@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { dataErrorMessage } from "./errors";
+import { getAvatarUrls, getProfiles } from "./profiles";
 import { fail, ok, type Result } from "./result";
 
 /**
@@ -81,6 +82,46 @@ export async function listMembers(
       role: row.role as Role,
       joinedAt: row.created_at as string,
     })),
+  );
+}
+
+export interface MemberProfile extends Member {
+  displayName: string | null;
+  avatarUrl: string | null;
+}
+
+/**
+ * Mitglieder samt Klarname und signierter Foto-URL — für die Mitgliederliste
+ * im Haushalt und die Zuweisung bei Aufgaben. Zwei zusätzliche Abfragen statt
+ * eines Joins: `profiles` hat keine Fremdschlüsselbeziehung zu
+ * `household_members`, PostgREST könnte sie nicht auflösen (siehe
+ * `profiles.ts`).
+ */
+export async function listMembersWithProfiles(
+  supabase: SupabaseClient,
+  householdId: string,
+): Promise<Result<MemberProfile[]>> {
+  const members = await listMembers(supabase, householdId);
+  if (!members.ok) return members;
+
+  const profiles = await getProfiles(supabase, members.value.map((member) => member.userId));
+  const profileByUser = new Map(
+    (profiles.ok ? profiles.value : []).map((profile) => [profile.userId, profile]),
+  );
+  const avatarUrls = await getAvatarUrls(
+    supabase,
+    (profiles.ok ? profiles.value : []).map((profile) => profile.avatarPath),
+  );
+
+  return ok(
+    members.value.map((member) => {
+      const profile = profileByUser.get(member.userId);
+      return {
+        ...member,
+        displayName: profile?.displayName ?? null,
+        avatarUrl: profile?.avatarPath ? (avatarUrls[profile.avatarPath] ?? null) : null,
+      };
+    }),
   );
 }
 

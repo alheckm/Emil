@@ -74,6 +74,18 @@ export async function DELETE() {
     );
   }
 
+  // Das Profilfoto liegt im Storage, nicht in der Datenbank — die Kaskade auf
+  // `profiles` (0024_profil.sql) räumt beim Löschen des Kontos nur die Zeile
+  // weg, nicht die Datei. Bester Versuch, kein Fehlerfall: das Konto ist in
+  // diesem Moment schon weg, ein Fehler hier darf die Löschung nicht mehr
+  // scheitern lassen.
+  const { data: avatarFiles } = await admin.storage.from("avatars").list(user.id);
+  if (avatarFiles && avatarFiles.length > 0) {
+    await admin.storage
+      .from("avatars")
+      .remove(avatarFiles.map((file) => `${user.id}/${file.name}`));
+  }
+
   // Das Sitzungs-Cookie zeigt jetzt auf einen Nutzer, den es nicht mehr gibt.
   await supabase.auth.signOut();
 

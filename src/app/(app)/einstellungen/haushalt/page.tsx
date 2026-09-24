@@ -2,8 +2,8 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/server/supabase";
 import { requireHousehold } from "@/lib/server/household";
-import { listHouseholds, listMembers, listOpenInvites } from "@/lib/data/households";
-import { Section, Notice, Screen, ScreenHeader } from "@/components/ui";
+import { listHouseholds, listMembersWithProfiles, listOpenInvites } from "@/lib/data/households";
+import { Avatar, Section, Notice, Screen, ScreenHeader } from "@/components/ui";
 import { HeaderSkeleton, RowsSkeleton } from "@/components/skeletons";
 import { InviteSection } from "./InviteSection";
 import { JoinByCode } from "./JoinByCode";
@@ -86,27 +86,32 @@ async function Members() {
   const context = await requireHousehold();
   if (!context.ok) return <Notice tone="error">{context.error}</Notice>;
 
-  const members = await listMembers(context.supabase, context.household.id);
+  const members = await listMembersWithProfiles(context.supabase, context.household.id);
   if (!members.ok) {
     return <p className="text-[15px] text-muted">{members.error}</p>;
   }
 
   return (
-    <ul className="space-y-2 text-[15px]">
-      {members.value.map((member) => (
-        <li
-          key={member.userId}
-          className="flex items-center justify-between gap-4"
-        >
-          {/* Namen gibt es hier bewusst nicht: auth.users ist für die App
-              nicht lesbar, und eine zweite Kopie der E-Mail-Adresse in
-              einer eigenen Tabelle wäre mehr Datenhaltung als Nutzen. */}
-          <span>{member.userId === user.id ? "Du" : "Mitbewohner:in"}</span>
-          <span className="text-[13px] text-muted">
-            {member.role === "owner" ? "Eigentümer:in" : "Mitglied"}
-          </span>
-        </li>
-      ))}
+    <ul className="space-y-3 text-[15px]">
+      {members.value.map((member) => {
+        const isSelf = member.userId === user.id;
+        const name = member.displayName || (isSelf ? "Du" : "Mitbewohner:in");
+        return (
+          <li key={member.userId} className="flex items-center gap-3">
+            <Avatar
+              url={member.avatarUrl}
+              initial={name.charAt(0).toUpperCase()}
+              size={36}
+            />
+            <span className="min-w-0 flex-1 truncate">
+              {member.displayName && isSelf ? `${name} · Du` : name}
+            </span>
+            <span className="shrink-0 text-[13px] text-muted">
+              {member.role === "owner" ? "Eigentümer:in" : "Mitglied"}
+            </span>
+          </li>
+        );
+      })}
     </ul>
   );
 }

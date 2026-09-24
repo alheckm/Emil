@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { startTransition, useOptimistic } from "react";
 import { HomeIcon, BagIcon, ChecklistIcon } from "@/components/icons";
+import { Avatar } from "@/components/ui";
 
 /**
  * Die schwebende Glas-Leiste am unteren Rand (DESIGN.md, „Tabbar").
@@ -46,12 +47,14 @@ function Frame({
   active,
   pending,
   avatarInitial,
+  avatarUrl,
   onSelect,
 }: {
   active: TabHref | null;
   pending?: boolean;
-  /** Erster Buchstabe der E-Mail-Adresse, oder `null`, solange unbekannt. */
+  /** Erster Buchstabe des Klarnamens (oder der E-Mail-Adresse), sonst `null`. */
   avatarInitial?: string | null;
+  avatarUrl?: string | null;
   onSelect?: (href: TabHref) => void;
 }) {
   const kontoActive = active === "/einstellungen";
@@ -94,13 +97,7 @@ function Frame({
               (kontoActive ? "bg-tabbar-active" : "")
             }
           >
-            <span
-              aria-hidden
-              className="flex h-[26px] w-[26px] items-center justify-center rounded-full text-[11px] font-bold"
-              style={{ background: "#DCE3D9", color: "#33422F" }}
-            >
-              {avatarInitial ?? ""}
-            </span>
+            <Avatar url={avatarUrl} initial={avatarInitial} size={26} />
           </Link>
         </li>
       </ul>
@@ -121,7 +118,13 @@ export function TabBarFallback() {
   return <Frame active={null} avatarInitial={null} />;
 }
 
-export function TabBar({ avatarInitial }: { avatarInitial: string | null }) {
+export function TabBar({
+  avatarInitial,
+  avatarUrl,
+}: {
+  avatarInitial: string | null;
+  avatarUrl: string | null;
+}) {
   const pathname = usePathname();
 
   // Welcher Tab gehört zur aktuellen Adresse? `/rezepte/17/bearbeiten` zählt
@@ -142,6 +145,7 @@ export function TabBar({ avatarInitial }: { avatarInitial: string | null }) {
       active={optimistic}
       pending={pending}
       avatarInitial={avatarInitial}
+      avatarUrl={avatarUrl}
       onSelect={(href) => {
         // Der Wechsel selbst läuft über den Link; hier wird nur die Anzeige
         // vorgezogen. `useOptimistic`-Setter greifen im aktuellen Frame,

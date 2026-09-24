@@ -134,6 +134,15 @@
         "value": "space mono",
         "createdAt": "2026-09-23T09:44:09.299Z",
         "reason": "user steer in live mode: explicit request to test Space Mono for headings/quantities on public/design-preview/unified.html; DESIGN.md already lists Space Mono as an open point under discussion"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "src/components/ui.tsx"
+        ],
+        "createdAt": "2026-09-24T15:21:27.945Z",
+        "reason": "Avatar's <img src={url}> only renders inside an if(url) guard, url is always a real signed Storage URL or the branch isn't taken — same conditional pattern as RecipeImageField.tsx/ListView.tsx, false positive from static src-attribute scan"
       }
     ]
   }

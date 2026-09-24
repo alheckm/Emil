@@ -2351,6 +2351,172 @@ revoke all on function leave_household(uuid) from public, anon;
 grant execute on function leave_household(uuid) to authenticated;
 
 -- ===================================================================
+-- supabase/migrations/0024_profil.sql
+-- ===================================================================
+
+-- Klarname und Profilfoto.
+--
+-- Bisher gab es dafür absichtlich keine eigene Tabelle (siehe der alte
+-- Kommentar in `einstellungen/haushalt/page.tsx`): `auth.users` ist für die
+-- App nicht lesbar, und eine zweite Kopie der E-Mail-Adresse wäre mehr
+-- Datenhaltung als Nutzen gewesen. Jetzt kommt echter Inhalt dazu — Name und
+-- Foto —, der diese eigene Tabelle rechtfertigt.
+
+create table profiles (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  display_name text,
+  avatar_path text,
+  updated_at timestamptz not null default now()
+);
+
+create trigger profiles_touch_updated_at
+  before update on profiles
+  for each row execute function touch_updated_at();
+
+/**
+ * Alle Nutzer-IDs aus allen Haushalten des angemeldeten Nutzers, ihn selbst
+ * eingeschlossen.
+ *
+ * Anders als `current_household_ids()` geht es hier nicht um Haushalte,
+ * sondern um Personen: Name und Foto sollen in jedem gemeinsamen Haushalt
+ * sichtbar sein, nicht an einen einzelnen Pfad-Präfix gebunden (wie bei
+ * `recipe-images`). SECURITY DEFINER aus demselben Grund wie dort — sonst
+ * bricht die rekursive Prüfung auf `household_members` ab.
+ */
+create or replace function current_housemate_ids()
+returns setof uuid
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+  select distinct user_id from household_members
+  where household_id in (select current_household_ids());
+$$;
+
+revoke all on function current_housemate_ids() from public, anon;
+grant execute on function current_housemate_ids() to authenticated;
+
+alter table profiles enable row level security;
+
+create policy profiles_select on profiles
+  for select to authenticated
+  using (user_id in (select current_housemate_ids()));
+
+create policy profiles_insert on profiles
+  for insert to authenticated
+  with check (user_id = (select auth.uid()));
+
+create policy profiles_update on profiles
+  for update to authenticated
+  using (user_id = (select auth.uid()))
+  with check (user_id = (select auth.uid()));
+
+-- ------------------------------------------------------------------ Storage --
+
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', false)
+on conflict (id) do nothing;
+
+-- Der erste Pfadabschnitt ist die user_id: {user_id}/{datei}. Sichtbar für
+-- alle Mitbewohner:innen (wie die Profilzeile selbst), änderbar nur vom
+-- Konto, dem die Datei gehört.
+create policy avatars_select on storage.objects
+  for select to authenticated
+  using (
+    bucket_id = 'avatars'
+    and ((storage.foldername(name))[1])::uuid in (select current_housemate_ids())
+  );
+
+create policy avatars_insert on storage.objects
+  for insert to authenticated
+  with check (
+    bucket_id = 'avatars'
+    and ((storage.foldername(name))[1])::uuid = (select auth.uid())
+  );
+
+create policy avatars_delete on storage.objects
+  for delete to authenticated
+  using (
+    bucket_id = 'avatars'
+    and ((storage.foldername(name))[1])::uuid = (select auth.uid())
+  );
+
+-- ===================================================================
+-- supabase/migrations/0025_aufgaben_zuweisen.sql
+-- ===================================================================
+
+-- Aufgaben Mitgliedern zuweisen.
+--
+-- `assigned_to` zeigt auf `auth.users`, nicht auf `household_members` — eine
+-- zusammengesetzte Fremdschlüsselbeziehung wäre hier nur unnötige Komplexität,
+-- und `on delete set null` beim Löschen des Kontos reicht als Aufräumregel.
+-- Verlässt jemand nur einen einzelnen Haushalt (Konto bleibt bestehen),
+-- greift diese Regel nicht — dafür räumt `leave_household()` unten gezielt auf.
+
+alter table todos add column assigned_to uuid references auth.users (id) on delete set null;
+
+create index todos_assigned_to_idx on todos (assigned_to);
+
+-- Ersetzt die bestehende Regel aus 0017: zusätzlich zur Haushaltsgrenze muss
+-- eine Zuweisung entweder leer sein oder auf ein tatsächliches Mitglied genau
+-- dieses Haushalts zeigen — sonst ließe sich eine Aufgabe an eine beliebige
+-- geratene Nutzer-ID "zuweisen".
+drop policy todos_all on todos;
+
+create policy todos_all on todos
+  for all to authenticated
+  using (household_id in (select current_household_ids()))
+  with check (
+    household_id in (select current_household_ids())
+    and (
+      assigned_to is null
+      or exists (
+        select 1 from household_members hm
+        where hm.household_id = todos.household_id and hm.user_id = todos.assigned_to
+      )
+    )
+  );
+
+-- Beim Verlassen eines Haushalts (Konto bleibt bestehen) auch die eigenen
+-- Zuweisungen darin loslassen — sonst zeigt eine Aufgabe scheinbar
+-- unverändert auf jemanden, der gar nicht mehr im Haushalt ist (und dessen
+-- Profil die übrigen Mitglieder wegen `current_housemate_ids()` dann auch
+-- nicht mehr sehen).
+create or replace function leave_household(p_household_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'Nicht angemeldet';
+  end if;
+
+  delete from household_members
+  where household_id = p_household_id and user_id = auth.uid();
+
+  if not found then
+    raise exception 'Du bist kein Mitglied dieses Haushalts';
+  end if;
+
+  update todos
+  set assigned_to = null
+  where household_id = p_household_id and assigned_to = auth.uid();
+
+  if not exists (
+    select 1 from household_members where household_id = p_household_id
+  ) then
+    delete from households where id = p_household_id;
+  end if;
+end;
+$$;
+
+revoke all on function leave_household(uuid) from public, anon;
+grant execute on function leave_household(uuid) to authenticated;
+
+-- ===================================================================
 -- supabase/seed/0001_units.sql
 -- ===================================================================
 

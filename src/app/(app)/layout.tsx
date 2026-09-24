@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getCurrentUser } from "@/lib/server/supabase";
+import { getMyAvatar } from "@/lib/server/profile";
 import { TabBar, TabBarFallback } from "./TabBar";
 
 /**
@@ -50,7 +50,6 @@ export default function AppLayout({
  * Session-Daten nicht dorthin exportieren kann.
  */
 async function TabBarForUser() {
-  const user = await getCurrentUser();
-  const initial = user?.email?.trim().charAt(0).toUpperCase() || null;
-  return <TabBar avatarInitial={initial} />;
+  const { initial, avatarUrl } = await getMyAvatar();
+  return <TabBar avatarInitial={initial} avatarUrl={avatarUrl} />;
 }

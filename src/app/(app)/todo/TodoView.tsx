@@ -3,9 +3,10 @@
 import { startTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getBrowserSupabase } from "@/lib/client/supabase";
-import { addTodo, setTodoDone, type Todo } from "@/lib/data/todos";
+import { addTodo, setTodoAssignee, setTodoDone, type Todo } from "@/lib/data/todos";
+import type { MemberProfile } from "@/lib/data/households";
 import { CheckIcon, PlusIcon } from "@/components/icons";
-import { Notice } from "@/components/ui";
+import { Avatar, Notice } from "@/components/ui";
 
 /**
  * Die Todo-Liste.
@@ -21,25 +22,38 @@ import { Notice } from "@/components/ui";
  * ganzen Zeile hakt ab oder macht das rückgängig, sofort im selben Frame;
  * geht der Server-Aufruf schief, springt die Zeile zurück und die Meldung
  * erklärt warum.
+ *
+ * Zuweisen läuft genauso schlicht: der Foto-Kreis am Zeilenende tippt sich
+ * durch die Mitglieder des Haushalts, „niemand" eingeschlossen — kein eigenes
+ * Auswahlmenü, das es sonst nirgends in Emil gibt. Bei genau einem Mitglied
+ * bringt eine Zuweisung nichts, deshalb bleibt der Kreis dann ganz weg.
  */
 export function TodoView({
   householdId,
   open,
   done,
+  members,
+  currentUserId,
 }: {
   householdId: string;
   open: Todo[];
   done: Todo[];
+  members: MemberProfile[];
+  currentUserId: string | null;
 }) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [text, setText] = useState("");
   // Vorgezogene Anzeige: neu ergänzte Einträge, bevor der Server geantwortet
-  // hat, und Häkchen, die von dem abweichen, was `open`/`done` gerade sagen.
+  // hat, und Häkchen/Zuweisungen, die von dem abweichen, was `open`/`done`
+  // gerade sagen.
   const [adding, setAdding] = useState<Todo[]>([]);
   const [doneOverride, setDoneOverride] = useState<Record<string, boolean>>(
     {},
   );
+  const [assigneeOverride, setAssigneeOverride] = useState<
+    Record<string, string | null>
+  >({});
 
   // Sobald frische Serverdaten eintreffen (nach `router.refresh()`), gilt
   // wieder nur noch, was der Server sagt — genau wie in `liste/ListView.tsx`.
@@ -52,6 +66,7 @@ export function TodoView({
     setShownDone(done);
     setAdding([]);
     setDoneOverride({});
+    setAssigneeOverride({});
   }
 
   function run(action: () => Promise<{ ok: boolean; error?: string }>, zurueck?: () => void) {
@@ -82,6 +97,7 @@ export function TodoView({
       done: false,
       doneAt: null,
       createdAt: new Date().toISOString(),
+      assignedTo: null,
     };
     setAdding((current) => [...current, optimistic]);
     setText("");
@@ -109,6 +125,27 @@ export function TodoView({
       () => setTodoDone(supabase, todo.id, next),
       () =>
         setDoneOverride((current) => ({ ...current, [todo.id]: !next })),
+    );
+  }
+
+  /** Kreis am Zeilenende antippen: springt zum nächsten Mitglied, danach zu „niemand". */
+  function cycleAssignee(todo: Todo) {
+    const supabase = getBrowserSupabase();
+    if (!supabase) {
+      setError("Supabase ist nicht konfiguriert.");
+      return;
+    }
+
+    const current = todo.id in assigneeOverride ? assigneeOverride[todo.id] : todo.assignedTo;
+    const currentIndex = members.findIndex((member) => member.userId === current);
+    const nextIndex = currentIndex + 1;
+    const next = nextIndex >= members.length ? null : members[nextIndex].userId;
+
+    setAssigneeOverride((state) => ({ ...state, [todo.id]: next }));
+
+    run(
+      () => setTodoAssignee(supabase, todo.id, next),
+      () => setAssigneeOverride((state) => ({ ...state, [todo.id]: current })),
     );
   }
 
@@ -174,7 +211,16 @@ export function TodoView({
       ) : (
         <ul>
           {openItems.map((todo) => (
-            <TodoRow key={todo.id} todo={todo} done={false} onToggle={toggle} />
+            <TodoRow
+              key={todo.id}
+              todo={todo}
+              done={false}
+              members={members}
+              currentUserId={currentUserId}
+              assignedTo={todo.id in assigneeOverride ? assigneeOverride[todo.id] : todo.assignedTo}
+              onToggle={toggle}
+              onCycleAssignee={cycleAssignee}
+            />
           ))}
         </ul>
       )}
@@ -186,7 +232,16 @@ export function TodoView({
           </h2>
           <ul>
             {doneItems.map((todo) => (
-              <TodoRow key={todo.id} todo={todo} done onToggle={toggle} />
+              <TodoRow
+                key={todo.id}
+                todo={todo}
+                done
+                members={members}
+                currentUserId={currentUserId}
+                assignedTo={todo.id in assigneeOverride ? assigneeOverride[todo.id] : todo.assignedTo}
+                onToggle={toggle}
+                onCycleAssignee={cycleAssignee}
+              />
             ))}
           </ul>
         </section>
@@ -198,12 +253,26 @@ export function TodoView({
 function TodoRow({
   todo,
   done,
+  members,
+  currentUserId,
+  assignedTo,
   onToggle,
+  onCycleAssignee,
 }: {
   todo: Todo;
   done: boolean;
+  members: MemberProfile[];
+  currentUserId: string | null;
+  assignedTo: string | null;
   onToggle: (todo: Todo) => void;
+  onCycleAssignee: (todo: Todo) => void;
 }) {
+  const assignee = members.find((member) => member.userId === assignedTo);
+  const assigneeName = assignee
+    ? assignee.displayName ||
+      (assignee.userId === currentUserId ? "Dir" : "Mitbewohner:in")
+    : null;
+
   return (
     <li className="flex items-center gap-3.5 border-b border-border py-3.5">
       <button
@@ -228,6 +297,23 @@ function TodoRow({
       >
         {todo.text}
       </span>
+      {members.length > 1 && (
+        <button
+          type="button"
+          onClick={() => onCycleAssignee(todo)}
+          aria-label={
+            assigneeName ? `Zugewiesen an ${assigneeName}. Zuweisung ändern.` : "Niemandem zugewiesen. Zuweisen."
+          }
+          className="shrink-0 press-flat tap-target"
+        >
+          <Avatar
+            url={assignee?.avatarUrl}
+            initial={assigneeName?.charAt(0).toUpperCase()}
+            placeholder={!assignee}
+            size={26}
+          />
+        </button>
+      )}
     </li>
   );
 }

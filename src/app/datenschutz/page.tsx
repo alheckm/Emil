@@ -43,6 +43,11 @@ export default function PrivacyPage() {
             Passwort-Hash. Das Passwort selbst wird nicht gespeichert.
           </li>
           <li>
+            <strong>Profil:</strong> Klarname und Profilfoto, freiwillig
+            hinterlegt unter Konto. Beides ist für die Mitglieder deines
+            Haushalts sichtbar — etwa bei zugewiesenen Aufgaben.
+          </li>
+          <li>
             <strong>Inhalte:</strong> deine Rezepte samt Zutaten, hochgeladene
             Rezeptbilder, die Einkaufsliste und der Haushalt, zu dem du gehörst.
           </li>

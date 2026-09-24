@@ -185,6 +185,66 @@ export function Notice({
  * dieser Richtung aus Feed/Foto, nicht aus einer Display-Versalie.
  */
 /**
+ * Nutzer-Avatar: das Foto, oder ersatzweise ein Kreis mit dem ersten
+ * Buchstaben (Konto, Tabbar, Mitgliederliste, Aufgaben-Zuweisung — überall
+ * dieselbe Optik statt vier eigenen Inline-Kreisen).
+ *
+ * Kein `next/image`: die URL ist eine signierte Storage-Adresse und
+ * kurzlebig, da bringt der Optimierer nichts und macht nur Ärger mit
+ * wechselnden Adressen (wie bei den Rezeptbildern).
+ */
+export function Avatar({
+  url,
+  initial,
+  size = 36,
+  /** Gestrichelter leerer Kreis statt Initiale — „niemandem zugewiesen". */
+  placeholder = false,
+}: {
+  url?: string | null;
+  initial?: string | null;
+  size?: number;
+  placeholder?: boolean;
+}) {
+  if (url) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={url}
+        alt=""
+        className="shrink-0 rounded-full object-cover"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+
+  if (placeholder) {
+    return (
+      <span
+        aria-hidden
+        className="shrink-0 rounded-full border-[1.5px] border-dashed border-inactive"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+
+  return (
+    <span
+      aria-hidden
+      className="flex shrink-0 items-center justify-center rounded-full font-bold"
+      style={{
+        width: size,
+        height: size,
+        fontSize: Math.round(size * 0.42),
+        background: "#DCE3D9",
+        color: "#33422F",
+      }}
+    >
+      {initial ?? ""}
+    </span>
+  );
+}
+
+/**
  * Die Wortmarke „e" — Emils Logo, aus `design/logo/emil-icon-final.svg`.
  *
  * Ein Kreis-Ausschnitt derselben Figur, die dort für Quadrat und Kreis
