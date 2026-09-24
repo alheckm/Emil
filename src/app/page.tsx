@@ -25,24 +25,23 @@ export const instant = false;
  * Bereiche dauerhaft erreichbar, und ein eigener Startbildschirm davor wäre
  * eine Sackgasse — wer von hier auf einen Tab tippt, käme nie wieder zurück.
  *
- * Also geht es direkt auf die Einkaufsliste. Das ist ohnehin der Bildschirm,
- * der im Supermarkt in Sekunden da sein muss; ein Zwischenschritt mit einem
- * Knopf darauf hat ihn nur langsamer gemacht.
+ * Also geht es auf den Home-Tab (/rezepte) — den Feed, der beim Öffnen der
+ * App zuerst erscheinen soll, nicht auf einen der anderen drei Tabs.
  *
  * Nicht angemeldet → Anmeldung, kein Haushalt → Haushalt anlegen: diese
  * Prüfungen gehören auf den Server. Im Browser blitzte sonst kurz der falsche
  * Bildschirm auf, und im Standalone-Modus sieht man genau das besonders
- * deutlich. Die Haushalts-Weiche übernimmt `requireHousehold()` auf /liste.
+ * deutlich. Die Haushalts-Weiche übernimmt `requireHousehold()` auf /rezepte.
  */
 export default async function Home() {
   if (!getSupabaseConfig()) {
     return (
-      <Screen title="Emil" tabbar={false}>
+      <Screen title="emil" tabbar={false}>
         <Notice tone="error">{SUPABASE_MISSING_MESSAGE}</Notice>
       </Screen>
     );
   }
 
   if (!(await getCurrentUser())) redirect("/anmelden");
-  redirect("/liste");
+  redirect("/rezepte");
 }

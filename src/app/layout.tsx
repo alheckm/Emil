@@ -30,11 +30,11 @@ const display = Unbounded({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Emil", template: "%s · Emil" },
+  title: { default: "emil", template: "%s · emil" },
   description:
     "Rezepte aus Kochbuch, Webseite oder App sammeln, Portionen umrechnen und die Einkaufsliste im Haushalt teilen.",
-  applicationName: "Emil",
-  appleWebApp: { capable: true, title: "Emil", statusBarStyle: "default" },
+  applicationName: "emil",
+  appleWebApp: { capable: true, title: "emil", statusBarStyle: "default" },
   formatDetection: { telephone: false },
   icons: {
     icon: [

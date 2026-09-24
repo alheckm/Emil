@@ -40,7 +40,7 @@ export default async function JoinPage({
 
   if (!getSupabaseConfig()) {
     return (
-      <Screen title="Emil" tabbar={false}>
+      <Screen title="emil" tabbar={false}>
         <Notice tone="error">{SUPABASE_MISSING_MESSAGE}</Notice>
       </Screen>
     );
@@ -53,7 +53,7 @@ export default async function JoinPage({
     return (
       <Screen
         title="Einladung"
-        lead="Jemand hat dich zu seinem Haushalt bei Emil eingeladen."
+        lead="Jemand hat dich zu seinem Haushalt bei emil eingeladen."
         tabbar={false}
       >
         <Section>
@@ -90,7 +90,7 @@ export default async function JoinPage({
     <Screen title="Einladung" tabbar={false}>
       {existing.length > 0 && (
         <Notice tone="info">
-          Du bist noch in „{existing[0].name}“. Nach dem Beitritt zeigt Emil
+          Du bist noch in „{existing[0].name}“. Nach dem Beitritt zeigt emil
           den neuen Haushalt — den alten kannst du in den Einstellungen
           verlassen.
         </Notice>

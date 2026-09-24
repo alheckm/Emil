@@ -145,7 +145,7 @@ async function Households() {
         Deine Haushalte
       </h2>
       <p className="mt-1 text-[15px] leading-relaxed text-muted">
-        Emil zeigt oben Rezepte und Einkaufsliste aus „{context.household.name}
+        emil zeigt oben Rezepte und Einkaufsliste aus „{context.household.name}
         “. Brauchst du einen der anderen nicht mehr, verlasse ihn hier.
       </p>
       <div className="mt-4">

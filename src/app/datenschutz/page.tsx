@@ -3,7 +3,7 @@ import { Section, Screen } from "@/components/ui";
 
 export const metadata = {
   title: "Datenschutz",
-  description: "Welche Daten Emil speichert, wo sie liegen und wie du sie löschst.",
+  description: "Welche Daten emil speichert, wo sie liegen und wie du sie löschst.",
 };
 
 /**
@@ -20,7 +20,7 @@ export default function PrivacyPage() {
   return (
     <Screen
       title="Datenschutz"
-      lead="Was Emil speichert, wo es liegt und wie du es wieder loswirst."
+      lead="Was emil speichert, wo es liegt und wie du es wieder loswirst."
       tabbar={false}
     >
       <Section>
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
           Verantwortlich
         </h2>
         <p className="mt-2 text-[15px] leading-relaxed">
-          [Name], [Anschrift], [E-Mail-Adresse]. Emil wird privat betrieben und
+          [Name], [Anschrift], [E-Mail-Adresse]. emil wird privat betrieben und
           nicht kommerziell angeboten.
         </p>
       </Section>

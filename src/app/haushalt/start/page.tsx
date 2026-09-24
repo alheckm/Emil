@@ -29,13 +29,13 @@ export default async function HouseholdStartPage() {
   const supabase = await getServerSupabase();
   if (supabase) {
     const households = await listHouseholds(supabase);
-    if (households.ok && households.value.length > 0) redirect("/liste");
+    if (households.ok && households.value.length > 0) redirect("/rezepte");
   }
 
   return (
     <Screen
       title="Haushalt"
-      lead="Emil teilt Rezepte und Einkaufsliste innerhalb eines Haushalts. Leg einen an oder tritt einem bei."
+      lead="emil teilt Rezepte und Einkaufsliste innerhalb eines Haushalts. Leg einen an oder tritt einem bei."
       tabbar={false}
     >
       <StartForms />

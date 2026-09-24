@@ -31,7 +31,7 @@ export default async function LoginPage({
 
   return (
     <Screen
-      title="Emil"
+      title="emil"
       lead="Rezepte, Portionen, Einkaufsliste — geteilt im Haushalt."
       tabbar={false}
     >

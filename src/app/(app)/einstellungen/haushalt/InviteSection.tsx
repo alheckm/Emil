@@ -71,10 +71,10 @@ export function InviteSection({
    */
   function share(code: string) {
     const url = `${window.location.origin}/beitreten/${code}`;
-    const text = "Tritt unserem Haushalt bei Emil bei:";
+    const text = "Tritt unserem Haushalt bei emil bei:";
 
     if (navigator.share) {
-      navigator.share({ title: "Emil – Einladung", text, url }).catch(() => {
+      navigator.share({ title: "emil – Einladung", text, url }).catch(() => {
         // Abgebrochener Freigabedialog ist kein Fehler.
       });
       return;

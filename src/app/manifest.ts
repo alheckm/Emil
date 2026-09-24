@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Emil – Rezepte & Einkaufsliste",
-    short_name: "Emil",
+    name: "emil – Rezepte & Einkaufsliste",
+    short_name: "emil",
     description:
       "Rezepte sammeln, Portionen umrechnen, Einkaufsliste im Haushalt teilen.",
     lang: "de",
