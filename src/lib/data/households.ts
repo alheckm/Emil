@@ -27,12 +27,15 @@ export interface Member {
 }
 
 /**
- * Haushalte des angemeldeten Nutzers.
+ * Haushalte des angemeldeten Nutzers, neueste Mitgliedschaft zuerst.
  *
  * Meistens genau einer. Mehrere kommen vor, solange jemand einer weiteren
- * Einladung folgt, ohne den alten Haushalt vorher zu verlassen — `/liste`
- * & Co. zeigen dann weiter den ältesten (siehe `requireHousehold()`), bis
- * `leaveHousehold()` den überzähligen aufräumt.
+ * Einladung folgt, ohne den alten Haushalt vorher zu verlassen — `/liste` &
+ * Co. zeigen dann den zuletzt beigetretenen (siehe `requireHousehold()`, das
+ * Element 0 nimmt): wer über /beitreten/[code] beitritt, soll sofort im neuen
+ * Haushalt landen, nicht weiter im alten, den `leaveHousehold()` danach
+ * aufräumt. `created_at` sortiert hier über `household_members`, nicht über
+ * `households` — gemeint ist der Zeitpunkt des Beitritts.
  */
 export async function listHouseholds(
   supabase: SupabaseClient,
@@ -40,7 +43,7 @@ export async function listHouseholds(
   const { data, error } = await supabase
     .from("household_members")
     .select("role, households (id, name)")
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false });
 
   if (error) return fail(dataErrorMessage(error));
 

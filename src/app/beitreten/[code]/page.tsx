@@ -81,17 +81,18 @@ export default async function JoinPage({
   const households = supabase ? await listHouseholds(supabase) : null;
   const existing = households?.ok ? households.value : [];
 
-  // Wer schon einen Haushalt hat, tritt trotzdem bei — Emil zeigt bis auf
-  // Weiteres weiter den älteren (siehe requireHousehold()). Den überzähligen
-  // wieder loszuwerden ist Sache von /einstellungen/haushalt, deshalb landet
-  // man danach genau dort statt auf /liste.
+  // Wer schon einen Haushalt hat, tritt trotzdem bei — Emil zeigt danach den
+  // neu beigetretenen (siehe listHouseholds(): neueste Mitgliedschaft
+  // zuerst). Den alten wieder loszuwerden ist Sache von
+  // /einstellungen/haushalt, deshalb landet man danach genau dort statt auf
+  // /liste.
   return (
     <Screen title="Einladung" tabbar={false}>
       {existing.length > 0 && (
         <Notice tone="info">
-          Du bist schon in „{existing[0].name}“. Nach dem Beitritt zeigt Emil
-          weiter diesen Haushalt — in den Einstellungen kannst du den, den du
-          nicht mehr brauchst, verlassen.
+          Du bist noch in „{existing[0].name}“. Nach dem Beitritt zeigt Emil
+          den neuen Haushalt — den alten kannst du in den Einstellungen
+          verlassen.
         </Notice>
       )}
       <JoinHousehold

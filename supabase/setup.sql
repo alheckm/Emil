@@ -2308,8 +2308,8 @@ $$;
 -- Einen einzelnen Haushalt verlassen.
 --
 -- Seit /beitreten/[code] einem Beitritt nicht mehr im Weg steht, auch wenn
--- schon ein Haushalt besteht (siehe 0022), braucht es ein Gegenstück: den
--- nicht mehr gebrauchten Haushalt danach wieder loswerden.
+-- schon ein Haushalt besteht, braucht es ein Gegenstück: den nicht mehr
+-- gebrauchten Haushalt danach wieder loswerden.
 --
 -- `delete_own_household_data()` (0005) reicht dafür nicht — die räumt beim
 -- Konto löschen *alle* Mitgliedschaften ab. Hier soll gezielt nur einer
