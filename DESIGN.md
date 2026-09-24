@@ -164,7 +164,10 @@ Kachelraster — bewusst kantig, wie bei Instagram).
 - Glas-Effekt: `background: rgba(255,255,255,.72)`,
   `backdrop-filter: blur(24px) saturate(180%)` — der `saturate`-Zusatz ist
   Pflicht, sonst wirkt es milchig statt Glas.
-- Aktiver Tab: `accent`-Farbe am Icon plus 4-px-Punkt darunter.
+- Aktiver Tab: runder `soft`-Hintergrund hinter dem Icon (Instagram-Vorbild,
+  kein Punkt darunter, seit 2026-09-24) — dadurch fällt die Leiste dünner aus
+  (56 statt 64 px) und der Konto-Kreis sitzt mittig statt vom Punkt nach oben
+  verschoben.
 
 **„Etwas hinzufügen"-Zeile** (Einkaufsliste, Aufgaben)
 - Kein schwebender Button — inline erste Zeile der Liste, echtes `<input>`

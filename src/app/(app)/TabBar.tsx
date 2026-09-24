@@ -14,15 +14,18 @@ import { HomeIcon, BagIcon, ChecklistIcon } from "@/components/icons";
  * `pb-tabbar` (siehe `Screen` in `components/ui.tsx`), damit nichts unter der
  * Leiste verschwindet.
  *
- * Bauform nach DESIGN.md: 16 px Seitenabstand, 64 px hoch, `999px`-Pille,
+ * Bauform nach DESIGN.md: 16 px Seitenabstand, 56 px hoch, `999px`-Pille,
  * Milchglas (`rgba(255,255,255,.72)` + `blur(24px) saturate(180%)` —
  * `saturate` ist Pflicht, sonst wirkt es milchig statt Glas). Genau vier
  * Ziele: Home, Einkaufsliste, Aufgaben, Konto. Konto zeigt den echten
  * Nutzer-Avatar, kein generisches Icon.
  *
  * Aktiv/inaktiv unterscheidet sich laut Entwurf **nicht** über die Iconfarbe
- * (die bleibt überall `--text`) — Signal ist allein der 4-px-Punkt darunter
- * (bzw. beim Konto-Avatar zusätzlich ein `--accent`-Ring).
+ * (die bleibt überall `--text`) — Signal ist ein runder `--soft`-Hintergrund
+ * hinter dem Icon (Instagram-Vorbild statt Punkt darunter, 2026-09-24). Das
+ * erlaubt eine dünnere Leiste, weil kein Platz mehr für einen Punkt unter dem
+ * Icon reserviert werden muss, und der Konto-Kreis sitzt dadurch mittig statt
+ * nach oben verschoben.
  *
  * Der Kern gegen die gefühlte Trägheit ist `useOptimistic`: der angetippte Tab
  * wird im selben Frame aktiv, statt erst wenn der Server geantwortet hat.
@@ -38,15 +41,6 @@ const TABS = [
 ] as const;
 
 type TabHref = (typeof TABS)[number]["href"] | "/einstellungen";
-
-function Dot({ show }: { show: boolean }) {
-  return (
-    <span
-      aria-hidden
-      className={"h-1 w-1 rounded-full " + (show ? "bg-accent" : "bg-transparent")}
-    />
-  );
-}
 
 function Frame({
   active,
@@ -66,7 +60,7 @@ function Frame({
     <nav
       aria-label="Hauptbereiche"
       data-pending={pending ? "" : undefined}
-      className="fixed inset-x-4 z-40 h-16 rounded-pill glass-bar"
+      className="fixed inset-x-4 z-40 h-14 rounded-pill glass-bar"
       style={{ bottom: "max(16px, env(safe-area-inset-bottom))" }}
     >
       <ul className="flex h-full items-center justify-around px-1.5">
@@ -79,10 +73,12 @@ function Frame({
                 aria-label={label}
                 aria-current={current ? "page" : undefined}
                 onClick={() => onSelect?.(href)}
-                className="flex h-11 w-11 flex-col items-center justify-center gap-[3px] press-flat tap-target"
+                className={
+                  "flex h-11 w-11 items-center justify-center rounded-full press-flat tap-target " +
+                  (current ? "bg-soft" : "")
+                }
               >
                 <Icon className="h-[22px] w-[22px] text-text" />
-                <Dot show={current} />
               </Link>
             </li>
           );
@@ -93,20 +89,18 @@ function Frame({
             aria-label="Konto"
             aria-current={kontoActive ? "page" : undefined}
             onClick={() => onSelect?.("/einstellungen")}
-            className="flex h-11 w-11 flex-col items-center justify-center gap-[3px] press-flat tap-target"
+            className={
+              "flex h-11 w-11 items-center justify-center rounded-full press-flat tap-target " +
+              (kontoActive ? "bg-soft" : "")
+            }
           >
             <span
               aria-hidden
               className="flex h-[26px] w-[26px] items-center justify-center rounded-full text-[11px] font-bold"
-              style={{
-                background: "#DCE3D9",
-                color: "#33422F",
-                border: kontoActive ? "2px solid var(--accent)" : "none",
-              }}
+              style={{ background: "#DCE3D9", color: "#33422F" }}
             >
               {avatarInitial ?? ""}
             </span>
-            <Dot show={kontoActive} />
           </Link>
         </li>
       </ul>

@@ -100,7 +100,7 @@ body {
 }
 /* Platz unter dem scrollenden Inhalt, damit die schwebende Glas-Tabbar
    (TabBar.tsx) nichts verdeckt. */
-@utility pb-tabbar { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
+@utility pb-tabbar { padding-bottom: calc(102px + env(safe-area-inset-bottom)); }
 
 /* ---------------------------------------------------------------------------
    Touch-Verhalten auf dem iPhone.
