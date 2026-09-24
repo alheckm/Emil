@@ -2,16 +2,37 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useId, useMemo, useOptimistic, useState, startTransition } from "react";
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useOptimistic,
+  useState,
+  startTransition,
+} from "react";
 import type { RecipeSummary } from "@/lib/data/recipes";
-import { Section } from "@/components/ui";
-import { ChevronRightIcon } from "@/components/icons";
+import { getRecipe } from "@/lib/data/recipes";
+import { addRecipeToList, removeRecipeFromList } from "@/lib/data/shoppingList";
+import { buildListItems } from "@/lib/core/mergeList";
+import { formatRelativeTime } from "@/lib/core/format";
+import { getBrowserSupabase } from "@/lib/client/supabase";
+import { Notice } from "@/components/ui";
+import {
+  CheckIcon,
+  ClockIcon,
+  GridIcon,
+  ImportIcon,
+  MoreIcon,
+  RowsIcon,
+  SearchIcon,
+} from "@/components/icons";
 
 /**
- * Suche, Schlagwort-Filter und Trefferliste in einem.
+ * „Home" (DESIGN.md): Wortmarke, Feed/Kacheln-Umschalter, Suche,
+ * Schlagwort-Filter und die Trefferliste in einem.
  *
- * Zusammengelegt, weil die drei zusammengehören: der Filter entscheidet, was
- * die Liste zeigt, und genau das soll ohne Umweg über den Server passieren.
+ * Zusammengelegt, weil sie zusammengehören: der Filter entscheidet, was die
+ * Liste zeigt, und genau das soll ohne Umweg über den Server passieren.
  *
  * Die beiden Filter werden bewusst **unterschiedlich** behandelt:
  *
@@ -30,6 +51,9 @@ import { ChevronRightIcon } from "@/components/icons";
  *   auf dem Server. Er läuft deshalb weiter über die Adresse — aber entprellt
  *   und in einer Transition, sodass die Liste währenddessen blass wird statt
  *   einzufrieren.
+ *
+ * Die Feed/Kacheln-Umschaltung ist reiner Anzeigezustand (nicht in der
+ * Adresse) — DESIGN.md zeigt sie als lokalen Umschalter ohne eigene URL.
  */
 
 /** Reservierte Werte im `filter`-Parameter, die keine Schlagwörter sind. */
@@ -41,16 +65,20 @@ export function RecipeBrowser({
   tags,
   planned,
   images,
+  listId,
 }: {
   recipes: RecipeSummary[];
   tags: { tag: string; count: number }[];
   planned: Record<string, number>;
   /** Pfad → signierte URL, gebündelt geholt (siehe getRecipeImageUrls). */
   images: Record<string, string>;
+  listId: string | null;
 }) {
   const router = useRouter();
   const params = useSearchParams();
   const inputId = useId();
+
+  const [view, setView] = useState<"feed" | "grid">("feed");
 
   const currentQuery = params.get("q") ?? "";
   const [value, setValue] = useState(currentQuery);
@@ -131,62 +159,162 @@ export function RecipeBrowser({
     return recipes;
   }, [recipes, isZeitFilter, isSaisonFilter, activeTag, currentMonth]);
 
+  // Auf-Liste-Zustand, sofort sichtbar vorgezogen — dieselbe Zutatenmenge wie
+  // ein frischer Import: die Basisportion aus dem Rezept, ohne Umweg über den
+  // Rezept-Screen. Die Zutaten selbst holt erst der Antipper (`getRecipe`),
+  // nicht schon die Übersicht — sonst trüge jede Zeile hier das Gewicht eines
+  // ganzen Rezepts mit sich herum, nur damit dieser eine Knopf funktioniert.
+  const [override, setOverride] = useState<Record<string, number | null>>({});
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [listError, setListError] = useState("");
+
+  async function toggleOnList(recipe: RecipeSummary) {
+    if (!listId) {
+      setListError("Keine aktive Liste gefunden.");
+      return;
+    }
+    const supabase = getBrowserSupabase();
+    if (!supabase) {
+      setListError("Supabase ist nicht konfiguriert.");
+      return;
+    }
+
+    const currentServings = override[recipe.id] ?? planned[recipe.id] ?? null;
+    setListError("");
+    setBusyId(recipe.id);
+
+    if (currentServings !== null) {
+      const result = await removeRecipeFromList(supabase, listId, recipe.id);
+      setBusyId(null);
+      if (!result.ok) {
+        setListError(result.error);
+        return;
+      }
+      setOverride((current) => ({ ...current, [recipe.id]: null }));
+      startTransition(() => router.refresh());
+      return;
+    }
+
+    const full = await getRecipe(supabase, recipe.id);
+    if (!full.ok || !full.value) {
+      setBusyId(null);
+      setListError(full.ok ? "Rezept nicht gefunden." : full.error);
+      return;
+    }
+    const fullRecipe = full.value;
+    const items = buildListItems(
+      fullRecipe.ingredients,
+      fullRecipe.baseServings,
+      fullRecipe.baseServings,
+    );
+    const result = await addRecipeToList(
+      supabase,
+      listId,
+      recipe.id,
+      fullRecipe.baseServings,
+      items,
+    );
+    setBusyId(null);
+    if (!result.ok) {
+      setListError(result.error);
+      return;
+    }
+    setOverride((current) => ({
+      ...current,
+      [recipe.id]: fullRecipe.baseServings,
+    }));
+    startTransition(() => router.refresh());
+  }
+
   return (
-    <div className="space-y-6" data-pending={searching ? "" : undefined}>
-      <div className="space-y-4">
+    <div data-pending={searching ? "" : undefined}>
+      <div className="flex items-center justify-between px-5 pt-1 pb-3.5">
+        <span className="font-display text-[22px] font-bold tracking-[-0.01em]">
+          emil
+        </span>
+        <div className="flex items-center gap-1">
+          <Link
+            href="/rezepte/importieren"
+            aria-label="Rezept importieren"
+            className="flex h-11 w-11 items-center justify-center press-flat tap-target"
+          >
+            <ImportIcon className="h-[23px] w-[23px] text-text" />
+          </Link>
+          <div
+            role="tablist"
+            aria-label="Ansicht"
+            className="flex items-center gap-0.5 rounded-pill bg-border p-0.5"
+          >
+            <ViewTabButton
+              label="Feed-Ansicht"
+              active={view === "feed"}
+              onClick={() => setView("feed")}
+            >
+              <RowsIcon className="h-[15px] w-[15px]" />
+            </ViewTabButton>
+            <ViewTabButton
+              label="Kachel-Ansicht"
+              active={view === "grid"}
+              onClick={() => setView("grid")}
+            >
+              <GridIcon className="h-[15px] w-[15px]" />
+            </ViewTabButton>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-5 pb-4">
         <label htmlFor={inputId} className="sr-only">
-          Rezepte durchsuchen
+          Rezept oder Zutat suchen
         </label>
-        {/* 16px Schrift trotz Vorlage (dort 13px) — Untergrenze fürs
-            Eingabefeld, sonst zoomt iOS beim Antippen hinein. */}
-        <div className="flex items-center gap-3 border-b-2 border-text pb-2.5">
+        <div className="relative">
+          <SearchIcon
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 left-4 h-[18px] w-[18px] -translate-y-1/2 text-muted"
+          />
+          {/* 16px Schrift Pflicht, sonst zoomt iOS beim Fokussieren hinein. */}
           <input
             id={inputId}
             type="search"
             inputMode="search"
             value={value}
             onChange={(event) => setValue(event.target.value)}
-            placeholder="Titel oder Zutat …"
-            className="min-w-0 flex-1 bg-transparent text-base font-bold tracking-[0.02em] text-text uppercase outline-none placeholder:text-muted/60"
+            placeholder="Rezept oder Zutat suchen"
+            className="h-11 w-full rounded-pill bg-border pr-4 pl-11 text-base text-text outline-none placeholder:text-muted"
           />
-          <span aria-hidden className="shrink-0 text-[15px] font-extrabold">
-            →
-          </span>
-        </div>
-
-        {/* Zwei feste Schnellfilter zuerst, danach die echten Schlagwörter —
-            eine Reihe, derselbe Chip-Stil (radiuslos wie der Rest der
-            Richtung, trotz Funktionsname FilterPill). Die festen Chips
-            stehen immer da, auch ohne passende Rezepte — anders als die
-            Tag-Liste darunter, die nur zeigt, was es wirklich gibt. */}
-        <div className="flex flex-wrap gap-2">
-          <FilterPill active={isZeitFilter} onClick={() => toggleFilter(QUICK_ZEIT)}>
-            ≤ 30 Min
-          </FilterPill>
-          <FilterPill
-            active={isSaisonFilter}
-            onClick={() => toggleFilter(QUICK_SAISON)}
-          >
-            Saisonal
-          </FilterPill>
-          {tags.map(({ tag, count }) => (
-            <FilterPill
-              key={tag}
-              active={activeTag === tag}
-              onClick={() => toggleFilter(tag)}
-            >
-              {tag}
-              <span className="ml-1.5 opacity-60">{count}</span>
-            </FilterPill>
-          ))}
         </div>
       </div>
 
-      {/* Nur die Trefferliste wird blass, während die Textsuche läuft — der
-          Rahmen und die Filter darüber bleiben scharf und bedienbar. */}
+      <div className="flex gap-2 overflow-x-auto px-5 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <FilterChip active={isZeitFilter} onClick={() => toggleFilter(QUICK_ZEIT)}>
+          <span className="tabular">≤ 30 Min</span>
+        </FilterChip>
+        <FilterChip active={isSaisonFilter} onClick={() => toggleFilter(QUICK_SAISON)}>
+          Saisonal
+        </FilterChip>
+        {tags.map(({ tag, count }) => (
+          <FilterChip
+            key={tag}
+            active={activeTag === tag}
+            onClick={() => toggleFilter(tag)}
+          >
+            {tag}
+            <span className="ml-1.5 opacity-60">{count}</span>
+          </FilterChip>
+        ))}
+      </div>
+
+      <div className="h-px bg-border" />
+
+      {listError && (
+        <div className="px-5 pt-4">
+          <Notice tone="error">{listError}</Notice>
+        </div>
+      )}
+
       <div className="dims-when-pending">
         {visible.length === 0 ? (
-          <Section>
+          <div className="px-5 py-8">
             {currentQuery || activeFilter ? (
               <p className="text-[15px] leading-[1.55] text-muted">
                 {currentQuery
@@ -194,132 +322,183 @@ export function RecipeBrowser({
                   : "Nichts gefunden. Kein Rezept passt gerade zu diesem Filter."}
               </p>
             ) : (
-              <div className="py-6">
-                <h2 className="text-[24px] leading-[1.05] font-black text-text uppercase">
+              <div>
+                <h2 className="font-display text-[20px] leading-[1.2] font-bold text-text">
                   Noch leer
                 </h2>
-                <p className="mt-2 max-w-[240px] text-[15px] leading-relaxed text-muted">
-                  Am schnellsten geht es über „Importieren“: die Adresse einer
+                <p className="mt-2 max-w-[260px] text-[15px] leading-relaxed text-muted">
+                  Am schnellsten geht es über „Importieren": die Adresse einer
                   Rezeptseite einfügen, oder ein Kochbuch-Foto digitalisieren
                   und das Ergebnis hier einsetzen.
                 </p>
                 <Link
                   href="/rezepte/importieren"
-                  className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-extrabold tracking-[0.1em] text-text uppercase press-flat tap-target"
+                  className="mt-3 inline-flex min-h-11 items-center gap-1.5 text-[14px] font-semibold text-text press-flat tap-target"
                 >
                   Rezept importieren →
                 </Link>
               </div>
             )}
-          </Section>
-        ) : (
-          /* Kein Kartenrahmen, kein Schatten (DESIGN.md, "Flach-Regel"):
-             Titel und Foto laufen offen auf `--bg`, nur der Zeilenabstand
-             (20 px zwischen den Rezepten) trennt sie voneinander. Eine
-             Spalte, Inhaltsbreite bleibt `max-w-md`. */
-          <ul className="space-y-5">
+          </div>
+        ) : view === "feed" ? (
+          <ul>
             {visible.map((recipe) => {
-              const servings = planned[recipe.id];
-              const image = recipe.imagePath
-                ? images[recipe.imagePath]
-                : undefined;
-              const facts = [
-                recipe.totalTimeMin ? `${recipe.totalTimeMin} Min` : null,
-                ...recipe.tags.slice(0, 2),
-              ].filter((fact): fact is string => Boolean(fact));
-
+              const onList = (override[recipe.id] ?? planned[recipe.id] ?? null) !== null;
+              const image = recipe.imagePath ? images[recipe.imagePath] : undefined;
               return (
                 <li key={recipe.id}>
-                  {/* `prefetch` holt die Rezeptseite samt ihrer URL-Daten vor
-                      dem Klick. Das kostet eine Server-Runde pro sichtbarem
-                      Verweis — bei einer Liste dieser Größe ist das der
-                      richtige Tausch, bei tausend Rezepten wäre es keiner. */}
+                  <div className="flex items-start justify-between gap-3 px-5 pt-3.5 pb-2.5">
+                    <Link
+                      href={`/rezepte/${recipe.id}`}
+                      prefetch
+                      className="min-w-0"
+                    >
+                      <h2 className="font-display text-[15px] leading-[1.3] font-bold text-text">
+                        {recipe.title}
+                      </h2>
+                    </Link>
+                    <Link
+                      href={`/rezepte/${recipe.id}`}
+                      aria-label={`${recipe.title} — weitere Optionen`}
+                      className="flex h-7 w-7 shrink-0 items-center justify-center press-flat tap-target"
+                    >
+                      <MoreIcon className="text-muted" />
+                    </Link>
+                  </div>
+
                   <Link
                     href={`/rezepte/${recipe.id}`}
                     prefetch
-                    className="block overflow-hidden rounded-card bg-card shadow-card press tap-target"
+                    aria-label={recipe.title}
+                    className="relative block aspect-[393/340] w-full overflow-hidden bg-photo"
                   >
-                    {/* Textinhalt trägt den vollen Seitenrand (20 px) — das
-                        Foto darunter dagegen fast keinen, siehe unten. */}
-                    <div className="px-5 pt-5">
-                      <h2
-                        lang="de"
-                        className="text-[28px] leading-[1.05] font-extrabold tracking-[-0.005em] text-text uppercase [hyphens:auto] [text-wrap:balance]"
-                      >
-                        {recipe.title}
-                      </h2>
-
-                      {/* Merkmal-Chips — Pendant zu „1,200 sq ft · 3 Beds …"
-                          in der Referenz. Kontur statt Fläche. */}
-                      <ul className="mt-3 flex flex-wrap gap-2">
-                        {facts.map((fact) => (
-                          <li
-                            key={fact}
-                            className="border border-border px-3 py-1 text-[11px] font-bold tracking-[0.08em] uppercase"
-                          >
-                            {fact}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Nur 8 px Rand zur Karte (`px-2 pb-2`), fast bündig —
-                        so sitzt das Foto in der Referenz, nicht mit demselben
-                        Rand wie der Text darüber. Eigene, große Rundung wie
-                        die Karte selbst, kein Titel mehr darauf: die Referenz
-                        legt den Titel immer neben oder unter das Foto. Fehlt
-                        das Foto, bleibt `bg-photo` stehen. */}
-                    <div className="px-2 pb-2 pt-4">
-                      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-card bg-photo">
-                        {image && (
-                          /* eslint-disable-next-line @next/next/no-img-element */
-                          <img
-                            src={image}
-                            alt=""
-                            loading="lazy"
-                            className="absolute inset-0 h-full w-full object-cover"
-                          />
-                        )}
-
-                        {servings ? (
-                          /* Dieselbe Milchglasfläche wie die Knöpfe auf dem
-                             Rezeptfoto, damit auf dem Foto nur eine Sprache
-                             gesprochen wird — bewusst nicht `--accent`, damit
-                             der Listenstatus nicht mit der CTA-Farbe
-                             verwechselt wird. */
-                          <span className="absolute top-3 left-3 bg-card/70 px-3 py-1.5 text-[11px] font-bold tracking-[0.06em] text-text uppercase backdrop-blur-[8px]">
-                            Auf der Liste · {servings}
-                          </span>
-                        ) : null}
-
-                        {/* Einzige Stelle, an der eine Akzent-Fläche direkt
-                            auf einem Foto sitzt statt auf `--bg`. */}
-                        <span className="absolute right-3 bottom-3 flex items-center gap-2 bg-accent py-1.5 pr-1.5 pl-4 text-[11px] font-extrabold tracking-[0.08em] text-accent-ink uppercase">
-                          Ansehen
-                          <span className="flex h-6 w-6 items-center justify-center bg-text text-card">
-                            <ChevronRightIcon className="h-3.5 w-3.5" />
-                          </span>
-                        </span>
-                      </div>
-                    </div>
+                    {image && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={image}
+                        alt=""
+                        loading="lazy"
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    )}
                   </Link>
+
+                  <div className="flex items-center justify-between gap-3 px-5 pt-3.5 pb-1">
+                    {recipe.totalTimeMin ? (
+                      <span className="tabular flex items-center gap-1.5 text-[14px] text-text">
+                        <ClockIcon className="h-4 w-4" strokeWidth={1.8} />
+                        {recipe.totalTimeMin} Min
+                      </span>
+                    ) : (
+                      <span />
+                    )}
+                    <ListToggleButton
+                      on={onList}
+                      busy={busyId === recipe.id}
+                      onClick={() => void toggleOnList(recipe)}
+                    />
+                  </div>
+                  <p className="px-5 pt-1 pb-4 text-[13px] text-muted">
+                    {formatRelativeTime(recipe.createdAt)}
+                    {recipe.tags.length > 0 && ` · ${recipe.tags.slice(0, 2).join(", ")}`}
+                  </p>
+
+                  <div className="h-px bg-border" />
                 </li>
               );
             })}
           </ul>
+        ) : (
+          <div className="grid grid-cols-2 gap-[3px] bg-border">
+            {visible.map((recipe) => {
+              const onList = (override[recipe.id] ?? planned[recipe.id] ?? null) !== null;
+              const image = recipe.imagePath ? images[recipe.imagePath] : undefined;
+              return (
+                <div key={recipe.id} className="relative aspect-[3/4] overflow-hidden">
+                  <Link
+                    href={`/rezepte/${recipe.id}`}
+                    prefetch
+                    aria-label={recipe.title}
+                    className="absolute inset-0 block bg-photo"
+                  >
+                    {image && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={image}
+                        alt=""
+                        loading="lazy"
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    )}
+                    <span
+                      aria-hidden
+                      className="absolute inset-0"
+                      style={{
+                        background:
+                          "linear-gradient(to top, rgba(15,16,18,0.74) 0%, rgba(15,16,18,0) 60%)",
+                      }}
+                    />
+                    <span className="absolute right-3 bottom-8 left-3 line-clamp-2 font-display text-[12px] leading-[1.25] font-bold text-white">
+                      {recipe.title}
+                    </span>
+                    {recipe.totalTimeMin && (
+                      <span className="tabular absolute bottom-2 left-3 flex items-center gap-1 text-[11.5px] text-white/85">
+                        <ClockIcon className="h-3.5 w-3.5" strokeWidth={2} />
+                        {recipe.totalTimeMin} Min
+                      </span>
+                    )}
+                  </Link>
+                  <div className="absolute top-2 right-2">
+                    <ListToggleButton
+                      compact
+                      on={onList}
+                      busy={busyId === recipe.id}
+                      onClick={() => void toggleOnList(recipe)}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-/**
- * Ein Chip in der Filterreihe — für die zwei festen Schnellfilter und die
- * echten Schlagwörter gleichermaßen: aktiv `--text`-gefüllt mit
- * `--card`-hellem Text, inaktiv `--soft` mit `--muted`-Text, radiuslos wie
- * der Rest der Richtung, kein Rahmen in beiden Zuständen.
- */
-function FilterPill({
+function ViewTabButton({
+  label,
+  active,
+  onClick,
+  children,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-label={label}
+      aria-selected={active}
+      onClick={onClick}
+      className="flex h-9 w-9 items-center justify-center press-flat tap-target"
+    >
+      <span
+        className={
+          "flex h-7 w-7 items-center justify-center rounded-pill " +
+          (active ? "bg-card text-text" : "text-inactive")
+        }
+      >
+        {children}
+      </span>
+    </button>
+  );
+}
+
+function FilterChip({
   active,
   onClick,
   children,
@@ -334,11 +513,51 @@ function FilterPill({
       onClick={onClick}
       aria-pressed={active}
       className={
-        "min-h-11 px-4 text-[11px] font-bold tracking-[0.06em] uppercase press tap-target " +
-        (active ? "bg-text text-card" : "bg-soft text-muted")
+        "flex h-[34px] shrink-0 items-center rounded-pill border px-3.5 text-[13px] font-semibold press-flat tap-target " +
+        (active
+          ? "border-accent bg-accent text-accent-ink"
+          : "border-border bg-card text-text")
       }
     >
       {children}
+    </button>
+  );
+}
+
+/**
+ * „Auf Liste" — dieselbe Aktion wie `ShoppingListButton` in `RecipeActions`,
+ * aber ohne Zwischenzustand „stale": von Home aus gibt es keinen
+ * Portionswähler, es zählt nur an/aus.
+ */
+function ListToggleButton({
+  on,
+  busy,
+  compact,
+  onClick,
+}: {
+  on: boolean;
+  busy: boolean;
+  /** Kleinere Form für die Kachel-Ansicht, wo der Knopf auf dem Foto sitzt. */
+  compact?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={busy}
+      aria-pressed={on}
+      className={
+        "flex shrink-0 items-center gap-1.5 rounded-pill font-display press-flat tap-target disabled:opacity-60 " +
+        (compact
+          ? "h-[26px] px-3 text-[11px] font-semibold shadow-[0_2px_6px_rgba(0,0,0,0.2)]"
+          : "h-9 px-4 text-[12.5px] font-bold") +
+        " " +
+        (on ? "bg-card text-text border border-border" : "bg-accent text-accent-ink")
+      }
+    >
+      {on && <CheckIcon className="h-3 w-3" />}
+      {on ? "Auf der Liste" : "Auf Liste"}
     </button>
   );
 }

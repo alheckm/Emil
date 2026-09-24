@@ -1,46 +1,46 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Maison Augé (2026-09-23, siehe HANDOFF-maison-auge.md): bewusste, vom
-   Nutzer bestaetigte Abweichung von der aelteren "Fliederblau/Karten"-
-   Richtung. Referenz ist https://maisonauge.com/, keine App — Farben 1:1 aus
-   deren computed style extrahiert, seither in drei Artefakten abgestimmt
-   (Screens, Typografie-System, Komponenten-Specimen; Links im Handoff).
+   Instagram-Baseline (2026-09-24, siehe DESIGN.md): Struktur und
+   Interaktionssprache von Instagram (Feed, Story-Ringe, Profilraster,
+   Glas-Tabbar) auf einen Haushalts-Kochassistenten übertragen, mit eigener
+   Typografie statt Systemschrift. Referenzwelt ist die aktuelle
+   Instagram-iOS-App (Grundlayout und Verhalten, nicht die Farbmarke).
 
-   `--card` fällt bewusst mit `--bg` zusammen: Flächen trennen sich über
-   `--border` (Haarlinie), nicht über Schatten — `--shadow-card` ist deshalb
-   `none`. `--accent` fällt bewusst mit `--text` zusammen: CTAs sind Navy-
-   Flächen, kein separater Markenton (Unterschied zur alten Gold-Richtung).
+   `--card` fällt bewusst mit `--bg` zusammen: der Feed läuft offen auf Weiß,
+   nur eine Haarlinie (`--border`) trennt Beiträge — kein Kartenschatten
+   (`--shadow-card` bleibt `none`). `--accent` fällt bewusst mit `--text`
+   zusammen (DESIGN.md: Primäraktion ist eine schwarze Pille, keine eigene
+   Markenfarbe) — die zwei Alternativen aus dem Farbwähler des Design-Canvas
+   (`#0095F6`, `#ED4956`) sind hier bewusst nicht verdrahtet, siehe
+   DESIGN.md „Farbe".
 
-   Radius ueberall 0 — das Signature-Element dieser Richtung. Einzige
-   Ausnahme bleibt die native Segmented Control (System-Control, nicht neu
-   gezeichnet).
+   Radien: 999px (Pillen), 12–16px (Felder/Karten/Leer-Zustand), 0 (Fotos in
+   Feed und Kachelraster — bewusst kantig, wie bei Instagram).
 
-   Kein Dark Mode: die Referenz zeigt nur Hell.
+   Kein Dark Mode (bewusste Produktentscheidung, siehe PRODUCT.md).
 --------------------------------------------------------------------------- */
 :root {
-  --bg: #fef5f9;
-  --card: #fef5f9;
-  --chip: #f3efec;
-  --soft: #f3efec;
-  --border: #e4d9d3;
-  --text: #222a36;
-  --muted: #b99c8e;
-  --accent: #222a36;
-  --accent-ink: #fef5f9;
-  --danger: #a2283a;
-  /* Gedrückt-Fläche für den Destruktiv-Button (Outline, keine Füllung im
-     Ruhezustand) — entschiedener Wert aus dem Komponenten-Specimen. */
-  --danger-tint: #f5dee1;
-  /* Kein Erfolgs-/Warnton in den drei Maison-Augé-Artefakten entschieden —
-     eigene, zur Palette passende Ergaenzung: gedecktes Waldgruen bzw.
-     gebranntes Ocker statt Systemgruen/-gelb. */
+  --bg: #ffffff;
+  --card: #ffffff;
+  --chip: #f7f7f7;
+  --soft: #f7f7f7;
+  --border: #efefef;
+  --text: #262626;
+  --muted: #8e8e8e;
+  --inactive: #c7c7c7;
+  --accent: #262626;
+  --accent-ink: #ffffff;
+  --danger: #c0392b;
+  --danger-tint: #fbefee;
+  /* Kein Erfolgs-/Warnton in DESIGN.md entschieden — eigene, zur Palette
+     passende Ergänzung: gedecktes Waldgrün bzw. gebranntes Ocker statt
+     Systemgrün/-gelb. */
   --ok: #3f5d42;
   --warn: #8a5a2b;
   /* Das Bett, auf dem ein Rezeptfoto liegt, solange die signierte Adresse
-     noch unterwegs ist, oder wenn ein Rezept keins hat — dieselbe Flaeche
-     wie `--soft`. */
-  --photo: #f3efec;
+     noch unterwegs ist, oder wenn ein Rezept keins hat. */
+  --photo: #efefef;
   --shadow-card: none;
 }
 
@@ -51,6 +51,7 @@
   --color-soft: var(--soft);
   --color-text: var(--text);
   --color-muted: var(--muted);
+  --color-inactive: var(--inactive);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-danger: var(--danger);
@@ -60,13 +61,14 @@
   --color-warn: var(--warn);
   --color-photo: var(--photo);
   --shadow-card: var(--shadow-card);
-  --font-display: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-sans: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  /* Alle Radien 0 — Signature-Element der Maison-Augé-Richtung. */
-  --radius-pill: 0px;
-  --radius-card: 0px;
+  /* Unbounded für Display/Titel/Abschnitt/Kennzahl, Public Sans für
+     Fließtext/UI — siehe DESIGN.md „Typografie". */
+  --font-display: var(--font-display-ui), "Unbounded Fallback", sans-serif;
+  --font-sans: var(--font-sans-ui), "Public Sans Fallback", sans-serif;
+  --radius-pill: 999px;
+  --radius-card: 16px;
+  --radius-soft: 12px;
   --radius-tile: 0px;
-  --radius-soft: 0px;
 }
 
 html {
@@ -78,16 +80,27 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Safe-Area-Helfer für den Standalone-Modus (Notch oben, Home-Indikator unten).
-   Einmal hier definiert, damit kein Screen es selbst zusammenbaut. */
-@utility pt-safe { padding-top: max(1rem, env(safe-area-inset-top)); }
+/* Zahlen: überall dort, wo Mengen, Zeiten oder Zähler stehen. */
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Safe-Area-Helfer für den Standalone-Modus (Notch oben, Home-Indikator
+   unten). DESIGN.md reserviert oben fest 52px, kein simulierter
+   Statusbalken — auf echten Geräten darf `env()` diesen Mindestwert
+   überschreiben (Dynamic Island etc.), nie unterschreiten. */
+@utility pt-safe { padding-top: max(52px, env(safe-area-inset-top)); }
 @utility pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
 @utility px-safe {
   padding-left: max(1.25rem, env(safe-area-inset-left));
   padding-right: max(1.25rem, env(safe-area-inset-right));
 }
+/* Platz unter dem scrollenden Inhalt, damit die schwebende Glas-Tabbar
+   (TabBar.tsx) nichts verdeckt. */
+@utility pb-tabbar { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
 
 /* ---------------------------------------------------------------------------
    Touch-Verhalten auf dem iPhone.
@@ -253,9 +266,8 @@ select,
    Zoom-Regler im Bildzuschnitt (RecipeImageField/ImageCropper).
 
    Ein natives <input type="range"> im Auslieferungszustand ist ein
-   Browser-Steuerelement, das Emil sonst nirgends zeigt (Abschnitt 1). Eigene
-   Spur und eigener Griff, beide aus den Tokens: Spur `--soft` — dieselbe
-   Fläche, die auch ein Formularfeld auf `--bg` trägt —, Griff gefüllt in
+   Browser-Steuerelement, das Emil sonst nirgends zeigt. Eigene Spur und
+   eigener Griff, beide aus den Tokens: Spur `--soft`, Griff gefüllt in
    `--accent` mit 28 px Durchmesser als Trefferfläche.
 --------------------------------------------------------------------------- */
 @utility zoom-slider {
@@ -293,4 +305,37 @@ select,
     border-radius: var(--radius-pill);
     background: var(--soft);
   }
+}
+
+/* Ladepunkte im Primärbutton (ui.tsx, `LoadingDots`) — DESIGN.md:
+   „Lädt: Label wird durch drei Punkte ersetzt (kein Spinner-Ring)". Leichtes
+   Auf- und Abblenden, 1.1s Zyklus, gestaffelt über `animation-delay`. */
+@keyframes punkt-blinken {
+  0%, 80%, 100% { opacity: 0.35; }
+  40% { opacity: 1; }
+}
+
+@utility dot-blink {
+  animation: punkt-blinken 1100ms ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot-blink {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Glas-Tabbar (TabBar.tsx) und Story-Ring (ListView.tsx) — DESIGN.md-
+   Signature-Elemente, die keine einzelne Farbe/Radius-Utility sind, sondern
+   ein kleines Bündel Eigenschaften. Als eigene Utilities, damit sie nicht in
+   jeder Komponente neu zusammengetippt werden.
+--------------------------------------------------------------------------- */
+@utility glass-bar {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 8px 28px rgba(21, 22, 26, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }

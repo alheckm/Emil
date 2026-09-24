@@ -1,49 +1,35 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { requireHousehold } from "@/lib/server/household";
 import { getListState } from "@/lib/server/listState";
 import { listHouseholdTags, searchRecipes } from "@/lib/data/recipes";
 import { getRecipeImageUrls } from "@/lib/data/recipeImages";
-import { Notice, Screen } from "@/components/ui";
-import { PlusIcon } from "@/components/icons";
+import { Notice } from "@/components/ui";
 import { RecipeGridSkeleton } from "@/components/skeletons";
 import { RecipeBrowser } from "./RecipeBrowser";
 
 export const metadata = { title: "Rezepte" };
 
 /**
- * Die Rezeptübersicht.
+ * Die Rezeptübersicht — „Home" im Design-Canvas (DESIGN.md).
  *
- * Der Rahmen — Überschrift mit dem Knopf zum Anlegen — ist statisch und
- * landet damit in der App Shell: er steht, sobald der Tab angetippt wird.
- * Nur die Treffer strömen nach, und die hängen am Suchtext in der Adresse,
- * sind also URL-Daten und können gar nicht vorab im Shell liegen.
+ * Kein generischer `Screen`/`ScreenHeader`: der Kopf dieses einen Screens
+ * (Wortmarke „emil", Importieren, Feed/Kacheln-Umschalter, Suche, Filter-
+ * Chips) ist eigen genug, dass `RecipeBrowser` ihn selbst zeichnet — er hängt
+ * ohnehin am Umschalt-Zustand, den nur die Browser-Komponente kennt.
+ *
+ * Der Rahmen bleibt trotzdem statisch und landet in der App Shell: nur die
+ * Treffer strömen nach, und die hängen am Suchtext in der Adresse, sind also
+ * URL-Daten und können gar nicht vorab im Shell liegen.
  */
 export default function RecipesPage(props: PageProps<"/rezepte">) {
   return (
-    <Screen
-      title="Rezepte"
-      titleSize="display"
-      action={
-        // Einziger Einstieg zu neuen Rezepten, deshalb in Markenfarbe wie
-        // die „Bearbeiten"-Aktion auf dem Rezept-Screen. „Importieren" bleibt
-        // das Ziel, weil es der Haupteinstieg ist — die Zeile dort führt mit
-        // „Lieber von Hand eingeben" weiter zum manuellen Formular.
-        <Link
-          href="/rezepte/importieren"
-          aria-label="Rezept hinzufügen"
-          className="flex h-11 w-11 items-center justify-center press tap-target"
-        >
-          <span className="flex h-9 w-9 items-center justify-center rounded-pill bg-accent text-accent-ink">
-            <PlusIcon className="h-5 w-5" />
-          </span>
-        </Link>
-      }
-    >
-      <Suspense fallback={<RecipeGridSkeleton />}>
-        <Results searchParams={props.searchParams} />
-      </Suspense>
-    </Screen>
+    <main className="flex-1 pt-safe pb-tabbar">
+      <div className="mx-auto w-full max-w-md">
+        <Suspense fallback={<RecipeGridSkeleton />}>
+          <Results searchParams={props.searchParams} />
+        </Suspense>
+      </div>
+    </main>
   );
 }
 
@@ -54,7 +40,13 @@ async function Results({ searchParams }: { searchParams: SearchParams }) {
   const query = typeof q === "string" ? q : null;
 
   const context = await requireHousehold();
-  if (!context.ok) return <Notice tone="error">{context.error}</Notice>;
+  if (!context.ok) {
+    return (
+      <div className="px-5 pt-5">
+        <Notice tone="error">{context.error}</Notice>
+      </div>
+    );
+  }
 
   const { supabase, household } = context;
 
@@ -68,7 +60,13 @@ async function Results({ searchParams }: { searchParams: SearchParams }) {
     getListState(),
   ]);
 
-  if (!recipes.ok) return <Notice tone="error">{recipes.error}</Notice>;
+  if (!recipes.ok) {
+    return (
+      <div className="px-5 pt-5">
+        <Notice tone="error">{recipes.error}</Notice>
+      </div>
+    );
+  }
 
   // Ein Bündelaufruf für alle Bilder statt einer Runde pro Zeile.
   const images = await getRecipeImageUrls(
@@ -82,6 +80,7 @@ async function Results({ searchParams }: { searchParams: SearchParams }) {
       tags={tags.ok ? tags.value : []}
       planned={list.planned}
       images={images}
+      listId={list.listId}
     />
   );
 }

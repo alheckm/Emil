@@ -16,27 +16,25 @@ export const metadata = { title: "Einstellungen" };
  */
 export default function SettingsPage() {
   return (
-    <Screen title="Einstellungen" titleSize="display">
-      <nav className="space-y-2">
+    <Screen title="Konto">
+      <nav>
         <RowLink href="/einstellungen/haushalt" prefetch>
-          <span className="font-medium">Haushalt</span>
+          <span>Haushalt</span>
           <span className="block text-[13px] text-muted">
             Mitglieder und Einladungen
           </span>
         </RowLink>
+        <div className="h-px bg-border" />
         <RowLink href="/einstellungen/konto" prefetch>
-          <span className="font-medium">Konto</span>
+          <span>Konto</span>
           <span className="block text-[13px] text-muted">
             E-Mail, Abmelden, Konto löschen
           </span>
         </RowLink>
       </nav>
 
-      <p className="text-center text-[15px]">
-        <Link
-          href="/datenschutz"
-          className="text-muted underline underline-offset-4"
-        >
+      <p className="text-center text-[14px]">
+        <Link href="/datenschutz" className="text-muted underline underline-offset-4">
           Datenschutz
         </Link>
       </p>

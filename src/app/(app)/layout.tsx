@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { getCurrentUser } from "@/lib/server/supabase";
 import { TabBar, TabBarFallback } from "./TabBar";
 
 /**
@@ -32,10 +33,24 @@ export default function AppLayout({
       {/* Die Leiste liest die Adresse und hängt deshalb hinter einer eigenen
           Grenze — sonst hielte sie den ganzen Rahmen aus der App Shell heraus.
           Der Platzhalter ist dieselbe Leiste ohne Hervorhebung, also springt
-          nichts, wenn die Markierung nachkommt. */}
+          nichts, wenn die Markierung nachkommt. Sie ist `fixed` (TabBar.tsx)
+          und braucht deshalb keinen Platz im Fluss — Inhalt weicht ihr über
+          `pb-tabbar` (components/ui.tsx) aus. */}
       <Suspense fallback={<TabBarFallback />}>
-        <TabBar />
+        <TabBarForUser />
       </Suspense>
     </div>
   );
+}
+
+/**
+ * Holt den echten Nutzer-Avatar für den Konto-Tab (DESIGN.md: „Konto zeigt
+ * den echten Nutzer-Avatar, kein generisches Icon"). Ein eigener, kleiner
+ * Server-Baustein, weil `TabBar` selbst clientseitig ist (`usePathname`) und
+ * Session-Daten nicht dorthin exportieren kann.
+ */
+async function TabBarForUser() {
+  const user = await getCurrentUser();
+  const initial = user?.email?.trim().charAt(0).toUpperCase() || null;
+  return <TabBar avatarInitial={initial} />;
 }

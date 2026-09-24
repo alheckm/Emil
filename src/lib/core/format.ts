@@ -17,6 +17,28 @@ const LADDERS: Partial<Record<Dimension, string[]>> = {
 /** „Stück" schreibt man nicht hin — „2 Zwiebeln" statt „2 Stück Zwiebeln". */
 const SILENT_UNITS = new Set(["Stück"]);
 
+/**
+ * Kurze relative Zeitangabe für die Rezeptübersicht (Home-Feed, DESIGN.md:
+ * „Mira · vor 2 Std."). Grob gestuft — auf einer Übersicht zählt nur die
+ * Größenordnung, nicht die Minute genau.
+ */
+export function formatRelativeTime(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const minutes = Math.round(diffMs / 60_000);
+  if (minutes < 1) return "gerade eben";
+  if (minutes < 60) return `vor ${minutes} Min.`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `vor ${hours} Std.`;
+  const days = Math.round(hours / 24);
+  if (days < 7) return `vor ${days} Tag${days === 1 ? "" : "en"}`;
+  const weeks = Math.round(days / 7);
+  if (weeks < 5) return `vor ${weeks} Woche${weeks === 1 ? "" : "n"}`;
+  const months = Math.round(days / 30);
+  if (months < 12) return `vor ${months} Monat${months === 1 ? "" : "en"}`;
+  const years = Math.round(days / 365);
+  return `vor ${years} Jahr${years === 1 ? "" : "en"}`;
+}
+
 export function formatNumber(amount: string, maxDecimals = 2): string {
   const rounded = new Decimal(amount).toDecimalPlaces(maxDecimals);
   // toString() lässt bereits keine Nachkommanullen übrig ("1.50" → "1.5").

@@ -5,7 +5,7 @@ import { Notice, Screen } from "@/components/ui";
 import { ListSkeleton } from "@/components/skeletons";
 import { TodoView } from "./TodoView";
 
-export const metadata = { title: "Todo" };
+export const metadata = { title: "Aufgaben" };
 
 /**
  * Die Todo-Liste — bewusst schlicht: ein Feld zum Ergänzen oben, darunter die
@@ -15,7 +15,7 @@ export const metadata = { title: "Todo" };
  */
 export default function TodoPage() {
   return (
-    <Screen title="Todo" titleSize="display">
+    <Screen title="Aufgaben">
       <Suspense fallback={<ListSkeleton />}>
         <Todos />
       </Suspense>

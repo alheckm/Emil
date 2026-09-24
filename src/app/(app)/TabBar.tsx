@@ -3,84 +3,112 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { startTransition, useOptimistic } from "react";
+import { HomeIcon, BagIcon, ChecklistIcon } from "@/components/icons";
 
 /**
- * Die Leiste am unteren Rand.
+ * Die schwebende Glas-Leiste am unteren Rand (DESIGN.md, „Tabbar").
  *
- * Sie steht unten, weil die App einhändig und in Bewegung bedient wird — oben
- * käme der Daumen nicht hin. Und sie liegt im Layout und nicht in den Seiten,
- * damit sie beim Wechsel stehen bleibt: nur der Bereich darüber wird neu
- * gerendert.
+ * Sie liegt im Layout und nicht in den Seiten, damit sie beim Wechsel stehen
+ * bleibt: nur der Bereich darüber wird neu gerendert. Als `fixed` Element
+ * außerhalb des normalen Flusses — der Inhalt darunter braucht deshalb
+ * `pb-tabbar` (siehe `Screen` in `components/ui.tsx`), damit nichts unter der
+ * Leiste verschwindet.
  *
- * Bauform nach der Maison-Augé-Richtung (HANDOFF-maison-auge.md,
- * Signature-Elemente): keine freistehende Pille mehr, sondern eine
- * bildschirmbreite Leiste mit `--border`-Haarlinie oben, auf `--bg`. Jeder
- * Eintrag zeigt **nur seinen Namen, kein Symbol** — die eine Stelle, an der
- * die Richtung Ikonen bewusst verweigert (genau wie die Referenzseite). Der
- * aktive Eintrag wird dunkler und schwerer (`--text`, Gewicht 900 statt 700)
- * und bekommt einen 4-px-Punkt darüber; die Spaltenbreite ändert sich dabei
- * nie, also kann nichts zur Seite springen.
+ * Bauform nach DESIGN.md: 16 px Seitenabstand, 64 px hoch, `999px`-Pille,
+ * Milchglas (`rgba(255,255,255,.72)` + `blur(24px) saturate(180%)` —
+ * `saturate` ist Pflicht, sonst wirkt es milchig statt Glas). Genau vier
+ * Ziele: Home, Einkaufsliste, Aufgaben, Konto. Konto zeigt den echten
+ * Nutzer-Avatar, kein generisches Icon.
+ *
+ * Aktiv/inaktiv unterscheidet sich laut Entwurf **nicht** über die Iconfarbe
+ * (die bleibt überall `--text`) — Signal ist allein der 4-px-Punkt darunter
+ * (bzw. beim Konto-Avatar zusätzlich ein `--accent`-Ring).
  *
  * Der Kern gegen die gefühlte Trägheit ist `useOptimistic`: der angetippte Tab
  * wird im selben Frame aktiv, statt erst wenn der Server geantwortet hat.
  * Bis die neue Seite da ist, meldet `data-pending` nach oben, dass etwas läuft
  * — das Layout dimmt darüber nur den Inhalt und tauscht ihn nicht gegen ein
- * Skelett aus. Ein Tab-Wechsel, bei dem der halbe Bildschirm verschwindet,
- * fühlt sich langsamer an als einer, bei dem der alte Inhalt kurz blass wird.
+ * Skelett aus.
  */
 
 const TABS = [
-  { href: "/liste", label: "Liste" },
-  { href: "/rezepte", label: "Rezepte" },
-  { href: "/todo", label: "Todos" },
-  { href: "/einstellungen", label: "Konto" },
+  { href: "/rezepte", label: "Home", Icon: HomeIcon },
+  { href: "/liste", label: "Einkaufsliste", Icon: BagIcon },
+  { href: "/todo", label: "Aufgaben", Icon: ChecklistIcon },
 ] as const;
 
-type TabHref = (typeof TABS)[number]["href"];
+type TabHref = (typeof TABS)[number]["href"] | "/einstellungen";
+
+function Dot({ show }: { show: boolean }) {
+  return (
+    <span
+      aria-hidden
+      className={"h-1 w-1 rounded-full " + (show ? "bg-accent" : "bg-transparent")}
+    />
+  );
+}
 
 function Frame({
   active,
   pending,
+  avatarInitial,
   onSelect,
 }: {
   active: TabHref | null;
   pending?: boolean;
+  /** Erster Buchstabe der E-Mail-Adresse, oder `null`, solange unbekannt. */
+  avatarInitial?: string | null;
   onSelect?: (href: TabHref) => void;
 }) {
+  const kontoActive = active === "/einstellungen";
+
   return (
     <nav
       aria-label="Hauptbereiche"
       data-pending={pending ? "" : undefined}
-      className="sticky bottom-0 z-10 border-t border-border bg-bg pb-safe"
+      className="fixed inset-x-4 z-40 h-16 rounded-pill glass-bar"
+      style={{ bottom: "max(16px, env(safe-area-inset-bottom))" }}
     >
-      <ul className="mx-auto flex w-full max-w-md items-stretch">
-        {TABS.map((tab) => {
-          const current = active === tab.href;
+      <ul className="flex h-full items-center justify-around px-1.5">
+        {TABS.map(({ href, label, Icon }) => {
+          const current = active === href;
           return (
-            <li key={tab.href} className="flex-1">
+            <li key={href}>
               <Link
-                href={tab.href}
+                href={href}
+                aria-label={label}
                 aria-current={current ? "page" : undefined}
-                onClick={() => onSelect?.(tab.href)}
-                className={
-                  // Jede Spalte gleich breit, immer — nur Farbe/Gewicht/Punkt
-                  // wechseln mit dem aktiven Zustand, nie die Größe.
-                  "flex h-[54px] w-full flex-col items-center justify-center gap-1.5 " +
-                  "text-[10.5px] font-bold tracking-[0.08em] uppercase press-flat tap-target " +
-                  (current ? "font-black text-text" : "text-muted")
-                }
+                onClick={() => onSelect?.(href)}
+                className="flex h-11 w-11 flex-col items-center justify-center gap-[3px] press-flat tap-target"
               >
-                <span
-                  aria-hidden
-                  className={
-                    "h-1 w-1 rounded-full " + (current ? "bg-text" : "bg-transparent")
-                  }
-                />
-                {tab.label}
+                <Icon className="h-[22px] w-[22px] text-text" />
+                <Dot show={current} />
               </Link>
             </li>
           );
         })}
+        <li>
+          <Link
+            href="/einstellungen"
+            aria-label="Konto"
+            aria-current={kontoActive ? "page" : undefined}
+            onClick={() => onSelect?.("/einstellungen")}
+            className="flex h-11 w-11 flex-col items-center justify-center gap-[3px] press-flat tap-target"
+          >
+            <span
+              aria-hidden
+              className="flex h-[26px] w-[26px] items-center justify-center rounded-full text-[11px] font-bold"
+              style={{
+                background: "#DCE3D9",
+                color: "#33422F",
+                border: kontoActive ? "2px solid var(--accent)" : "none",
+              }}
+            >
+              {avatarInitial ?? ""}
+            </span>
+            <Dot show={kontoActive} />
+          </Link>
+        </li>
       </ul>
     </nav>
   );
@@ -96,19 +124,21 @@ function Frame({
  * Markierung nachträglich erscheint.
  */
 export function TabBarFallback() {
-  return <Frame active={null} />;
+  return <Frame active={null} avatarInitial={null} />;
 }
 
-export function TabBar() {
+export function TabBar({ avatarInitial }: { avatarInitial: string | null }) {
   const pathname = usePathname();
 
   // Welcher Tab gehört zur aktuellen Adresse? `/rezepte/17/bearbeiten` zählt
-  // noch zu „Rezepte“, `/einstellungen/konto` noch zu „Konto“ — sonst wäre
-  // beim Blättern in eine Unterseite kein Tab aktiv.
-  const current =
-    TABS.find(
-      (tab) => pathname === tab.href || pathname.startsWith(`${tab.href}/`),
-    )?.href ?? null;
+  // noch zu „Home“, `/einstellungen/konto` noch zu „Konto“ — sonst wäre beim
+  // Blättern in eine Unterseite kein Tab aktiv.
+  const current: TabHref | null =
+    pathname === "/einstellungen" || pathname.startsWith("/einstellungen/")
+      ? "/einstellungen"
+      : (TABS.find(
+          (tab) => pathname === tab.href || pathname.startsWith(`${tab.href}/`),
+        )?.href ?? null);
 
   const [optimistic, setOptimistic] = useOptimistic(current);
   const [pending, setPending] = useOptimistic(false);
@@ -117,6 +147,7 @@ export function TabBar() {
     <Frame
       active={optimistic}
       pending={pending}
+      avatarInitial={avatarInitial}
       onSelect={(href) => {
         // Der Wechsel selbst läuft über den Link; hier wird nur die Anzeige
         // vorgezogen. `useOptimistic`-Setter greifen im aktuellen Frame,

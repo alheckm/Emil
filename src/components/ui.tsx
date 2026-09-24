@@ -4,11 +4,11 @@
  * Bewusst klein gehalten und ohne Bibliothek: Emil hat eine Handvoll Screens,
  * und ein Design-System für zwei Nutzer wäre mehr Pflege als Nutzen.
  *
- * Anatomie und Zustände folgen dem Komponenten-Specimen der Maison-Augé-
- * Richtung (HANDOFF-maison-auge.md): Buttons sind rechteckige Flächen statt
- * Pillen, Textfelder ein Unterstrich statt ein Kasten, Notices ein Rahmen in
- * Tonfarbe statt eine gefüllte Fläche. Zwei Maße stehen trotzdem nicht
- * zufällig, unabhängig von der Design-Richtung:
+ * Anatomie und Zustände folgen dem Komponenten-Specimen der
+ * Instagram-Baseline-Richtung (DESIGN.md): Buttons sind schwarze Pillen,
+ * Textfelder gerundete Kästen auf `--soft`, Notices eine getönte Fläche statt
+ * eines Rahmens. Zwei Maße stehen trotzdem nicht zufällig, unabhängig von der
+ * Design-Richtung:
  * - Eingabefelder haben mindestens 16 px Schrift. Darunter zoomt iOS Safari
  *   beim Antippen ins Feld hinein und der Screen sitzt schief.
  * - Interaktive Flächen sind mindestens 44 px hoch — Apples Mindestgröße für
@@ -17,6 +17,7 @@
  */
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
+import { ChevronRightIcon } from "./icons";
 
 /**
  * Ein Block, der inhaltlich zusammengehört — mehr nicht.
@@ -31,7 +32,9 @@ export function Section({ children }: { children: ReactNode }) {
 }
 
 /**
- * Textfeld — Unterstrich statt Kasten, Label darüber in Überschrift-Skala.
+ * Textfeld — gerundeter Kasten auf `--soft` (DESIGN.md, „Eingabefeld —
+ * Formular"): passt zu Nachbarfeldern wie einer Textarea, die selbst keine
+ * Pille sein kann. Die Pillenform ist der Suche vorbehalten (Home).
  */
 export function Field({
   label,
@@ -41,29 +44,29 @@ export function Field({
 }: ComponentProps<"input"> & { label: string; hint?: string }) {
   return (
     <label className="block">
-      <span className="text-[10px] font-extrabold tracking-[0.08em] text-muted uppercase">
+      <span className="mb-1.5 block text-[12.5px] font-medium text-muted">
         {label}
       </span>
       <input
         {...props}
         className={
-          "mt-1.5 block h-11 w-full border-0 border-b-2 border-text bg-transparent px-0 text-base " +
-          "font-semibold text-text outline-none placeholder:text-muted/50 " +
-          "focus:border-b-[3px] " +
+          "block h-12 w-full rounded-soft border border-border bg-soft px-3.5 text-base " +
+          "text-text outline-none transition-colors placeholder:text-muted " +
+          "focus:border-text focus:bg-card focus:shadow-[0_0_0_3px_rgba(38,38,38,0.08)] " +
           className
         }
       />
       {hint && (
-        <span className="mt-1.5 block text-[13px] text-muted">{hint}</span>
+        <span className="mt-1.5 block text-[12.5px] text-muted">{hint}</span>
       )}
     </label>
   );
 }
 
 /**
- * Buttons — rechteckig, Versal-Label, gesperrt. Vier Rollen:
- * Primär (Fläche), Sekundär (Kontur), Tertiär (Text + „→", kein Rahmen),
- * Destruktiv (Kontur in `--danger`). Nur ein Primärbutton pro Screen.
+ * Buttons — Pillen, vier Rollen: Primär (schwarze Fläche), Sekundär (Kontur),
+ * Tertiär (Text + „→", kein Rahmen), Destruktiv (rote Fläche). Nur ein
+ * Primärbutton pro Screen.
  */
 export function Button({
   variant = "primary",
@@ -82,7 +85,7 @@ export function Button({
         {...props}
         disabled={disabled}
         className={
-          "inline-flex min-h-11 items-center gap-1.5 text-[13px] font-extrabold tracking-[0.1em] text-text uppercase " +
+          "inline-flex min-h-11 items-center gap-1.5 text-[14px] font-semibold text-text " +
           "press-flat tap-target disabled:cursor-not-allowed disabled:opacity-30 " +
           className
         }
@@ -94,8 +97,8 @@ export function Button({
 
   const look = {
     primary: "bg-accent text-accent-ink",
-    secondary: "border-2 border-text text-text active:bg-text/8",
-    danger: "border-2 border-danger text-danger active:bg-danger-tint",
+    secondary: "border border-text text-text active:bg-text/5",
+    danger: "bg-danger text-white",
   }[variant];
 
   return (
@@ -103,30 +106,50 @@ export function Button({
       {...props}
       disabled={disabled || loading}
       className={
-        "inline-flex h-13 w-full items-center justify-center gap-2.5 px-6 " +
-        "text-[13px] font-extrabold tracking-[0.1em] uppercase press " +
-        "disabled:cursor-not-allowed disabled:opacity-30 " +
+        "inline-flex h-12 w-full items-center justify-center gap-2 rounded-pill px-6 " +
+        "text-[15px] font-semibold press " +
+        "disabled:cursor-not-allowed disabled:opacity-40 " +
         look +
         " " +
         className
       }
     >
-      {loading && (
-        <span
-          aria-hidden
-          className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current/35 border-t-current motion-reduce:animate-none"
-        />
+      {loading ? (
+        <LoadingDots aria-label="Lädt" />
+      ) : (
+        children
       )}
-      {children}
     </button>
   );
 }
 
 /**
- * Meldung über einem Formular.
+ * Ladeanzeige im Primärbutton — drei Punkte statt Spinner-Ring (DESIGN.md,
+ * „Primärbutton": „Lädt: Label wird durch drei Punkte ersetzt"). Leichtes,
+ * gestaffeltes Auf- und Abblenden statt Drehung; steht still bei
+ * `prefers-reduced-motion`.
+ */
+function LoadingDots(props: { "aria-label"?: string }) {
+  return (
+    <span className="inline-flex items-center gap-1" {...props}>
+      {[0, 1, 2].map((index) => (
+        <span
+          key={index}
+          aria-hidden
+          className="dot-blink h-1.5 w-1.5 rounded-full bg-current"
+          style={{ animationDelay: `${index * 160}ms` }}
+        />
+      ))}
+    </span>
+  );
+}
+
+/**
+ * Meldung über einem Formular oder Screen.
  *
- * Gerahmt statt gefüllt — Fläche bleibt `--bg`/`--card` (dieselbe Fläche in
- * dieser Richtung), nur der Rahmen und der Text tragen die Tonfarbe.
+ * Getönte Fläche statt Rahmen — passt zur flachen Instagram-Baseline-Richtung,
+ * in der Trennung sonst über Weißraum und Haarlinien läuft, nicht über
+ * Konturen.
  *
  * `role="alert"` ist kein Beiwerk: ohne die Ansage liest VoiceOver einen
  * Fehler, der nach dem Absenden erscheint, schlicht nicht vor — der Nutzer
@@ -140,15 +163,15 @@ export function Notice({
   children: ReactNode;
 }) {
   const look = {
-    error: "border-danger text-danger",
-    ok: "border-ok text-ok",
-    info: "border-text text-text",
+    error: "bg-danger-tint text-danger",
+    ok: "bg-soft text-ok",
+    info: "bg-soft text-muted",
   }[tone];
 
   return (
     <p
       role={tone === "error" ? "alert" : "status"}
-      className={"border px-4 py-3 text-[15px] leading-relaxed font-medium " + look}
+      className={"rounded-soft px-4 py-3 text-[14px] leading-relaxed font-medium " + look}
     >
       {children}
     </p>
@@ -156,55 +179,34 @@ export function Notice({
 }
 
 /**
- * Überschrift eines Screens.
- *
- * `size="display"` ist die Riesenversalie der vier Root-Tab-Screens
- * (Rezeptübersicht, Einkaufsliste, Todo, Einstellungen) — `hyphens: auto`
- * bewahrt sie vor langen Wörtern, die bei 56 px über den Rand laufen.
- * `size="title"` (Vorgabe) ist die kleinere Skala für Formulare, Detail- und
- * Unterseiten. Steht als eigener Baustein daneben, weil der Titel nicht
- * immer im Voraus feststeht: beim Rezept kommt er aus den Daten und darf
- * deshalb erst erscheinen, wenn diese da sind — also innerhalb der
- * Suspense-Grenze, nicht im statischen Rahmen darum.
+ * Kopfzeile eines Screens: Titel (Unbounded, 20 px) mit optionaler
+ * tabellarischer Unterzeile und optionaler Aktion rechts (DESIGN.md-Muster
+ * aus Liste/Aufgaben/Konto). Kein Riesentitel mehr — Hierarchie kommt in
+ * dieser Richtung aus Feed/Foto, nicht aus einer Display-Versalie.
  */
 export function ScreenHeader({
   title,
   lead,
   action,
-  size = "title",
 }: {
   title: ReactNode;
   lead?: ReactNode;
-  /**
-   * Etwas rechts neben der Überschrift — in der Praxis der Zugang zu den
-   * Einstellungen.
-   *
-   * Als Slot und nicht fest eingebaut, weil er nur auf die beiden Haupt-Tabs
-   * gehört. Auf einem Rezept oder in einem Formular steht oben ein Weg zurück,
-   * und zwei konkurrierende Ziele an derselben Ecke wären eine Falle.
-   */
   action?: ReactNode;
-  size?: "display" | "title";
 }) {
   return (
-    <header>
-      <div className="flex items-start justify-between gap-4">
+    <header className="flex items-center justify-between gap-4 pb-1.5">
+      <div className="min-w-0">
         <h1
           lang="de"
-          className={
-            "font-display font-black text-text uppercase [hyphens:auto] " +
-            (size === "display"
-              ? "text-[56px] leading-[1.02] tracking-[-0.01em]"
-              : "text-[28px] leading-[1.05] tracking-[-0.005em]")
-          }
+          className="truncate font-display text-[20px] leading-[1.2] font-bold text-text"
         >
           {title}
         </h1>
-        {action && <div className="shrink-0 pt-1">{action}</div>}
+        {lead && (
+          <p className="tabular mt-0.5 text-[13px] text-muted">{lead}</p>
+        )}
       </div>
-      {lead && (
-        <p className="mt-2 text-[15px] leading-relaxed text-muted">{lead}</p>
-      )}
+      {action && <div className="shrink-0">{action}</div>}
     </header>
   );
 }
@@ -221,40 +223,32 @@ export function Screen({
   title,
   lead,
   action,
-  titleSize,
   bleed,
   children,
 }: {
   title?: ReactNode;
   lead?: ReactNode;
   action?: ReactNode;
-  titleSize?: "display" | "title";
   /**
    * Nimmt dem Rahmen Seitenrand und Abstand nach oben.
    *
-   * Für den einen Screen, auf dem ein Foto bis an den Bildschirmrand läuft und
-   * unter der Statusleiste beginnt — so steht es im Entwurf. Die Abschnitte
-   * darunter setzen ihren Seitenrand dann selbst.
+   * Für Screens, auf denen ein Foto bis an den Bildschirmrand läuft und unter
+   * der Statusleiste beginnt (Rezeptdetail). Die Abschnitte darunter setzen
+   * ihren Seitenrand dann selbst.
    */
   bleed?: boolean;
   children: ReactNode;
 }) {
   return (
-    <main className={"flex-1 pb-safe " + (bleed ? "" : "px-safe pt-safe")}>
-      <div
-        className={
-          "mx-auto w-full max-w-md " + (bleed ? "" : "space-y-8 py-8")
-        }
-      >
+    <main className={"flex-1 pb-tabbar " + (bleed ? "pt-safe" : "px-5 pt-safe")}>
+      <div className="mx-auto w-full max-w-md">
         {title !== undefined && (
-          <ScreenHeader
-            title={title}
-            lead={lead}
-            action={action}
-            size={titleSize}
-          />
+          <>
+            <ScreenHeader title={title} lead={lead} action={action} />
+            <div className="h-px bg-border" />
+          </>
         )}
-        <div className={bleed ? "" : "space-y-6"}>{children}</div>
+        <div className={bleed ? "" : "space-y-6 pt-5"}>{children}</div>
       </div>
     </main>
   );
@@ -269,22 +263,22 @@ export function Select({
 }: ComponentProps<"select"> & { label: string; hint?: string }) {
   return (
     <label className="block">
-      <span className="text-[10px] font-extrabold tracking-[0.08em] text-muted uppercase">
+      <span className="mb-1.5 block text-[12.5px] font-medium text-muted">
         {label}
       </span>
       <select
         {...props}
         className={
-          "mt-1.5 block h-11 w-full appearance-none border-0 border-b-2 border-text " +
-          "bg-transparent px-0 text-base font-semibold text-text outline-none " +
-          "focus:border-b-[3px] " +
+          "block h-12 w-full appearance-none rounded-soft border border-border bg-soft " +
+          "px-3.5 text-base text-text outline-none transition-colors " +
+          "focus:border-text focus:bg-card focus:shadow-[0_0_0_3px_rgba(38,38,38,0.08)] " +
           className
         }
       >
         {children}
       </select>
       {hint && (
-        <span className="mt-1.5 block text-[13px] text-muted">{hint}</span>
+        <span className="mt-1.5 block text-[12.5px] text-muted">{hint}</span>
       )}
     </label>
   );
@@ -298,30 +292,29 @@ export function Textarea({
 }: ComponentProps<"textarea"> & { label: string; hint?: string }) {
   return (
     <label className="block">
-      <span className="text-[10px] font-extrabold tracking-[0.08em] text-muted uppercase">
+      <span className="mb-1.5 block text-[12.5px] font-medium text-muted">
         {label}
       </span>
       <textarea
         {...props}
         className={
-          "mt-1.5 block w-full border-0 border-b-2 border-text bg-transparent px-0 py-2 " +
-          "text-base font-semibold text-text outline-none placeholder:text-muted/50 " +
-          "focus:border-b-[3px] " +
+          "block w-full rounded-soft border border-border bg-soft px-3.5 py-3 " +
+          "text-base leading-relaxed text-text outline-none transition-colors placeholder:text-muted " +
+          "focus:border-text focus:bg-card focus:shadow-[0_0_0_3px_rgba(38,38,38,0.08)] " +
           className
         }
       />
       {hint && (
-        <span className="mt-1.5 block text-[13px] text-muted">{hint}</span>
+        <span className="mt-1.5 block text-[12.5px] text-muted">{hint}</span>
       )}
     </label>
   );
 }
 
 /**
- * Zeile einer Liste, die auf einen Bildschirm führt.
- *
- * Als eigener Baustein, weil die Trefferfläche sonst je nach Screen anders
- * ausfällt — und im Supermarkt wird einhändig und in Bewegung getippt.
+ * Zeile einer Liste, die auf einen Bildschirm führt (DESIGN.md-Muster
+ * „settings-row" aus Konto): volle Breite, 52 px hoch, kein Rahmen, kein
+ * Hintergrund — nur der Chevron rechts sagt, dass es weitergeht.
  */
 export function RowLink({
   href,
@@ -344,12 +337,10 @@ export function RowLink({
     <Link
       href={href}
       prefetch={prefetch}
-      className="flex min-h-14 items-center justify-between gap-3 bg-soft px-4 py-3 text-[15px] press tap-target"
+      className="flex min-h-[52px] items-center justify-between gap-3 py-2 text-[15px] text-text press-flat tap-target"
     >
-      <span className="min-w-0">{children}</span>
-      <span aria-hidden className="shrink-0 text-muted">
-        ›
-      </span>
+      <span className="min-w-0 flex-1">{children}</span>
+      <ChevronRightIcon aria-hidden className="h-4 w-4 shrink-0 text-inactive" />
     </Link>
   );
 }
