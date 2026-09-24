@@ -1,6 +1,11 @@
 # Rohbilder: ~350 PNGs, ca. 100 MB. Werden lokal erzeugt (generate.py) und
 # zu kleinen WebPs unter public/ verarbeitet — nur die gehoeren ins Repo.
 raw/
+
+# Dasselbe fuer generate-marktregal.py: Rohbilder nur lokal, die WebPs unter
+# public/zutaten-marktregal/ gehoeren ins Repo.
+raw-marktregal/
+
 __pycache__/
 
 # Stil-Test-Renders: reine Vergleichsbilder, kein Teil der App.

@@ -16,7 +16,11 @@
  *
  * Mit --generate wird fuer die fehlenden (und mit einem Bildmotiv versehenen)
  * Zutaten direkt generate.py + process.py angestossen — der volle Weg von
- * "was fehlt" bis "Bild liegt unter public/zutaten".
+ * "was fehlt" bis "Bild liegt unter public/zutaten". Jedes Bild wird dabei
+ * einzeln erzeugt und sofort committed + gepusht (nicht erst als Batch am
+ * Ende) — kostet pro Bild einen erneuten Modell-Ladevorgang (~20s), dafuer
+ * ist ein fertiges Bild binnen Sekunden im Repo/Deploy, statt erst wenn
+ * jemand nach dem ganzen Lauf an git push denkt.
  *
  * Braucht SUPABASE_SECRET_KEY (umgeht RLS, sonst saehe man nur Zutaten des
  * eigenen Haushalts) aus .env.local.
@@ -117,13 +121,48 @@ if (!missing.length) {
   console.log("Alle Zutaten haben ein Bild.");
 }
 
+/** Ein einzelnes Bild committen + pushen, sobald es fertig ist — statt am
+ * Ende des ganzen Batches. So landet es binnen Sekunden im Repo/Deploy und
+ * bricht der Lauf mittendrin ab, sind die bis dahin fertigen trotzdem schon
+ * da. `process.py` rewrites die ganze `ingredientImages.ts`-Tabelle bei
+ * jedem Aufruf neu (deterministisch aus subjects.mjs + vorhandenen WebPs),
+ * das ist bei einem einzelnen Bild pro Lauf schnell genug, um es nicht extra
+ * zu optimieren. */
+function git(args) {
+  return execFileSync("git", args, { cwd: ROOT, encoding: "utf8" });
+}
+
+function publishOne(name, py) {
+  execFileSync(py, [ROOT + "scripts/ingredient-images/generate.py", "--names", name], { stdio: "inherit" });
+  execFileSync(py, [ROOT + "scripts/ingredient-images/process.py"], { stdio: "inherit" });
+
+  const paths = ["public/zutaten", "src/lib/core/ingredientImages.ts"];
+  git(["add", "--", ...paths]);
+  const staged = git(["diff", "--cached", "--name-only", "--", ...paths]).trim();
+  if (!staged) {
+    console.log(`  ${name}: unveraendert, nichts zu committen`);
+    return;
+  }
+  try {
+    git(["commit", "-m", `Zutatenbild: ${name}`, "--", ...paths]);
+  } catch (err) {
+    console.log(`  git commit fehlgeschlagen fuer ${name}: ${err.message}`);
+    return;
+  }
+  try {
+    git(["push"]);
+    console.log(`  -> ${name} committed + gepusht`);
+  } catch (err) {
+    console.log(`  git push fehlgeschlagen fuer ${name} (bleibt lokal committed): ${err.message}`);
+  }
+}
+
 if (shouldGenerate && withSubject.length) {
   const PY = `${process.env.HOME}/.mflux/venv/bin/python`;
-  console.log(`\nGeneriere ${withSubject.length} Bild(er) …\n`);
-  execFileSync(PY, [ROOT + "scripts/ingredient-images/generate.py", "--names", withSubject.join(",")], {
-    stdio: "inherit",
-  });
-  execFileSync(PY, [ROOT + "scripts/ingredient-images/process.py"], { stdio: "inherit" });
+  console.log(`\nGeneriere ${withSubject.length} Bild(er), je einzeln committed + gepusht …\n`);
+  for (const name of withSubject) {
+    publishOne(name, PY);
+  }
 } else if (shouldGenerate && !withSubject.length) {
   console.log("\nNichts zu generieren — keine fehlende Zutat hat ein Bildmotiv.");
 }

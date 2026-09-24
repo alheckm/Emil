@@ -43,7 +43,8 @@ export const SUBJECTS = {
   "Champignons": "three white button mushrooms", "Pilze": "a small pile of mixed mushrooms",
   "Pfifferlinge": "a small pile of chanterelle mushrooms", "Kürbis": "a whole orange hokkaido pumpkin",
   "Pastinake": "a parsnip", "Rote Bete": "a raw beetroot", "Radieschen": "a small bunch of red radishes",
-  "Rettich": "a white daikon radish", "Fenchel": "a fennel bulb", "Spargel": "a bundle of white asparagus spears",
+  "Rettich": "a white daikon radish", "Meerrettich": "a fresh horseradish root",
+  "Fenchel": "a fennel bulb", "Spargel": "a bundle of white asparagus spears",
   "Grüne Bohnen": "a small bundle of green beans", "Zuckerschoten": "a small pile of sugar snap peas",
   "Ingwer": "a piece of fresh ginger root", "Chilischote": "two red chili peppers",
   "Petersilie": "a bunch of flat-leaf parsley", "Basilikum": "a bunch of fresh basil",
@@ -51,6 +52,7 @@ export const SUBJECTS = {
   "Koriander": "a bunch of fresh cilantro", "Minze": "a bunch of fresh mint",
   "Rosmarin": "two sprigs of rosemary", "Thymian": "a few sprigs of thyme",
   "Salbei": "a few fresh sage leaves", "Zitrone": "a whole lemon", "Limette": "a whole lime",
+  "Limettensaft": GLASS("lime juice"),
   "Orange": "a whole orange", "Apfel": "a red apple", "Banane": "a ripe banana",
   "Birne": "a green pear", "Erdbeeren": "a few fresh strawberries", "Himbeeren": "a small pile of raspberries",
   "Blaubeeren": "a small pile of blueberries", "Weintrauben": "a bunch of green grapes",
@@ -68,7 +70,8 @@ export const SUBJECTS = {
   "Croissant": "a golden croissant", "Burgerbrötchen": "a sesame burger bun",
 
   // ── Fleisch & Fisch ──────────────────────────────────────────────────────
-  "Rindergulasch": "raw diced beef for stew", "Rinderhackfleisch": "raw ground beef",
+  "Rindergulasch": "raw diced beef for stew", "Gulasch": "a bowl of hearty beef goulash stew",
+  "Rinderhackfleisch": "raw ground beef",
   "Gemischtes Hackfleisch": "raw mixed ground meat", "Rinderfilet": "a raw beef tenderloin",
   "Rumpsteak": "a raw rump steak", "Rinderbraten": "a raw beef roast",
   "Schweinefilet": "a raw pork tenderloin", "Schweineschnitzel": "a raw pork cutlet",
@@ -103,9 +106,11 @@ export const SUBJECTS = {
   "Mascarpone": BOWL("mascarpone"), "Gorgonzola": "a wedge of gorgonzola cheese",
   "Camembert": "a round camembert cheese", "Brie": "a wedge of brie cheese",
   "Halloumi": "a block of halloumi cheese", "Reibekäse": BOWL("grated cheese"),
+  "Käse": "a wedge of cheese",
   "Frische Hefe": "a cube of fresh yeast", "Tofu": "a block of firm tofu",
   "Räuchertofu": "a block of smoked tofu", "Blätterteig": "a roll of puff pastry",
-  "Pizzateig": "a ball of pizza dough", "Hafermilch": GLASS("oat milk"),
+  "Pizzateig": "a ball of pizza dough", "Pizza": "a whole baked pizza with melted cheese and toppings",
+  "Hafermilch": GLASS("oat milk"),
   "Sojamilch": GLASS("soy milk"), "Mandelmilch": GLASS("almond milk"), "Hummus": BOWL("hummus"),
 
   // ── Tiefkühl ─────────────────────────────────────────────────────────────
@@ -166,6 +171,7 @@ export const SUBJECTS = {
   "Gelatine": "a few sheets of gelatine", "Agar-Agar": BOWL("agar agar powder"),
   "Ahornsirup": JAR("maple syrup"), "Agavendicksaft": JAR("agave syrup"),
   "Zuckerrübensirup": JAR("dark beet syrup"), "Rohrzucker": BOWL("raw cane sugar"),
+  "Kuchen": "a slice of layered cake",
 
   // ── Gewürze, Öle & Saucen ────────────────────────────────────────────────
   "Salz": BOWL("coarse salt"), "Meersalz": BOWL("flaky sea salt"),
@@ -213,6 +219,7 @@ export const SUBJECTS = {
   "Backpapier": "a roll of baking parchment paper", "Alufolie": "a roll of aluminium foil",
   "Frischhaltefolie": "a roll of cling film", "Küchenrolle": "a roll of kitchen paper towels",
   "Gefrierbeutel": "a stack of clear freezer bags", "Zahnstocher": "a small pile of wooden toothpicks",
+  "Holzspieße": "a bundle of wooden skewers",
   "Küchengarn": "a ball of kitchen twine", "Müllbeutel": "a roll of black bin bags",
   "Spülmittel": "a bottle of dish soap",
 };
@@ -246,11 +253,12 @@ export const COLORS = {
   "Kopfsalat": "green", "Rucola": "green", "Eisbergsalat": "green", "Romanasalat": "green",
   "Champignons": "yellow", "Pilze": "orange", "Pfifferlinge": "orange", "Kürbis": "orange",
   "Pastinake": "yellow", "Rote Bete": "purple", "Radieschen": "red", "Rettich": "yellow",
+  "Meerrettich": "yellow",
   "Fenchel": "green", "Spargel": "yellow", "Grüne Bohnen": "green", "Zuckerschoten": "green",
   "Ingwer": "orange", "Chilischote": "red", "Petersilie": "green", "Basilikum": "green",
   "Schnittlauch": "green", "Dill": "green", "Koriander": "green", "Minze": "green",
   "Rosmarin": "green", "Thymian": "green", "Salbei": "green", "Zitrone": "yellow",
-  "Limette": "green", "Orange": "orange", "Apfel": "red", "Banane": "yellow",
+  "Limette": "green", "Limettensaft": "green", "Orange": "orange", "Apfel": "red", "Banane": "yellow",
   "Birne": "green", "Erdbeeren": "red", "Himbeeren": "red", "Blaubeeren": "blue",
   "Weintrauben": "green", "Pfirsich": "orange", "Nektarine": "orange", "Pflaume": "purple",
   "Kirschen": "red", "Mango": "orange", "Ananas": "yellow", "Avocado": "green",
@@ -263,7 +271,7 @@ export const COLORS = {
   "Knäckebrot": "orange", "Zwieback": "yellow", "Croissant": "yellow", "Burgerbrötchen": "orange",
 
   // ── Fleisch & Fisch ──────────────────────────────────────────────────────
-  "Rindergulasch": "red", "Rinderhackfleisch": "red", "Gemischtes Hackfleisch": "red",
+  "Rindergulasch": "red", "Gulasch": "red", "Rinderhackfleisch": "red", "Gemischtes Hackfleisch": "red",
   "Rinderfilet": "red", "Rumpsteak": "red", "Rinderbraten": "red",
   "Schweinefilet": "red", "Schweineschnitzel": "red", "Schweinebauch": "red", "Kasseler": "red",
   "Hähnchenbrust": "yellow", "Hähnchenschenkel": "yellow", "Hähnchenkeule": "yellow",
@@ -281,11 +289,11 @@ export const COLORS = {
   "Griechischer Joghurt": "yellow", "Skyr": "yellow", "Quark": "yellow", "Magerquark": "yellow",
   "Frischkäse": "yellow", "Butter": "yellow", "Margarine": "yellow", "Butterschmalz": "yellow",
   "Schweineschmalz": "yellow", "Eier": "yellow",
-  "Gouda": "yellow", "Emmentaler": "yellow", "Bergkäse": "yellow", "Mozzarella": "yellow",
+  "Gouda": "yellow", "Emmentaler": "yellow", "Bergkäse": "yellow", "Käse": "yellow", "Mozzarella": "yellow",
   "Feta": "yellow", "Parmesan": "yellow", "Pecorino": "yellow", "Ricotta": "yellow",
   "Mascarpone": "yellow", "Gorgonzola": "yellow", "Camembert": "yellow", "Brie": "yellow",
   "Halloumi": "yellow", "Reibekäse": "yellow", "Frische Hefe": "orange", "Tofu": "yellow",
-  "Räuchertofu": "orange", "Blätterteig": "yellow", "Pizzateig": "yellow",
+  "Räuchertofu": "orange", "Blätterteig": "yellow", "Pizzateig": "yellow", "Pizza": "red",
   "Hafermilch": "yellow", "Sojamilch": "yellow", "Mandelmilch": "yellow", "Hummus": "yellow",
 
   // ── Tiefkühl ─────────────────────────────────────────────────────────────
@@ -327,7 +335,7 @@ export const COLORS = {
   "Zartbitterschokolade": "orange", "Vollmilchschokolade": "orange", "Kuvertüre": "orange",
   "Schokoladenraspel": "orange", "Kakaopulver": "orange", "Marzipan": "yellow",
   "Gelatine": "yellow", "Agar-Agar": "yellow", "Ahornsirup": "orange",
-  "Agavendicksaft": "yellow", "Zuckerrübensirup": "orange", "Rohrzucker": "orange",
+  "Agavendicksaft": "yellow", "Zuckerrübensirup": "orange", "Rohrzucker": "orange", "Kuchen": "orange",
 
   // ── Gewürze, Öle & Saucen ────────────────────────────────────────────────
   "Salz": "yellow", "Meersalz": "yellow", "Pfeffer": "orange", "schwarzer Pfeffer": "orange",
@@ -355,7 +363,7 @@ export const COLORS = {
 
   // ── Haushalt ─────────────────────────────────────────────────────────────
   "Backpapier": "orange", "Alufolie": "yellow", "Frischhaltefolie": "yellow",
-  "Küchenrolle": "yellow", "Gefrierbeutel": "blue", "Zahnstocher": "yellow",
+  "Küchenrolle": "yellow", "Gefrierbeutel": "blue", "Zahnstocher": "yellow", "Holzspieße": "yellow",
   "Küchengarn": "orange", "Müllbeutel": "orange", "Spülmittel": "blue",
 };
 

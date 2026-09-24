@@ -1,0 +1,15 @@
+{
+  "_readme": "Wird vom zutatenbilder-Skill (Modus 3) gepflegt, nicht von Hand. aliases: Zutatenname -> Name der Zutat, deren Marktregal-Bilder wiederverwendet werden (nur wenn das Foto ununterscheidbar waere, z. B. 'Gemüsebrühepulver' -> 'Gemüsebrühe' — NICHT bei Pulver/Fluessigkeit/Paste-Unterschieden wie 'Tomatenmark' -> 'Tomate'). skipped: Zutatenname -> Begruendung, warum bewusst kein Bild erzeugt wird (z. B. Sammelkategorien) — verhindert, dass dieselbe Zutat bei jedem Lauf neu geprueft wird.",
+  "aliases": {
+    "Gemüsebrühepulver": "Gemüsebrühe",
+    "Lauchzwiebel": "Frühlingszwiebel",
+    "Schmand 150 g": "Schmand",
+    "Brat- oder mildes Olivenöl": "Bratöl",
+    "Dinkel-Mandel-Drink": "Mandelmilch"
+  },
+  "skipped": {
+    "Testkachel Longpress Drei": "QA/Test-Fixture aus der Entwicklung, keine echte Zutat",
+    "Testkachel Swipe": "QA/Test-Fixture aus der Entwicklung, keine echte Zutat",
+    "Salz und Pfeffer": "Freitext-Kombination zweier bereits einzeln bebilderter Zutaten (Salz, Pfeffer) — kein eindeutiges Einzelmotiv, keine Zuordnung ohne die andere falsch darzustellen"
+  }
+}

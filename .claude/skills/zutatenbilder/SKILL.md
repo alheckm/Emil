@@ -5,13 +5,15 @@ description: Fehlende Zutatenbilder für aktuell genutzte Zutaten (Rezepte +
   Nutzer nach fehlenden/neuen Zutatenbildern fragt, "Zutatenbilder
   generieren/auffüllen" sagt, oder wenn Rezepte importiert wurden, die neue
   Zutaten angelegt haben. Auch einschlägig für die Design-Exploration der
-  "Marktregal"-Richtung (vollbild/grau/bold-Varianten, siehe unten).
+  "Marktregal"-Richtung (vollbild/grau/bold-Varianten) und den automatisierten
+  Marktregal-Produktionslauf (siehe unten, Modus 2/3).
 ---
 
-# Zutatenbilder — zwei getrennte Modi
+# Zutatenbilder — drei getrennte Modi
 
-Dieser Skill deckt zwei unabhängige Dinge ab, die beide mflux + `subjects.mjs`
-nutzen, aber unterschiedliche Ziele und Ausgabeorte haben. Nicht vermischen.
+Dieser Skill deckt drei unabhängige Dinge ab, die alle mflux + `subjects.mjs`
+nutzen, aber unterschiedliche Ziele, Ausgabeorte und Lebenszyklen haben.
+Nicht vermischen.
 
 ## Modus 1: Produktion, auf Bedarf
 
@@ -103,3 +105,89 @@ gegenprüfen lohnt sich, das Modell driftet bei bold-Farben gern Richtung der
 Eigenfarbe des Motivs, z. B. grüner Lauch → Teal statt gedecktes Salbeigrün —
 die Negativ-Constraints in `design-palette.json` federn das ab, aber nicht
 narrensicher).
+
+## Modus 3: Produktion — Marktregal-Assets automatisiert auffüllen
+
+Der Deploy-Pipeline-Lauf: sorgt dafür, dass über die Zeit so gut wie keine
+Zutat mehr ohne vollständiges vollbild/grau/bold-Set dasteht — für dieselbe
+Marktregal-Richtung wie Modus 2, aber als wiederholbarer, auf Vollständigkeit
+zielender Lauf statt einer Handvoll benannter Vergleichsbilder. Ergebnis
+landet als WebP unter `public/zutaten-marktregal/` — parallel zu, nicht
+anstelle von, der Pastell-Chip-Produktion aus Modus 1. Die Marktregal-Kachel-
+Oberfläche selbst ist noch nicht gebaut (`DESIGN.md`); dieser Lauf sorgt nur
+dafür, dass die Assets schon bereitstehen, wenn sie kommt.
+
+### Scope: "durably used", nicht nur "gerade aktiv"
+
+`find-missing-marktregal.mjs` fragt nicht wie Modus 1 nach Zutaten, die
+gerade in `recipe_ingredients`/`shopping_list_entries` stehen, sondern nach
+allen Zutaten mit gesetzter `household_id` in der `ingredients`-Tabelle
+(union mit den gerade aktiven globalen Seed-Zutaten). Grund:
+`set_entry_checked` (`supabase/migrations/0016_abgehaktes_begrenzen.sql`)
+löscht abgehakte Einkaufslisten-Zeilen, sobald mehr als 20 pro Liste abgehakt
+sind — eine nur von Hand hinzugefügte Zutat kann so aus der Liste
+verschwinden, bevor ein Lauf sie je sieht. Die `ingredients`-Zeile selbst
+bleibt dabei aber stehen (wird nie gelöscht), das ist der verlässliche
+Ledger. Die reinen ~350 globalen Seed-Zutaten, die noch nie ein Haushalt
+angefasst hat, bleiben trotzdem außen vor — kein Vorrats-Rendering.
+
+### Ablauf
+
+```
+npm run zutatenbilder:marktregal
+```
+
+1. Liefert zwei Listen: **bereit** (hat Bildmotiv in `subjects.mjs`, direkt
+   oder über `aliases.json`) und **braucht Agenten-Entscheidung** (noch
+   keines von beidem).
+2. Für jeden Namen in "braucht Agenten-Entscheidung" triffst *du* (der
+   Agent, der diesen Skill ausführt) eine von drei Entscheidungen — das ist
+   der Teil, der sich nicht deterministisch skripten lässt:
+   - **Alias** (`aliases.json` → `aliases`): nur wenn das Foto
+     *ununterscheidbar* wäre, nicht bloß "verwandt". Nutzers eigenes
+     Beispiel: `"Gemüsebrühepulver": "Gemüsebrühe"`. Falsch waere z. B.
+     `"Tomatenmark": "Tomate"` — Paste sieht anders aus als die Frucht.
+     Pulver/Flüssigkeit/Paste sind fast immer eigene Fotos.
+   - **Skip** (`aliases.json` → `skipped`, mit Begründung): Test-Fixtures,
+     Sammelkategorien, mehrdeutige Freitext-Kombinationen (z. B. "Salz und
+     Pfeffer" — keine eindeutige Zuordnung ohne die andere Zutat falsch
+     darzustellen). Ohne Eintrag wird derselbe Name bei jedem Lauf neu
+     geprüft.
+   - **Neues Motiv**: `SUBJECTS`- *und* `COLORS`-Eintrag in `subjects.mjs`
+     ergänzen (beides Pflicht — ohne `COLORS`-Eintrag greift der
+     `"yellow"`-Default in `colorFor()`, und das kollidiert mit Gold =
+     `--accent`). Bei Gefäß-Zutaten (Pulver, Öl, Sauce) `BOWL()`/`JAR()`/
+     `GLASS()` aus `subjects.mjs` verwenden, sonst rendert das Modell einen
+     Haufen Staub im Nichts.
+   - **Nebenwirkung, nicht übersehen:** neue `SUBJECTS`/`COLORS`-Einträge
+     wirken sich auch auf Modus 1 aus — `hexFor()`/`buildPrompt()` lesen
+     dieselbe Datei, die Pastell-Chip-Pipeline generiert diese Zutaten beim
+     nächsten Lauf also automatisch mit.
+3. `find-missing-marktregal.mjs` erneut laufen lassen — "braucht Agenten-
+   Entscheidung" muss jetzt leer sein.
+4. Generieren + veröffentlichen:
+   ```
+   ~/.mflux/venv/bin/python scripts/ingredient-images/generate-marktregal.py \
+     --names "<komma-getrennte bereit-Liste aus Schritt 1/3>"
+   ```
+   Löst Aliase intern auf (Alias-Quellname oder Zielname funktionieren
+   beide), dedupliziert, verwendet vorhandene Rohbilder aus
+   `design/ingredients_directions/` oder `raw-marktregal/` wieder, generiert
+   den Rest per mflux (`raw-marktregal/`, gitignored) und veröffentlicht als
+   WebP unter `public/zutaten-marktregal/`. Keine Größenanpassung, kein
+   Zuschnitt — provisorisch, bis die Kachel-UI existiert und die tatsächlich
+   gebrauchte Größe/Form festlegt.
+5. Idempotenz-Check: `find-missing-marktregal.mjs` ein drittes Mal — jetzt
+   "Alle durably-used Zutaten haben vollständige Marktregal-Assets."
+6. Committen und pushen (`public/zutaten-marktregal/*.webp`, geänderte
+   `subjects.mjs`, geänderte `aliases.json`, nie `raw-marktregal/`).
+
+### Automatisierung
+
+Läuft heute nur, wenn du diesen Skill ausführst — kein Cronjob. mflux läuft
+lokal auf diesem Mac; ein Cloud-Schedule (`/schedule`) könnte den Lauf zwar
+zeitgesteuert *anstoßen*, aber die Bildgenerierung selbst nicht ausführen,
+da sie nicht in der Cloud verfügbar ist. Wer eine wirklich unbeaufsichtigte
+Wiederholung will, braucht einen lokalen Trigger (z. B. `launchd`/`cron` auf
+diesem Mac, der eine Claude-Code-Session mit diesem Skill anstößt) — das ist
+hier bewusst nicht eingerichtet, weil unklar war, wie oft/ob gewünscht.
