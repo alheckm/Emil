@@ -184,6 +184,41 @@ export function Notice({
  * aus Liste/Aufgaben/Konto). Kein Riesentitel mehr — Hierarchie kommt in
  * dieser Richtung aus Feed/Foto, nicht aus einer Display-Versalie.
  */
+/**
+ * Die Wortmarke „e" — Emils Logo, aus `design/logo/emil-icon-final.svg`.
+ *
+ * Ein Kreis-Ausschnitt derselben Figur, die dort für Quadrat und Kreis
+ * geprüft wurde (mittig, mit Rand zum Kreisrand) — hier direkt als Pfad
+ * inline statt als `<img>`, damit sie ohne Netzwerk-Rundtrip steht und mit
+ * dem Rest der Kopfzeile skaliert.
+ */
+export function EmilMark({
+  size = 32,
+  className = "",
+}: {
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <span
+      aria-hidden
+      className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#E4DCF6] ${className}`}
+      style={{ width: size, height: size }}
+    >
+      <svg viewBox="0 0 240 240" className="h-full w-full">
+        <path
+          d="M 54 138 C 60 128, 74 116, 87 115 C 86 86, 114 58, 146 58 C 180 57, 186 86, 161 97 C 138 106, 110 98, 95 114 C 76 134, 82 166, 114 176 C 142 183, 166 170, 175 154"
+          fill="none"
+          stroke="#17171A"
+          strokeWidth={24}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
+  );
+}
+
 export function ScreenHeader({
   title,
   lead,
@@ -195,16 +230,19 @@ export function ScreenHeader({
 }) {
   return (
     <header className="flex items-center justify-between gap-4 pb-1.5">
-      <div className="min-w-0">
-        <h1
-          lang="de"
-          className="truncate font-display text-[20px] leading-[1.2] font-bold text-text"
-        >
-          {title}
-        </h1>
-        {lead && (
-          <p className="tabular mt-0.5 text-[13px] text-muted">{lead}</p>
-        )}
+      <div className="flex min-w-0 items-center gap-2.5">
+        <EmilMark size={30} />
+        <div className="min-w-0">
+          <h1
+            lang="de"
+            className="truncate font-display text-[20px] leading-[1.2] font-bold text-text"
+          >
+            {title}
+          </h1>
+          {lead && (
+            <p className="tabular mt-0.5 text-[13px] text-muted">{lead}</p>
+          )}
+        </div>
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </header>

@@ -16,7 +16,7 @@ import { addRecipeToList, removeRecipeFromList } from "@/lib/data/shoppingList";
 import { buildListItems } from "@/lib/core/mergeList";
 import { formatRelativeTime } from "@/lib/core/format";
 import { getBrowserSupabase } from "@/lib/client/supabase";
-import { Notice } from "@/components/ui";
+import { EmilMark, Notice } from "@/components/ui";
 import {
   CheckIcon,
   ClockIcon,
@@ -230,8 +230,11 @@ export function RecipeBrowser({
   return (
     <div data-pending={searching ? "" : undefined}>
       <div className="flex items-center justify-between px-5 pt-1 pb-3.5">
-        <span className="font-display text-[22px] font-bold tracking-[-0.01em]">
-          emil
+        <span className="flex items-center gap-2">
+          <EmilMark size={30} />
+          <span className="font-display text-[22px] font-bold tracking-[-0.01em]">
+            emil
+          </span>
         </span>
         <div className="flex items-center gap-1">
           <Link
