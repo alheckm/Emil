@@ -81,24 +81,19 @@ export default async function JoinPage({
   const households = supabase ? await listHouseholds(supabase) : null;
   const existing = households?.ok ? households.value : [];
 
-  // Wer schon einen Haushalt hat, tritt trotzdem bei — Emil zeigt danach den
-  // neu beigetretenen (siehe listHouseholds(): neueste Mitgliedschaft
-  // zuerst). Den alten wieder loszuwerden ist Sache von
-  // /einstellungen/haushalt, deshalb landet man danach genau dort statt auf
-  // /liste.
+  // Wer schon einen Haushalt hat, tritt trotzdem bei — der neue wird
+  // ausdrücklich der aktive (siehe JoinHousehold: setActiveHousehold()), der
+  // bisherige bleibt bestehen. Man landet deshalb immer auf /liste, nicht
+  // mehr in den Einstellungen: nichts muss hier aufgeräumt werden.
   return (
     <Screen title="Einladung" tabbar={false}>
       {existing.length > 0 && (
         <Notice tone="info">
-          Du bist noch in „{existing[0].name}“. Nach dem Beitritt zeigt emil
-          den neuen Haushalt — den alten kannst du in den Einstellungen
-          verlassen.
+          Du bist noch in „{existing[0].name}“. Das bleibt so — im Konto
+          kannst du jederzeit zwischen deinen Haushalten wechseln.
         </Notice>
       )}
-      <JoinHousehold
-        code={code}
-        redirectTo={existing.length > 0 ? "/einstellungen/haushalt" : "/liste"}
-      />
+      <JoinHousehold code={code} />
     </Screen>
   );
 }

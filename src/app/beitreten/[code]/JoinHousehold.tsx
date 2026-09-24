@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getBrowserSupabase } from "@/lib/client/supabase";
 import { redeemInvite } from "@/lib/data/households";
+import { setActiveHousehold } from "@/lib/data/profiles";
 import { Button, Notice } from "@/components/ui";
 
 /**
@@ -12,16 +13,12 @@ import { Button, Notice } from "@/components/ui";
  * angemeldet ist. Der Beitritt läuft deshalb ohne weiteren Klick, sobald die
  * Komponente steht — `useRef` verhindert einen zweiten RPC-Aufruf, falls der
  * Effekt (Entwicklungsmodus, ein erneuter Render) doppelt feuert.
+ *
+ * Der neue Haushalt wird explizit der aktive (0026_aktiver_haushalt.sql) —
+ * bisherige Haushalte bleiben bestehen, man kann später im Konto zwischen
+ * ihnen wechseln statt sie verlassen zu müssen.
  */
-export function JoinHousehold({
-  code,
-  redirectTo = "/liste",
-}: {
-  code: string;
-  /** Ziel nach erfolgreichem Beitritt — /liste, oder /einstellungen/haushalt,
-   * wenn schon ein anderer Haushalt bestand und dort aufgeräumt werden kann. */
-  redirectTo?: string;
-}) {
+export function JoinHousehold({ code }: { code: string }) {
   const router = useRouter();
   const [error, setError] = useState("");
   const ran = useRef(false);
@@ -41,10 +38,14 @@ export function JoinHousehold({
         setError(result.error);
         return;
       }
+
+      const { data } = await supabase.auth.getUser();
+      if (data.user) await setActiveHousehold(supabase, data.user.id, result.value);
+
       router.refresh();
-      router.replace(redirectTo);
+      router.replace("/liste");
     })();
-  }, [code, redirectTo, router]);
+  }, [code, router]);
 
   if (error) {
     return (

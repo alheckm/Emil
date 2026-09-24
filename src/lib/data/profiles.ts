@@ -22,17 +22,20 @@ export interface Profile {
   userId: string;
   displayName: string | null;
   avatarPath: string | null;
+  activeHouseholdId: string | null;
 }
 
 function toProfile(row: {
   user_id: string;
   display_name: string | null;
   avatar_path: string | null;
+  active_household_id?: string | null;
 }): Profile {
   return {
     userId: row.user_id,
     displayName: row.display_name,
     avatarPath: row.avatar_path,
+    activeHouseholdId: row.active_household_id ?? null,
   };
 }
 
@@ -42,7 +45,7 @@ export async function getProfile(
 ): Promise<Result<Profile | null>> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("user_id, display_name, avatar_path")
+    .select("user_id, display_name, avatar_path, active_household_id")
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -78,6 +81,24 @@ export async function setDisplayName(
   const { error } = await supabase
     .from("profiles")
     .upsert({ user_id: userId, display_name: displayName }, { onConflict: "user_id" });
+
+  return error ? fail(dataErrorMessage(error)) : ok(undefined);
+}
+
+/**
+ * Welchen Haushalt Home, Liste und Aufgaben zeigen, wenn jemand mehreren
+ * angehört (siehe 0026_aktiver_haushalt.sql). Die Policy lässt nur
+ * Haushalte zu, in denen man selbst Mitglied ist — ein ungültiger Wert
+ * kommt deshalb nicht als App-Fehler, sondern als RLS-Ablehnung zurück.
+ */
+export async function setActiveHousehold(
+  supabase: SupabaseClient,
+  userId: string,
+  householdId: string,
+): Promise<Result> {
+  const { error } = await supabase
+    .from("profiles")
+    .upsert({ user_id: userId, active_household_id: householdId }, { onConflict: "user_id" });
 
   return error ? fail(dataErrorMessage(error)) : ok(undefined);
 }

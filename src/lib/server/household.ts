@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { cacheLife } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { listHouseholds, type Household } from "@/lib/data/households";
+import { getProfile } from "@/lib/data/profiles";
 import { getCurrentUser, getServerSupabase } from "./supabase";
 
 /**
@@ -55,7 +56,15 @@ async function loadHousehold(): Promise<Household> {
   if (!households.ok) throw new HouseholdLoadError(households.error);
   if (households.value.length === 0) redirect("/haushalt/start");
 
-  return households.value[0];
+  // Der gewählte Haushalt (0026_aktiver_haushalt.sql), sonst der Rückfall auf
+  // den zuletzt beigetretenen. Verliert jemand die Mitgliedschaft im aktiven
+  // Haushalt (z. B. weil ihn ein Owner entfernt hat), fällt das hier still
+  // darauf zurück statt einen Fehler zu zeigen.
+  const profile = await getProfile(supabase, user.id);
+  const activeId = profile.ok ? profile.value?.activeHouseholdId : null;
+  const active = activeId && households.value.find((household) => household.id === activeId);
+
+  return active || households.value[0];
 }
 
 export async function requireHousehold(): Promise<HouseholdContext> {
