@@ -37,11 +37,15 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: "emil", statusBarStyle: "default" },
   formatDetection: { telephone: false },
   icons: {
+    // `?v=2` zwingt Browser und Service Worker zu einer frischen Anfrage,
+    // wenn sich der Bildinhalt unter demselben Dateinamen ändert — nötig,
+    // weil `/icons/*.png` anders als `/_next/static/` keine Hashes im Namen
+    // trägt. Bei der nächsten Icon-Änderung diese Zahl erhöhen.
     icon: [
-      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/icons/icon-192.png?v=2", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png?v=2", sizes: "512x512", type: "image/png" },
     ],
-    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+    apple: [{ url: "/icons/apple-touch-icon.png?v=2", sizes: "180x180" }],
   },
 };
 
