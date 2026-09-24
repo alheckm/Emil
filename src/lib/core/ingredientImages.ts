@@ -44,6 +44,7 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Rote Bete": "rote-bete",
   "Radieschen": "radieschen",
   "Rettich": "rettich",
+  "Meerrettich": "meerrettich",
   "Fenchel": "fenchel",
   "Spargel": "spargel",
   "Grüne Bohnen": "gruene-bohnen",
