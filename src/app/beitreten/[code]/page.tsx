@@ -78,7 +78,7 @@ export default async function JoinPage({
   }
 
   const supabase = await getServerSupabase();
-  const households = supabase ? await listHouseholds(supabase) : null;
+  const households = supabase ? await listHouseholds(supabase, user.id) : null;
   const existing = households?.ok ? households.value : [];
 
   // Wer schon einen Haushalt hat, tritt trotzdem bei — der neue wird

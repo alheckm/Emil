@@ -5,14 +5,15 @@ import { useRouter } from "next/navigation";
 import imageCompression from "browser-image-compression";
 import { getBrowserSupabase } from "@/lib/client/supabase";
 import { removeAvatar, setDisplayName, uploadAvatar } from "@/lib/data/profiles";
-import { Avatar, Button, Field, Notice } from "@/components/ui";
-import { PencilIcon } from "@/components/icons";
+import { Avatar, Button, Field, Notice, SectionEyebrow } from "@/components/ui";
 
 const MAX_EDGE_PX = 512;
 const MAX_SIZE_MB = 0.6;
 
 /**
- * Avatar und Klarname im Konto.
+ * „Profil bearbeiten" (DESIGN.md „Konto"): Avatar, Klarname, E-Mail — eigener
+ * Screen statt Teil des Konto-Hubs, seit der Hub selbst nur noch Zeilen und
+ * die Kopfzeile zeigt.
  *
  * Der Name wird über einen eigenen Knopf gespeichert (wie überall sonst in
  * Emil — kein Speichern beim Verlassen des Felds), das Foto sofort beim
@@ -138,22 +139,16 @@ export function AccountProfile({
   const shownAvatar = previewUrl ?? (removed ? null : initialAvatarUrl);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {error && <Notice tone="error">{error}</Notice>}
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col items-center gap-2 pt-2 text-center">
         <label
           htmlFor={inputId}
           aria-label="Profilfoto ändern"
-          className="relative block shrink-0 rounded-full press-flat tap-target"
+          className="block shrink-0 rounded-full press-flat tap-target"
         >
-          <Avatar url={shownAvatar} initial={initial} size={72} />
-          <span
-            aria-hidden
-            className="absolute -right-0.5 -bottom-0.5 flex h-7 w-7 items-center justify-center rounded-full border-[2.5px] border-card bg-accent"
-          >
-            <PencilIcon className="h-3.5 w-3.5 text-accent-ink" strokeWidth={2.4} />
-          </span>
+          <Avatar url={shownAvatar} initial={initial} size={96} />
         </label>
         <input
           id={inputId}
@@ -164,40 +159,44 @@ export function AccountProfile({
           onChange={(event) => void pickPhoto(event.target.files?.[0])}
         />
 
-        <div className="min-w-0 space-y-1">
-          <p className="min-w-0 truncate font-display text-[17px] font-bold text-text">
-            {uploadingPhoto ? "Foto wird hochgeladen" : (email ?? " ")}
-          </p>
-          {shownAvatar && !uploadingPhoto && (
-            <button
-              type="button"
-              onClick={() => void removePhoto()}
-              className="min-h-11 text-[13px] font-semibold text-muted press-flat tap-target"
-            >
-              Foto entfernen
-            </button>
-          )}
-        </div>
+        <label
+          htmlFor={inputId}
+          className="min-h-11 px-2 text-[14px] font-semibold text-text press-flat tap-target"
+        >
+          {uploadingPhoto ? "Foto wird hochgeladen" : "Foto ändern"}
+        </label>
+        {shownAvatar && !uploadingPhoto && (
+          <button
+            type="button"
+            onClick={() => void removePhoto()}
+            className="min-h-11 px-2 text-[13px] text-muted press-flat tap-target"
+          >
+            Foto entfernen
+          </button>
+        )}
       </div>
 
+      <Field
+        label="Name"
+        hint="Wird im Haushalt und bei zugewiesenen Aufgaben angezeigt"
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+        autoCapitalize="words"
+        maxLength={40}
+      />
+
       <div className="space-y-2">
-        <Field
-          label="Name"
-          hint="Wird im Haushalt und bei zugewiesenen Aufgaben angezeigt"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          autoCapitalize="words"
-          maxLength={40}
-        />
-        <Button
-          variant="secondary"
-          disabled={!nameChanged}
-          loading={savingName}
-          onClick={() => void saveName()}
-        >
-          {savingName ? "Wird gespeichert" : "Namen speichern"}
-        </Button>
+        <SectionEyebrow>E-Mail</SectionEyebrow>
+        <p className="text-[15px] text-muted">{email ?? "—"}</p>
       </div>
+
+      <Button
+        disabled={!nameChanged}
+        loading={savingName}
+        onClick={() => void saveName()}
+      >
+        {savingName ? "Wird gespeichert" : "Speichern"}
+      </Button>
     </div>
   );
 }

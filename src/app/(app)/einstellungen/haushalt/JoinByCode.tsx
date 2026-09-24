@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getBrowserSupabase } from "@/lib/client/supabase";
-import { redeemInvite } from "@/lib/data/households";
-import { setActiveHousehold } from "@/lib/data/profiles";
+import { redeemAndSwitchHousehold } from "@/lib/server/householdActions";
 import { Button, Field, Notice } from "@/components/ui";
 
 /**
@@ -13,11 +11,13 @@ import { Button, Field, Notice } from "@/components/ui";
  * (/beitreten/[code]): der landet automatisch hier, ein zugerufener Code
  * braucht dagegen ein Feld zum Abtippen.
  *
- * Der neu beigetretene Haushalt wird danach explizit der aktive
- * (`setActiveHousehold()`, 0026_aktiver_haushalt.sql) — `router.refresh()`
- * genügt danach, weil `/einstellungen/haushalt` selbst schon die richtige
- * Seite ist: Titel und „Deine Haushalte" holen sich mit dem Refresh den
- * neuen Stand.
+ * `redeemAndSwitchHousehold()` (Server Action, householdActions.ts) löst den
+ * Code ein UND setzt den neuen Haushalt explizit als aktiven
+ * (0026_aktiver_haushalt.sql) — beides zusammen, weil nur eine Server Action
+ * `loadHousehold()`s Zwischenspeicher per `updateTag()` sofort veralten
+ * lassen kann. `router.refresh()` genügt danach, weil
+ * `/einstellungen/haushalt` selbst schon die richtige Seite ist: Titel und
+ * „Deine Haushalte" holen sich mit dem Refresh den neuen Stand.
  */
 export function JoinByCode() {
   const router = useRouter();
@@ -31,24 +31,12 @@ export function JoinByCode() {
     setError("");
     setBusy(true);
 
-    const supabase = getBrowserSupabase();
-    if (!supabase) {
-      setError("Supabase ist nicht konfiguriert.");
-      setBusy(false);
-      return;
-    }
-
-    const result = await redeemInvite(supabase, code);
+    const result = await redeemAndSwitchHousehold(code);
+    setBusy(false);
     if (!result.ok) {
       setError(result.error);
-      setBusy(false);
       return;
     }
-
-    const { data } = await supabase.auth.getUser();
-    if (data.user) await setActiveHousehold(supabase, data.user.id, result.value);
-
-    setBusy(false);
     form.reset();
     router.refresh();
   }

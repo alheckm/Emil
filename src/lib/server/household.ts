@@ -1,9 +1,23 @@
 import { redirect } from "next/navigation";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { listHouseholds, type Household } from "@/lib/data/households";
 import { getProfile } from "@/lib/data/profiles";
 import { getCurrentUser, getServerSupabase } from "./supabase";
+
+/**
+ * Tag für `loadHousehold()`s Eintrag einer einzelnen Person — damit
+ * `switchActiveHousehold()`/`createAndSwitchHousehold()`/
+ * `redeemAndSwitchHousehold()` (householdActions.ts) ihn per `updateTag()`
+ * sofort veralten lassen können. Ohne das bliebe ein Wechsel bis zu
+ * `revalidate: 60` lang unsichtbar: „use cache: private" ist zwar laut
+ * Next-Doku nicht serverseitig über Anfragen hinweg gespeichert, hält den
+ * Wert im Turbopack-Dev-Server aber empirisch trotzdem bis zum
+ * `revalidate`-Fenster fest.
+ */
+export function householdContextTag(userId: string): string {
+  return `household-context:${userId}`;
+}
 
 /**
  * Der immer gleiche Vorspann jeder angemeldeten Seite: Client und Haushalt.
@@ -49,10 +63,12 @@ async function loadHousehold(): Promise<Household> {
   const user = await getCurrentUser();
   if (!user) redirect("/anmelden");
 
+  cacheTag(householdContextTag(user.id));
+
   const supabase = await getServerSupabase();
   if (!supabase) redirect("/anmelden");
 
-  const households = await listHouseholds(supabase);
+  const households = await listHouseholds(supabase, user.id);
   if (!households.ok) throw new HouseholdLoadError(households.error);
   if (households.value.length === 0) redirect("/haushalt/start");
 

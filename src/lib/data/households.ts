@@ -30,6 +30,16 @@ export interface Member {
 /**
  * Haushalte des angemeldeten Nutzers, neueste Mitgliedschaft zuerst.
  *
+ * `userId` muss explizit mitgegeben werden, `household_members_select`
+ * (0006_rls.sql) reicht dafür nicht: die Policy zeigt alle Mitgliedschaften
+ * der EIGENEN Haushalte, nicht nur die eigene Zeile — richtig für die
+ * Mitgliederliste (`listMembers()`), aber ohne den Filter hier lieferte diese
+ * Funktion eine Zeile pro Mitbewohner:in zurück, mit dem gleichen Haushalt
+ * mehrfach. Bei zwei Personen im selben Haushalt sah das aus wie zwei
+ * Haushalte — sichtbar geworden als „Encountered two children with the same
+ * key" im Haushalts-Wechsler (HouseholdSwitcher.tsx), der als erster über
+ * `household.id` rendert statt die Liste nur auf Länge zu prüfen.
+ *
  * Wer in mehreren Mitglied ist, wählt in `/einstellungen` den aktiven aus
  * (`profiles.active_household_id`, siehe `loadHousehold()` in
  * `household.ts`). Diese Sortierung ist nur noch der Rückfall, wenn (noch)
@@ -40,10 +50,12 @@ export interface Member {
  */
 export async function listHouseholds(
   supabase: SupabaseClient,
+  userId: string,
 ): Promise<Result<Household[]>> {
   const { data, error } = await supabase
     .from("household_members")
     .select("role, households (id, name)")
+    .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
   if (error) return fail(dataErrorMessage(error));

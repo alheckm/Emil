@@ -3,20 +3,22 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getBrowserSupabase } from "@/lib/client/supabase";
-import { redeemInvite } from "@/lib/data/households";
-import { setActiveHousehold } from "@/lib/data/profiles";
+import { redeemAndSwitchHousehold } from "@/lib/server/householdActions";
 import { Button, Notice } from "@/components/ui";
 
 /**
  * Wird nur gerendert, wenn die Seite schon geprüft hat, dass jemand
  * angemeldet ist. Der Beitritt läuft deshalb ohne weiteren Klick, sobald die
- * Komponente steht — `useRef` verhindert einen zweiten RPC-Aufruf, falls der
+ * Komponente steht — `useRef` verhindert einen zweiten Aufruf, falls der
  * Effekt (Entwicklungsmodus, ein erneuter Render) doppelt feuert.
  *
- * Der neue Haushalt wird explizit der aktive (0026_aktiver_haushalt.sql) —
- * bisherige Haushalte bleiben bestehen, man kann später im Konto zwischen
- * ihnen wechseln statt sie verlassen zu müssen.
+ * `redeemAndSwitchHousehold()` (Server Action, householdActions.ts) löst den
+ * Code ein und setzt den neuen Haushalt explizit als aktiven
+ * (0026_aktiver_haushalt.sql) — bisherige Haushalte bleiben bestehen, man
+ * kann später im Konto zwischen ihnen wechseln statt sie verlassen zu
+ * müssen. Beides zusammen in einer Server Action, weil nur die
+ * `loadHousehold()`s Zwischenspeicher per `updateTag()` sofort veralten
+ * lassen kann — sonst zeigte `/liste` gleich danach noch den alten Haushalt.
  */
 export function JoinHousehold({ code }: { code: string }) {
   const router = useRouter();
@@ -28,19 +30,11 @@ export function JoinHousehold({ code }: { code: string }) {
     ran.current = true;
 
     void (async () => {
-      const supabase = getBrowserSupabase();
-      if (!supabase) {
-        setError("Supabase ist nicht konfiguriert.");
-        return;
-      }
-      const result = await redeemInvite(supabase, code);
+      const result = await redeemAndSwitchHousehold(code);
       if (!result.ok) {
         setError(result.error);
         return;
       }
-
-      const { data } = await supabase.auth.getUser();
-      if (data.user) await setActiveHousehold(supabase, data.user.id, result.value);
 
       router.refresh();
       router.replace("/liste");

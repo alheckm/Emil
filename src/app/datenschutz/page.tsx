@@ -91,8 +91,11 @@ export default function PrivacyPage() {
         </h2>
         <p className="mt-2 text-[15px] leading-relaxed">
           Unter{" "}
-          <Link href="/einstellungen/konto" className="underline underline-offset-4">
-            Konto
+          <Link
+            href="/einstellungen/konto/loeschen"
+            className="underline underline-offset-4"
+          >
+            Konto löschen
           </Link>{" "}
           kannst du dein Konto jederzeit selbst löschen. Damit verschwinden
           deine Mitgliedschaft und — wenn du das letzte Mitglied warst — der

@@ -3,14 +3,15 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/server/supabase";
 import { getMyProfile } from "@/lib/server/profile";
 import { Avatar, Button, Field, Screen } from "@/components/ui";
-import { AccountActions } from "./AccountActions";
 import { AccountProfile } from "./AccountProfile";
 
-export const metadata = { title: "Konto" };
+export const metadata = { title: "Profil bearbeiten" };
 
 /**
- * Das Konto (DESIGN.md „Konto"): Avatar-Kreis, darunter Klarname und
- * E-Mail-Adresse, dann Abmelden/Löschen.
+ * „Profil bearbeiten" (DESIGN.md „Konto"): Avatar, Klarname, E-Mail — erreicht
+ * über „Bearbeiten" im Konto-Hub (`/einstellungen`), der seit dem Redesign die
+ * eigentliche Kontoübersicht ist. Abmelden und Löschen liegen seither dort
+ * bzw. auf `/einstellungen/konto/loeschen`, nicht mehr hier.
  *
  * Name und Foto kommen aus `getMyProfile()` — derselben `"use cache:
  * private"`-Funktion, die auch die Tabbar füllt (`layout.tsx`). Dieselbe
@@ -19,14 +20,10 @@ export const metadata = { title: "Konto" };
  */
 export default function AccountPage() {
   return (
-    <Screen title="Konto">
+    <Screen title="Profil bearbeiten">
       <Suspense fallback={<AccountProfileFallback />}>
         <AccountHeader />
       </Suspense>
-
-      <div className="h-px bg-border" />
-
-      <AccountActions />
     </Screen>
   );
 }
@@ -50,30 +47,32 @@ async function AccountHeader() {
 
 /**
  * Reserviert exakt den Platz, den `AccountProfile` unten füllt (Avatar,
- * E-Mail-Zeile, Namensfeld, Knopf) — sonst springt „Abmelden" nach unten,
- * sobald die Kopfzeile nachkommt.
+ * beide Textknöpfe, Namensfeld, E-Mail-Zeile, Knopf) — sonst springt der
+ * Screen, sobald die Kopfzeile nachkommt.
  */
 function AccountProfileFallback() {
   return (
-    <div className="space-y-5">
-      <div className="flex items-center gap-4">
-        <Avatar url={null} initial={null} size={72} />
-        <p className="min-w-0 truncate font-display text-[17px] font-bold text-text">
-          {" "}
-        </p>
+    <div className="space-y-6">
+      <div className="flex flex-col items-center gap-2 pt-2">
+        <Avatar url={null} initial={null} size={96} />
+        <span className="min-h-11 px-2 text-[14px] font-semibold text-transparent">
+          Foto ändern
+        </span>
       </div>
+      <Field
+        label="Name"
+        hint="Wird im Haushalt und bei zugewiesenen Aufgaben angezeigt"
+        value=""
+        readOnly
+        disabled
+      />
       <div className="space-y-2">
-        <Field
-          label="Name"
-          hint="Wird im Haushalt und bei zugewiesenen Aufgaben angezeigt"
-          value=""
-          readOnly
-          disabled
-        />
-        <Button variant="secondary" disabled>
-          Namen speichern
-        </Button>
+        <span className="block px-0.5 pb-1 text-[12px] font-bold tracking-[0.06em] text-transparent uppercase">
+          E-Mail
+        </span>
+        <p className="text-[15px] text-transparent">—</p>
       </div>
+      <Button disabled>Speichern</Button>
     </div>
   );
 }

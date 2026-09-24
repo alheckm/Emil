@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/server/supabase";
 import { requireHousehold } from "@/lib/server/household";
 import { listHouseholds, listMembersWithProfiles, listOpenInvites } from "@/lib/data/households";
-import { Avatar, Section, Notice, Screen, ScreenHeader } from "@/components/ui";
+import { Avatar, Section, Notice, Screen, ScreenHeader, SectionEyebrow } from "@/components/ui";
 import { HeaderSkeleton, RowsSkeleton } from "@/components/skeletons";
 import { InviteSection } from "./InviteSection";
 import { JoinByCode } from "./JoinByCode";
@@ -28,9 +28,7 @@ export default function HouseholdPage() {
       </Suspense>
 
       <Section>
-        <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
-          Mitglieder
-        </h2>
+        <SectionEyebrow>Mitglieder</SectionEyebrow>
         <div className="mt-3">
           <Suspense fallback={<RowsSkeleton rows={2} />}>
             <Members />
@@ -39,9 +37,7 @@ export default function HouseholdPage() {
       </Section>
 
       <Section>
-        <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
-          Einladen
-        </h2>
+        <SectionEyebrow>Einladen</SectionEyebrow>
         <p className="mt-1 text-[15px] leading-relaxed text-muted">
           Ein Code gilt 14 Tage und lässt sich einmal einlösen — geteilt als
           Link, muss er nicht abgetippt werden.
@@ -54,12 +50,11 @@ export default function HouseholdPage() {
       </Section>
 
       <Section>
-        <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
-          Beitreten
-        </h2>
+        <SectionEyebrow>Beitreten</SectionEyebrow>
         <p className="mt-1 text-[15px] leading-relaxed text-muted">
-          Selbst einen Code bekommen? Hier eintragen — der aktuelle Haushalt
-          bleibt bestehen, du kannst ihn danach unten verlassen.
+          Selbst einen Code bekommen? Hier eintragen — der neue Haushalt wird
+          der aktive, dein bisheriger bleibt bestehen. Im Konto kannst du
+          jederzeit zwischen ihnen wechseln.
         </p>
         <div className="mt-4">
           <JoinByCode />
@@ -131,27 +126,30 @@ async function Invites() {
 }
 
 /**
- * Nur sichtbar, wenn mehr als ein Haushalt besteht — der Normalfall, wenn
- * jemand einer Einladung gefolgt ist, ohne vorher den alten Haushalt zu
- * verlassen (siehe /beitreten/[code]). Sonst bliebe hier eine Überschrift
- * ohne Inhalt stehen, deshalb kein eigener Suspense-Fallback: bei einem
- * Haushalt erscheint der ganze Abschnitt einfach nie.
+ * Nur sichtbar, wenn mehr als ein Haushalt besteht. Welcher davon gerade der
+ * aktive ist, wählt der Wechsler im Konto-Tab (`HouseholdSwitcher.tsx`,
+ * 0026_aktiver_haushalt.sql); hier geht es nur ums endgültige Verlassen.
+ * Sonst bliebe hier eine Überschrift ohne Inhalt stehen, deshalb kein
+ * eigener Suspense-Fallback: bei einem Haushalt erscheint der ganze
+ * Abschnitt einfach nie.
  */
 async function Households() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/anmelden");
+
   const context = await requireHousehold();
   if (!context.ok) return null;
 
-  const households = await listHouseholds(context.supabase);
+  const households = await listHouseholds(context.supabase, user.id);
   if (!households.ok || households.value.length <= 1) return null;
 
   return (
     <Section>
-      <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
-        Deine Haushalte
-      </h2>
+      <SectionEyebrow>Deine Haushalte</SectionEyebrow>
       <p className="mt-1 text-[15px] leading-relaxed text-muted">
-        emil zeigt oben Rezepte und Einkaufsliste aus „{context.household.name}
-        “. Brauchst du einen der anderen nicht mehr, verlasse ihn hier.
+        „{context.household.name}“ ist gerade aktiv — wechseln geht im
+        Konto-Tab. Brauchst du einen der anderen nicht mehr, verlasse ihn
+        hier.
       </p>
       <div className="mt-4">
         <HouseholdsList

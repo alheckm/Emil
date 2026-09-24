@@ -16,7 +16,7 @@
  *   einhändig bedient. Fließtext (Notices) bleibt bei mindestens 15 px.
  */
 import Link from "next/link";
-import type { ComponentProps, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ComponentProps, ReactNode } from "react";
 import { ChevronRightIcon } from "./icons";
 
 /**
@@ -459,5 +459,96 @@ export function RowLink({
       <span className="min-w-0 flex-1">{children}</span>
       <ChevronRightIcon aria-hidden className="h-4 w-4 shrink-0 text-inactive" />
     </Link>
+  );
+}
+
+/**
+ * Zeile im Konto-Hub (DESIGN.md „Konto"): 52 px, ein optionaler Slot links
+ * (Avatar oder Icon), Label, optionaler Zusatz rechts, Chevron — außer bei
+ * `variant="danger"` (Konto löschen), die ohne Chevron endet, weil sie
+ * selbst schon die letzte Zeile eines Abschnitts ist.
+ *
+ * Anders als `RowLink` nimmt sie einen führenden Slot und eine eigene
+ * Textfarbe, deckt damit sowohl Mitgliederzeilen (Avatar + „Du") als auch
+ * einfache Verweiszeilen (Passwort, Datenschutz) ab, ohne die Zeile für
+ * jeden Fall neu zu bauen.
+ */
+export function SettingsRow({
+  href,
+  leading,
+  trailing,
+  variant = "default",
+  children,
+}: {
+  href: string;
+  /** Avatar oder Icon links, z. B. ein Mitgliedskreis oder ein gestricheltes „+". */
+  leading?: ReactNode;
+  /** Kurzer Zusatz rechts vor dem Chevron, z. B. „Du". */
+  trailing?: ReactNode;
+  variant?: "default" | "danger";
+  children: ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className={
+        "flex min-h-[52px] items-center gap-3 py-2 text-[15px] press-flat tap-target " +
+        (variant === "danger" ? "text-danger" : "text-text")
+      }
+    >
+      {leading && <span className="shrink-0">{leading}</span>}
+      <span className="min-w-0 flex-1 truncate">{children}</span>
+      {trailing && (
+        <span className="shrink-0 text-[13px] text-muted">{trailing}</span>
+      )}
+      {variant !== "danger" && (
+        <ChevronRightIcon aria-hidden className="h-4 w-4 shrink-0 text-inactive" />
+      )}
+    </Link>
+  );
+}
+
+/**
+ * Dieselbe Zeile als `<button>` statt `<Link>` — für Aktionen, die keine
+ * Route sind (den Haushalts-Wechsler öffnen).
+ */
+export function SettingsRowButton({
+  leading,
+  trailing,
+  children,
+  className = "",
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & {
+  leading?: ReactNode;
+  trailing?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      {...props}
+      className={
+        "flex min-h-[52px] w-full items-center gap-3 py-2 text-left text-[15px] text-text " +
+        "press-flat tap-target " +
+        className
+      }
+    >
+      {leading && <span className="shrink-0">{leading}</span>}
+      <span className="min-w-0 flex-1 truncate">{children}</span>
+      {trailing && <span className="shrink-0">{trailing}</span>}
+    </button>
+  );
+}
+
+/**
+ * Eyebrow über einem Abschnitt (DESIGN.md „eyebrow": Public Sans 12 px,
+ * +6–8 % Tracking, Versalien) — bisher als eigenes `<h2 className=…>` auf
+ * Konto und Haushalt dupliziert.
+ */
+export function SectionEyebrow({ children }: { children: ReactNode }) {
+  return (
+    <h2 className="px-0.5 pb-1 text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
+      {children}
+    </h2>
   );
 }

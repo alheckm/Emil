@@ -347,3 +347,55 @@ select,
 @utility bg-tabbar-active {
   background: rgba(0, 0, 0, 0.08);
 }
+
+/* ---------------------------------------------------------------------------
+   Bottom-Sheet (HouseholdSwitcher.tsx) — natives <dialog>, von unten
+   hereinfahrend statt eingeblendet. `@starting-style` animiert nur das
+   Öffnen; `close()` beendet sofort, ganz ohne JavaScript-Choreografie für
+   eine Austrittsanimation, die hier den Aufwand nicht wert ist. 220 ms
+   liegen in der 120–250-ms-Spanne aus DESIGN.md „Bewegung".
+--------------------------------------------------------------------------- */
+@utility sheet {
+  margin: 0;
+  border: none;
+  padding: 0;
+  position: fixed;
+  inset: auto 0 0 0;
+  width: 100%;
+  max-width: 28rem;
+  margin-inline: auto;
+  border-radius: 20px 20px 0 0;
+  background: var(--card);
+  box-shadow: 0 -8px 28px rgba(21, 22, 26, 0.14);
+  transition:
+    transform 220ms ease-out,
+    opacity 220ms ease-out,
+    overlay 220ms ease-out allow-discrete,
+    display 220ms ease-out allow-discrete;
+
+  &::backdrop {
+    background: rgba(21, 22, 26, 0.32);
+    transition:
+      background 220ms ease-out,
+      overlay 220ms allow-discrete,
+      display 220ms allow-discrete;
+  }
+
+  @starting-style {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  &::backdrop {
+    @starting-style {
+      background: rgba(21, 22, 26, 0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .sheet::backdrop {
+    transition: none;
+  }
+}

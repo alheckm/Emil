@@ -31,9 +31,19 @@ export default async function NewPasswordPage() {
   return (
     <Screen title="Neues Passwort" tabbar={false}>
       {user ? (
-        <Section>
-          <NewPasswordForm />
-        </Section>
+        <>
+          <Section>
+            <NewPasswordForm />
+          </Section>
+          <p className="text-center text-[15px]">
+            <Link
+              href="/einstellungen"
+              className="text-muted underline underline-offset-4"
+            >
+              Zurück zum Konto
+            </Link>
+          </p>
+        </>
       ) : (
         <>
           <Notice tone="error">

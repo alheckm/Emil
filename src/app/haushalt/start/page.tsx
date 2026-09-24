@@ -22,13 +22,14 @@ export const instant = false;
 export const metadata = { title: "Haushalt" };
 
 export default async function HouseholdStartPage() {
-  if (!(await getCurrentUser())) redirect("/anmelden");
+  const user = await getCurrentUser();
+  if (!user) redirect("/anmelden");
 
   // Wer schon in einem Haushalt ist, hat hier nichts verloren — sonst legt ein
   // zweiter Klick versehentlich einen zweiten Haushalt an.
   const supabase = await getServerSupabase();
   if (supabase) {
-    const households = await listHouseholds(supabase);
+    const households = await listHouseholds(supabase, user.id);
     if (households.ok && households.value.length > 0) redirect("/rezepte");
   }
 

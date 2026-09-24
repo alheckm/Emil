@@ -9,10 +9,11 @@ import { Button, Field, Notice } from "@/components/ui";
 /**
  * Nur sichtbar, wenn jemand mehr als einem Haushalt angehört — der Normalfall
  * bei einer Einladung, der einem schon bestehenden Haushalt folgt (siehe
- * /beitreten/[code]). Das Abtippen von „VERLASSEN" statt eines Systemdialogs
- * folgt demselben Muster wie „Konto löschen" (AccountActions.tsx): `confirm()`
- * ist im Standalone-Modus ein blockierendes Systemfenster, das man wegwischt,
- * ohne es zu lesen.
+ * /beitreten/[code]), oder beim Anlegen eines weiteren über den
+ * Haushalts-Wechsler im Konto-Tab. Das Abtippen von „VERLASSEN" statt eines
+ * Systemdialogs folgt demselben Muster wie „Konto löschen"
+ * (konto/loeschen/DeleteAccount.tsx): `confirm()` ist im Standalone-Modus ein
+ * blockierendes Systemfenster, das man wegwischt, ohne es zu lesen.
  */
 export function HouseholdsList({
   households,
@@ -52,9 +53,9 @@ export function HouseholdsList({
     <div className="space-y-3">
       {error && <Notice tone="error">{error}</Notice>}
 
-      <ul className="space-y-3">
+      <ul className="divide-y divide-border">
         {households.map((household) => (
-          <li key={household.id} className="rounded-card bg-soft p-4">
+          <li key={household.id} className="py-3">
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
                 <p className="truncate text-[15px] font-semibold text-text">
@@ -62,7 +63,7 @@ export function HouseholdsList({
                 </p>
                 <p className="text-[13px] text-muted">
                   {household.role === "owner" ? "Eigentümer:in" : "Mitglied"}
-                  {household.id === activeId && " · wird gerade angezeigt"}
+                  {household.id === activeId && " · Aktiv"}
                 </p>
               </div>
               {open !== household.id && (
@@ -82,7 +83,7 @@ export function HouseholdsList({
             </div>
 
             {open === household.id && (
-              <div className="mt-4 space-y-3 border-t border-border pt-4">
+              <div className="mt-4 space-y-3 rounded-soft bg-soft p-4">
                 <p className="text-[13px] leading-relaxed text-muted">
                   Entfernt deine Mitgliedschaft in „{household.name}“. Bist du
                   die letzte Person darin, verschwindet er mitsamt Rezepten,
