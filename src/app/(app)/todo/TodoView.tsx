@@ -268,9 +268,12 @@ function TodoRow({
   onCycleAssignee: (todo: Todo) => void;
 }) {
   const assignee = members.find((member) => member.userId === assignedTo);
-  const assigneeName = assignee
+  const assigneeLabel = assignee
     ? assignee.displayName ||
-      (assignee.userId === currentUserId ? "Dir" : "Mitbewohner:in")
+      (assignee.userId === currentUserId ? "dir" : "einem Mitbewohner")
+    : null;
+  const assigneeInitial = assignee
+    ? (assignee.displayName || (assignee.userId === currentUserId ? "Du" : "Mitbewohner:in")).charAt(0)
     : null;
 
   return (
@@ -302,13 +305,13 @@ function TodoRow({
           type="button"
           onClick={() => onCycleAssignee(todo)}
           aria-label={
-            assigneeName ? `Zugewiesen an ${assigneeName}. Zuweisung ändern.` : "Niemandem zugewiesen. Zuweisen."
+            assigneeLabel ? `${assigneeLabel} zugewiesen. Zuweisung ändern.` : "Niemandem zugewiesen. Zuweisen."
           }
           className="shrink-0 press-flat tap-target"
         >
           <Avatar
             url={assignee?.avatarUrl}
-            initial={assigneeName?.charAt(0).toUpperCase()}
+            initial={assigneeInitial?.toUpperCase()}
             placeholder={!assignee}
             size={26}
           />
