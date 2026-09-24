@@ -11,13 +11,13 @@ description: Emils Gestaltung — verbindliche Regeln für Farbe, Schrift, Maß,
 
 # Emils Gestaltung
 
-**Keine festgeschriebene Richtung aktuell.** Frühere Design-Dokumente
-(`docs/design-system.md`, `docs/app_redesign.jpg`, `DESIGN.md`,
-`HANDOFF-maison-auge.md`) wurden am 2026-09-24 auf Nutzerwunsch gelöscht —
-Neustart. Bevor du Oberflächen-Code schreibst, der über die Untergrenzen
-unten hinausgeht (neue Farben, Radien, Komponenten-Look), lass zuerst über
-`/app-art-director` eine Richtung entscheiden, statt aus altem Code oder
-Gedächtnis zu improvisieren.
+**Festgeschriebene Richtung: Instagram-Baseline, seit 2026-09-24.** Single
+Source of Truth ist `DESIGN.md` (Farben, Typografie, Radien, Komponenten) plus
+der darin verlinkte Design-Canvas. Der Rebuild darauf ist umgesetzt. Baue auf
+`DESIGN.md` und den bestehenden Komponenten (`src/components/ui.tsx`,
+`icons.tsx`) auf, statt neue Farben/Radien/Komponenten-Looks zu erfinden. Nur
+wenn der Nutzer ausdrücklich eine neue Richtung will, lass sie zuerst über
+`/app-art-director` entscheiden.
 
 ## Nicht verhandelbar (direction-unabhängig)
 

@@ -2,14 +2,16 @@
 
 ## Gestaltung — vor jeder Änderung an der Oberfläche
 
-**Keine festgeschriebene Richtung aktuell.** Frühere Design-Dokumente
-(`docs/design-system.md`, `docs/app_redesign.jpg`, `DESIGN.md`,
-`HANDOFF-maison-auge.md`) wurden am 2026-09-24 auf Nutzerwunsch gelöscht —
-Neustart. Wer etwas unter `src/app/`, `src/components/` oder an
-`src/app/globals.css` anfasst, ohne dass eine neue Richtung entschieden ist,
-sollte zuerst über den Skill `app-art-director` (bzw. `design`) eine Richtung
-festlegen lassen, statt aus dem Gedächtnis oder aus Code-Konventionen zu
-improvisieren.
+**Festgeschriebene Richtung: Instagram-Baseline, seit 2026-09-24.** Single
+Source of Truth ist `DESIGN.md` plus der darin verlinkte Design-Canvas
+(Screens, Typografie- und Komponenten-Specimen). Der komplette Rebuild von
+`src/app/`, `src/components/` und `src/app/globals.css` auf diese Richtung ist
+umgesetzt (Tokens, Home-Feed, Rezeptdetail, Einkaufsliste als Story-Ring-
+Kreise, Aufgaben, Konto, Import). Wer die Oberfläche weiter anfasst, hält sich
+an `DESIGN.md`, statt aus Gedächtnis oder alten Code-Konventionen (Maison
+Augé, radiuslos, Versalien) zu improvisieren. Nur wenn der Nutzer ausdrücklich
+eine neue Richtung will, geht es über den Skill `app-art-director` (bzw.
+`design`) neu los.
 
 Direction-unabhängige Untergrenzen, die trotzdem immer gelten:
 
