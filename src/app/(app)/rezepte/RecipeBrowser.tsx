@@ -327,7 +327,7 @@ export function RecipeBrowser({
                   Noch leer
                 </h2>
                 <p className="mt-2 max-w-[260px] text-[15px] leading-relaxed text-muted">
-                  Am schnellsten geht es über „Importieren": die Adresse einer
+                  Am schnellsten geht es über „Importieren“: die Adresse einer
                   Rezeptseite einfügen, oder ein Kochbuch-Foto digitalisieren
                   und das Ergebnis hier einsetzen.
                 </p>
