@@ -6,6 +6,7 @@ import { listHouseholds, listMembers, listOpenInvites } from "@/lib/data/househo
 import { Section, Notice, Screen, ScreenHeader } from "@/components/ui";
 import { HeaderSkeleton, RowsSkeleton } from "@/components/skeletons";
 import { InviteSection } from "./InviteSection";
+import { JoinByCode } from "./JoinByCode";
 import { HouseholdsList } from "./HouseholdsList";
 
 export const metadata = { title: "Haushalt" };
@@ -49,6 +50,19 @@ export default function HouseholdPage() {
           <Suspense fallback={<RowsSkeleton rows={1} />}>
             <Invites />
           </Suspense>
+        </div>
+      </Section>
+
+      <Section>
+        <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
+          Beitreten
+        </h2>
+        <p className="mt-1 text-[15px] leading-relaxed text-muted">
+          Selbst einen Code bekommen? Hier eintragen — der aktuelle Haushalt
+          bleibt bestehen, du kannst ihn danach unten verlassen.
+        </p>
+        <div className="mt-4">
+          <JoinByCode />
         </div>
       </Section>
 
