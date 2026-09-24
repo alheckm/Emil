@@ -209,17 +209,19 @@ export function RecipeIngredientsAndSteps({
  * der automatischen Rezept-Pflege befüllt (`docs/plan-rezept-pflege.md`).
  * Jeder Wert in einem farbigen Kreis — nimmt das Kreis-Schema der
  * Einkaufsliste noch einmal auf, statt eine dritte Darstellung für Zutaten-
- * Mengen zu erfinden. Farben aus derselben gedeckten Palette wie die
- * Foto-Kreise (`categoryColor.ts`), nur abgedunkelt statt pastellig — bei
- * den hellen Ausgangstönen war Weiß auf dem Kreis nicht lesbar. Fix statt
- * gehasht: dieselben vier Werte stehen immer in derselben Reihenfolge.
+ * Mengen zu erfinden. Die ersten drei Farben sind exakt die des
+ * Design-Canvas (`Liste-Kreise.dc.html`: Obst & Gemüse, Milchprodukte,
+ * Trockenwaren) — die vierte folgt derselben gedeckten Palette
+ * (`categoryColor.ts`), da der Canvas nur drei Kategorien durchfärbt. Fix
+ * statt gehasht: dieselben vier Werte stehen immer in derselben Reihenfolge.
+ * Text dunkel: die Canvas-Töne sind pastellig, Weiß wäre darauf kaum lesbar.
  */
 function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
   const stats: [string, string, string][] = [
-    [String(nutrition.kcal), "kcal", "#8A5A3E"],
-    [`${nutrition.proteinG} g`, "Eiweiß", "#556B45"],
-    [`${nutrition.fatG} g`, "Fett", "#8C6A32"],
-    [`${nutrition.carbsG} g`, "Kohlenhydrate", "#4F6E73"],
+    [String(nutrition.kcal), "kcal", "#B3927A"],
+    [`${nutrition.proteinG} g`, "Eiweiß", "#8C9A7B"],
+    [`${nutrition.fatG} g`, "Fett", "#C9BBA0"],
+    [`${nutrition.carbsG} g`, "Kohlenhydrate", "#8FA3A8"],
   ];
 
   return (
@@ -230,7 +232,7 @@ function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
         {stats.map(([value, label, color]) => (
           <div key={label} className="flex flex-1 flex-col items-center gap-[7px]">
             <span
-              className="tabular font-display flex h-[68px] w-[68px] items-center justify-center rounded-full text-[15px] font-bold text-white"
+              className="tabular font-display flex h-[68px] w-[68px] items-center justify-center rounded-full text-[15px] font-bold text-text"
               style={{ background: color }}
             >
               {value}
