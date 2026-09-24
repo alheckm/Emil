@@ -173,6 +173,7 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Räuchertofu": "raeuchertofu",
   "Blätterteig": "blaetterteig",
   "Pizzateig": "pizzateig",
+  "Pizza": "pizza",
   "Hafermilch": "hafermilch",
   "Sojamilch": "sojamilch",
   "Mandelmilch": "mandelmilch",
