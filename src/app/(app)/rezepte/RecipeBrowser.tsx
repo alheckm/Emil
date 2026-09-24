@@ -23,6 +23,7 @@ import {
   GridIcon,
   ImportIcon,
   MoreIcon,
+  PlusIcon,
   RowsIcon,
   SearchIcon,
 } from "@/components/icons";
@@ -525,9 +526,9 @@ function FilterChip({
 }
 
 /**
- * „Auf Liste" — dieselbe Aktion wie `ShoppingListButton` in `RecipeActions`,
- * aber ohne Zwischenzustand „stale": von Home aus gibt es keinen
- * Portionswähler, es zählt nur an/aus.
+ * „Einkaufsliste" mit Plus-Icon — dieselbe Beschriftung wie
+ * `ShoppingListButton` in `RecipeActions`, aber ohne Zwischenzustand
+ * „stale": von Home aus gibt es keinen Portionswähler, es zählt nur an/aus.
  */
 function ListToggleButton({
   on,
@@ -556,8 +557,8 @@ function ListToggleButton({
         (on ? "bg-card text-text border border-border" : "bg-accent text-accent-ink")
       }
     >
-      {on && <CheckIcon className="h-3 w-3" />}
-      {on ? "Auf der Liste" : "Auf Liste"}
+      {on ? <CheckIcon className="h-3 w-3" /> : <PlusIcon className="h-3 w-3" />}
+      {on ? "Auf der Liste" : "Einkaufsliste"}
     </button>
   );
 }
