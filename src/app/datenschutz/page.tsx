@@ -21,6 +21,7 @@ export default function PrivacyPage() {
     <Screen
       title="Datenschutz"
       lead="Was Emil speichert, wo es liegt und wie du es wieder loswirst."
+      tabbar={false}
     >
       <Section>
         <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">

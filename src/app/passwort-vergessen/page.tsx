@@ -24,6 +24,7 @@ export default function ForgotPasswordPage() {
     <Screen
       title="Passwort vergessen"
       lead="Wir schicken dir einen Link, mit dem du ein neues setzen kannst."
+      tabbar={false}
     >
       <Section>
         <ResetForm />

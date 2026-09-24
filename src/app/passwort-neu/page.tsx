@@ -29,7 +29,7 @@ export default async function NewPasswordPage() {
   const user = await getCurrentUser();
 
   return (
-    <Screen title="Neues Passwort">
+    <Screen title="Neues Passwort" tabbar={false}>
       {user ? (
         <Section>
           <NewPasswordForm />

@@ -14,6 +14,10 @@
  *   vorher fertig — dann sieht man nie einen Platzhalter, sondern nur, wie der
  *   Inhalt erscheint.
  *
+ * Maßgleich mit den echten Screens der Instagram-Baseline-Richtung
+ * (DESIGN.md): Story-Ring-Kreise für die Einkaufsliste, randloses Foto für
+ * Feed/Rezeptdetail — kein eckiger Kasten mehr.
+ *
  * `aria-hidden` und `role="status"`: Screenreader sollen „lädt" hören, nicht
  * eine Handvoll leerer Kästen vorgelesen bekommen.
  */
@@ -33,8 +37,8 @@ function Frame({ children }: { children: React.ReactNode }) {
 export function HeaderSkeleton() {
   return (
     <Frame>
-      <Box className="h-9 w-2/3" />
-      <Box className="mt-3 h-4 w-24" />
+      <Box className="h-5 w-1/2" />
+      <Box className="mt-2 h-3.5 w-20" />
     </Frame>
   );
 }
@@ -61,19 +65,41 @@ export function RowsSkeleton({ rows = 4 }: { rows?: number }) {
   );
 }
 
-/** Einkaufsliste: Abteilungsüberschrift plus Zeilen mit Kästchen. */
-export function ListSkeleton({ rows = 6 }: { rows?: number }) {
+/**
+ * Aufgaben: flache Zeilen mit Kreis-Checkbox — maßgleich mit `TodoRow`
+ * (TodoView.tsx).
+ */
+export function TodoSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <Frame>
-      <Box className="h-3 w-28" />
-      <ul className="mt-3 space-y-2">
+      <ul>
         {Array.from({ length: rows }, (_, index) => (
           <li
             key={index}
-            className="flex min-h-14 items-center gap-3 rounded-soft bg-soft px-4 py-3"
+            className="flex items-center gap-3.5 border-b border-border py-3.5"
           >
-            <Box className="h-7 w-7 shrink-0 rounded-soft" />
+            <Box className="h-[26px] w-[26px] shrink-0 rounded-full" />
             <Box className="h-4 w-1/2" />
+          </li>
+        ))}
+      </ul>
+    </Frame>
+  );
+}
+
+/**
+ * Einkaufsliste: Story-Ring-Kreise im 3er-Raster — maßgleich mit
+ * `renderEntry` (ListView.tsx).
+ */
+export function ShoppingListSkeleton({ rows = 9 }: { rows?: number }) {
+  return (
+    <Frame>
+      <Box className="h-3.5 w-32" />
+      <ul className="mt-5 grid grid-cols-3 gap-x-3.5 gap-y-5">
+        {Array.from({ length: rows }, (_, index) => (
+          <li key={index} className="flex flex-col items-center gap-[7px]">
+            <Box className="aspect-square w-full rounded-full" />
+            <Box className="h-3.5 w-2/3" />
           </li>
         ))}
       </ul>
@@ -84,30 +110,24 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
 /**
  * Der Rezept-Screen, solange das Rezept noch unterwegs ist.
  *
- * Maßgleich mit dem echten: dasselbe Seitenverhältnis, derselbe Seitenrand
- * und dieselbe Rundung wie `RecipeHero`. Das Foto-Bett ist hier keine
- * getönte Fläche, sondern schon der Ton, den der fertige Screen trägt — beim
- * Eintreffen der Daten wechselt also nur der Inhalt, nicht die Farbe.
+ * Maßgleich mit dem echten: randloses Foto (DESIGN.md „Rezeptdetail" —
+ * `aspect-[393/420]`, Radius 0), derselbe Seitenrand darunter. Beim
+ * Eintreffen der Daten wechselt so nur der Inhalt, nicht die Fläche.
  */
 export function RecipeCardSkeleton() {
   return (
     <Frame>
       <div>
-        <div className="px-5 pt-safe">
-          <div
-            aria-hidden
-            className="aspect-[4/3] w-full rounded-card bg-photo"
-          />
-        </div>
-        <div className="px-5 pb-6 pt-5">
-          <Box className="h-8 w-3/4" />
-          <div className="mt-3 flex gap-2">
+        <div aria-hidden className="aspect-[393/420] w-full bg-photo" />
+        <div className="px-5 pt-[18px] pb-6">
+          <Box className="h-6 w-3/4" />
+          <div className="mt-3.5 flex gap-2">
             <Box className="h-7 w-24 rounded-pill" />
             <Box className="h-7 w-16 rounded-pill" />
           </div>
           <div className="mt-6 flex items-center justify-between gap-4">
             <Box className="h-5 w-24" />
-            <Box className="h-10 w-32 rounded-pill" />
+            <Box className="h-11 w-28 rounded-pill" />
           </div>
           <ul className="mt-6 space-y-3">
             {Array.from({ length: 6 }, (_, index) => (
@@ -124,33 +144,24 @@ export function RecipeCardSkeleton() {
 }
 
 /**
- * Die Karten der Rezeptübersicht.
- *
- * Zwei reichen: mehr Platzhalter als sichtbare Karten zu zeigen füllt den
- * Bildschirm mit einem Versprechen, das die Daten vielleicht nicht halten.
- * Maßgleich mit `RecipeBrowserCard`: Fläche und Schatten stehen schon, damit
- * die Karte beim Eintreffen der Daten nicht nachträglich "aufklappt".
+ * Der Home-Feed (DESIGN.md „Rezepte — Home"): Titel, randloses Foto, Meta-
+ * Zeile — maßgleich mit den echten Feed-Karten in `RecipeBrowser.tsx`.
  */
 export function RecipeGridSkeleton({ cards = 2 }: { cards?: number }) {
   return (
     <Frame>
-      <ul className="space-y-5">
+      <ul>
         {Array.from({ length: cards }, (_, index) => (
-          <li
-            key={index}
-            aria-hidden
-            className="overflow-hidden rounded-card bg-card shadow-card"
-          >
-            <div className="px-5 pt-5">
-              <Box className="h-8 w-2/3" />
-              <div className="mt-3 flex gap-2">
-                <Box className="h-7 w-24 rounded-pill" />
-                <Box className="h-7 w-16 rounded-pill" />
-              </div>
+          <li key={index}>
+            <div className="px-5 pt-3.5 pb-2.5">
+              <Box className="h-4 w-2/3" />
             </div>
-            <div className="px-2 pb-2 pt-4">
-              <div className="aspect-[4/3] w-full rounded-card bg-photo" />
+            <div aria-hidden className="aspect-[393/340] w-full bg-photo" />
+            <div className="flex items-center justify-between gap-3 px-5 pt-3.5 pb-4">
+              <Box className="h-4 w-16" />
+              <Box className="h-9 w-24 rounded-pill" />
             </div>
+            <div className="h-px bg-border" />
           </li>
         ))}
       </ul>

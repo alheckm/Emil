@@ -30,7 +30,11 @@ export default async function LoginPage({
   const { fehler } = await searchParams;
 
   return (
-    <Screen title="Emil" lead="Rezepte, Portionen, Einkaufsliste — geteilt im Haushalt.">
+    <Screen
+      title="Emil"
+      lead="Rezepte, Portionen, Einkaufsliste — geteilt im Haushalt."
+      tabbar={false}
+    >
       <Section>
         <LoginForm initialError={fehler} />
       </Section>

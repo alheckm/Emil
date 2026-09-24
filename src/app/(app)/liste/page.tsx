@@ -4,7 +4,7 @@ import { requireHousehold } from "@/lib/server/household";
 import { getListState } from "@/lib/server/listState";
 import { listCategories, listEntries } from "@/lib/data/shoppingList";
 import { Notice, Screen } from "@/components/ui";
-import { ListSkeleton } from "@/components/skeletons";
+import { ShoppingListSkeleton } from "@/components/skeletons";
 import { ListView } from "./ListView";
 
 export const metadata = { title: "Einkaufsliste" };
@@ -30,7 +30,7 @@ export const metadata = { title: "Einkaufsliste" };
 export default function ListPage() {
   return (
     <Screen title="Einkaufsliste">
-      <Suspense fallback={<ListSkeleton />}>
+      <Suspense fallback={<ShoppingListSkeleton />}>
         <List />
       </Suspense>
     </Screen>

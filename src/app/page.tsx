@@ -37,7 +37,7 @@ export const instant = false;
 export default async function Home() {
   if (!getSupabaseConfig()) {
     return (
-      <Screen title="Emil">
+      <Screen title="Emil" tabbar={false}>
         <Notice tone="error">{SUPABASE_MISSING_MESSAGE}</Notice>
       </Screen>
     );

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { requireHousehold } from "@/lib/server/household";
 import { listDoneTodos, listOpenTodos } from "@/lib/data/todos";
 import { Notice, Screen } from "@/components/ui";
-import { ListSkeleton } from "@/components/skeletons";
+import { TodoSkeleton } from "@/components/skeletons";
 import { TodoView } from "./TodoView";
 
 export const metadata = { title: "Aufgaben" };
@@ -16,7 +16,7 @@ export const metadata = { title: "Aufgaben" };
 export default function TodoPage() {
   return (
     <Screen title="Aufgaben">
-      <Suspense fallback={<ListSkeleton />}>
+      <Suspense fallback={<TodoSkeleton />}>
         <Todos />
       </Suspense>
     </Screen>

@@ -28,6 +28,7 @@ export default async function RegisterPage() {
     <Screen
       title="Konto anlegen"
       lead="Danach legst du einen Haushalt an oder trittst mit einem Code einem bestehenden bei."
+      tabbar={false}
     >
       <Section>
         <RegisterForm />

@@ -50,7 +50,7 @@ export function StartForms() {
       {error && <Notice tone="error">{error}</Notice>}
 
       <Section>
-        <h2 className="text-[20px] font-extrabold uppercase">Haushalt anlegen</h2>
+        <h2 className="font-display text-[17px] font-bold text-text">Haushalt anlegen</h2>
         <p className="mt-1 text-[15px] leading-relaxed text-muted">
           Du wirst Eigentümer und kannst danach jemanden einladen.
         </p>
@@ -80,7 +80,7 @@ export function StartForms() {
       </Section>
 
       <Section>
-        <h2 className="text-[20px] font-extrabold uppercase">Einladung einlösen</h2>
+        <h2 className="font-display text-[17px] font-bold text-text">Einladung einlösen</h2>
         <p className="mt-1 text-[15px] leading-relaxed text-muted">
           Acht Zeichen vom anderen Handy. Groß- und Kleinschreibung egal.
         </p>

@@ -36,6 +36,7 @@ export default async function HouseholdStartPage() {
     <Screen
       title="Haushalt"
       lead="Emil teilt Rezepte und Einkaufsliste innerhalb eines Haushalts. Leg einen an oder tritt einem bei."
+      tabbar={false}
     >
       <StartForms />
     </Screen>

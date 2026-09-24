@@ -224,6 +224,7 @@ export function Screen({
   lead,
   action,
   bleed,
+  tabbar = true,
   children,
 }: {
   title?: ReactNode;
@@ -237,10 +238,20 @@ export function Screen({
    * ihren Seitenrand dann selbst.
    */
   bleed?: boolean;
+  /**
+   * `false` auf Screens ohne Tab-Leiste (Anmelden, Registrieren, Passwort,
+   * Datenschutz, Haushalt starten) — sonst bliebe unten der Freiraum stehen,
+   * den die schwebende Glas-Leiste sonst braucht.
+   */
+  tabbar?: boolean;
   children: ReactNode;
 }) {
   return (
-    <main className={"flex-1 pb-tabbar " + (bleed ? "pt-safe" : "px-5 pt-safe")}>
+    <main
+      className={
+        "flex-1 " + (tabbar ? "pb-tabbar " : "pb-safe ") + (bleed ? "pt-safe" : "px-5 pt-safe")
+      }
+    >
       <div className="mx-auto w-full max-w-md">
         {title !== undefined && (
           <>
