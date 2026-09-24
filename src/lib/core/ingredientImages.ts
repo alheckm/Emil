@@ -200,6 +200,7 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Mais": "mais",
   "Oliven": "oliven",
   "Gemüsebrühe": "gemuesebruehe",
+  "Gemüsebrühepulver": "gemuesebruehepulver",
   "Kalbsfond": "kalbsfond",
   "Nudeln": "nudeln",
   "Rote Linsen": "rote-linsen",
