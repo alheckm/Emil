@@ -61,6 +61,7 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Salbei": "salbei",
   "Zitrone": "zitrone",
   "Limette": "limette",
+  "Limettensaft": "limettensaft",
   "Orange": "orange",
   "Apfel": "apfel",
   "Banane": "banane",
