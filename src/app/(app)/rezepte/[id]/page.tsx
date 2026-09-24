@@ -116,7 +116,7 @@ async function RecipeDetail({ params }: { params: Params }) {
 
       {value.notes && (
         <section className="px-5 pb-6">
-          <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
+          <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
             Notizen
           </h2>
           <p className="mt-3 whitespace-pre-line text-[15px] leading-[1.55]">

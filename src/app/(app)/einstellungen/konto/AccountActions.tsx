@@ -76,8 +76,8 @@ export function AccountActions() {
         {busy === "out" ? "Einen Moment" : "Abmelden"}
       </Button>
 
-      <div className="space-y-3 border border-border p-5">
-        <h2 className="text-[13px] font-extrabold tracking-[0.1em] text-danger uppercase">
+      <div className="space-y-3 rounded-card bg-soft p-5">
+        <h2 className="font-display text-[15px] font-bold text-danger">
           Konto löschen
         </h2>
         <p className="text-[15px] leading-relaxed text-muted">

@@ -377,7 +377,7 @@ export function RecipeForm({
       </Section>
 
       <Section>
-        <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
+        <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
           Zutaten
         </h2>
 

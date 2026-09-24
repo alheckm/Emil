@@ -70,7 +70,7 @@ export function InviteSection({
       ) : (
         <ul className="space-y-3">
           {invites.map((invite) => (
-            <li key={invite.code} className="bg-soft p-4">
+            <li key={invite.code} className="rounded-card bg-soft p-4">
               <p className="font-mono text-2xl tracking-[0.2em]">{invite.code}</p>
               <p className="mt-1 text-[13px] text-muted">
                 gültig bis{" "}

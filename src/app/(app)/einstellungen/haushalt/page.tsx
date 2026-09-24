@@ -26,7 +26,7 @@ export default function HouseholdPage() {
       </Suspense>
 
       <Section>
-        <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
+        <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
           Mitglieder
         </h2>
         <div className="mt-3">
@@ -37,7 +37,7 @@ export default function HouseholdPage() {
       </Section>
 
       <Section>
-        <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
+        <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
           Einladen
         </h2>
         <p className="mt-1 text-[15px] leading-relaxed text-muted">
