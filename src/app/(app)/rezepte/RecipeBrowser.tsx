@@ -551,7 +551,7 @@ function ListToggleButton({
         "flex shrink-0 items-center gap-1.5 rounded-pill press-flat tap-target disabled:opacity-60 " +
         (compact
           ? "h-[26px] px-3 text-[11px] font-semibold shadow-[0_2px_6px_rgba(0,0,0,0.2)]"
-          : "h-9 px-4 text-[12.5px] font-display font-bold") +
+          : "h-9 px-4 text-[12.5px] font-bold") +
         " " +
         (on ? "bg-card text-text border border-border" : "bg-accent text-accent-ink")
       }
