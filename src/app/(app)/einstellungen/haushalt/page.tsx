@@ -2,10 +2,11 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/server/supabase";
 import { requireHousehold } from "@/lib/server/household";
-import { listMembers, listOpenInvites } from "@/lib/data/households";
+import { listHouseholds, listMembers, listOpenInvites } from "@/lib/data/households";
 import { Section, Notice, Screen, ScreenHeader } from "@/components/ui";
 import { HeaderSkeleton, RowsSkeleton } from "@/components/skeletons";
 import { InviteSection } from "./InviteSection";
+import { HouseholdsList } from "./HouseholdsList";
 
 export const metadata = { title: "Haushalt" };
 
@@ -50,6 +51,10 @@ export default function HouseholdPage() {
           </Suspense>
         </div>
       </Section>
+
+      <Suspense fallback={null}>
+        <Households />
+      </Suspense>
     </Screen>
   );
 }
@@ -103,5 +108,38 @@ async function Invites() {
       householdId={context.household.id}
       invites={invites.ok ? invites.value : []}
     />
+  );
+}
+
+/**
+ * Nur sichtbar, wenn mehr als ein Haushalt besteht — der Normalfall, wenn
+ * jemand einer Einladung gefolgt ist, ohne vorher den alten Haushalt zu
+ * verlassen (siehe /beitreten/[code]). Sonst bliebe hier eine Überschrift
+ * ohne Inhalt stehen, deshalb kein eigener Suspense-Fallback: bei einem
+ * Haushalt erscheint der ganze Abschnitt einfach nie.
+ */
+async function Households() {
+  const context = await requireHousehold();
+  if (!context.ok) return null;
+
+  const households = await listHouseholds(context.supabase);
+  if (!households.ok || households.value.length <= 1) return null;
+
+  return (
+    <Section>
+      <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
+        Deine Haushalte
+      </h2>
+      <p className="mt-1 text-[15px] leading-relaxed text-muted">
+        Emil zeigt oben Rezepte und Einkaufsliste aus „{context.household.name}
+        “. Brauchst du einen der anderen nicht mehr, verlasse ihn hier.
+      </p>
+      <div className="mt-4">
+        <HouseholdsList
+          households={households.value}
+          activeId={context.household.id}
+        />
+      </div>
+    </Section>
   );
 }

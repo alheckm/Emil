@@ -8,12 +8,20 @@ import { redeemInvite } from "@/lib/data/households";
 import { Button, Notice } from "@/components/ui";
 
 /**
- * Wird nur gerendert, wenn die Seite schon geprüft hat: angemeldet und noch
- * in keinem Haushalt. Der Beitritt läuft deshalb ohne weiteren Klick, sobald
- * die Komponente steht — `useRef` verhindert einen zweiten RPC-Aufruf, falls
- * der Effekt (Entwicklungsmodus, ein erneuter Render) doppelt feuert.
+ * Wird nur gerendert, wenn die Seite schon geprüft hat, dass jemand
+ * angemeldet ist. Der Beitritt läuft deshalb ohne weiteren Klick, sobald die
+ * Komponente steht — `useRef` verhindert einen zweiten RPC-Aufruf, falls der
+ * Effekt (Entwicklungsmodus, ein erneuter Render) doppelt feuert.
  */
-export function JoinHousehold({ code }: { code: string }) {
+export function JoinHousehold({
+  code,
+  redirectTo = "/liste",
+}: {
+  code: string;
+  /** Ziel nach erfolgreichem Beitritt — /liste, oder /einstellungen/haushalt,
+   * wenn schon ein anderer Haushalt bestand und dort aufgeräumt werden kann. */
+  redirectTo?: string;
+}) {
   const router = useRouter();
   const [error, setError] = useState("");
   const ran = useRef(false);
@@ -34,9 +42,9 @@ export function JoinHousehold({ code }: { code: string }) {
         return;
       }
       router.refresh();
-      router.replace("/liste");
+      router.replace(redirectTo);
     })();
-  }, [code, router]);
+  }, [code, redirectTo, router]);
 
   if (error) {
     return (

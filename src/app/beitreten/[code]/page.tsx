@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { SUPABASE_MISSING_MESSAGE, getSupabaseConfig } from "@/lib/server/env";
 import { getCurrentUser, getServerSupabase } from "@/lib/server/supabase";
 import { listHouseholds } from "@/lib/data/households";
@@ -80,32 +79,25 @@ export default async function JoinPage({
 
   const supabase = await getServerSupabase();
   const households = supabase ? await listHouseholds(supabase) : null;
+  const existing = households?.ok ? households.value : [];
 
-  // Dieselbe Schranke wie auf /haushalt/start: Emil kennt nur einen Haushalt
-  // pro Konto, ein zweiter Beitritt käme also nie an.
-  if (households?.ok && households.value.length > 0) {
-    return (
-      <Screen title="Einladung" tabbar={false}>
-        <Notice tone="info">
-          Du bist schon in einem Haushalt. Emil unterstützt zurzeit nur einen
-          Haushalt pro Konto, ein Beitritt zu einem weiteren ist deshalb nicht
-          möglich.
-        </Notice>
-        <p className="text-center text-[15px]">
-          <Link
-            href="/liste"
-            className="text-accent underline underline-offset-4"
-          >
-            Zu deinem Haushalt
-          </Link>
-        </p>
-      </Screen>
-    );
-  }
-
+  // Wer schon einen Haushalt hat, tritt trotzdem bei — Emil zeigt bis auf
+  // Weiteres weiter den älteren (siehe requireHousehold()). Den überzähligen
+  // wieder loszuwerden ist Sache von /einstellungen/haushalt, deshalb landet
+  // man danach genau dort statt auf /liste.
   return (
     <Screen title="Einladung" tabbar={false}>
-      <JoinHousehold code={code} />
+      {existing.length > 0 && (
+        <Notice tone="info">
+          Du bist schon in „{existing[0].name}“. Nach dem Beitritt zeigt Emil
+          weiter diesen Haushalt — in den Einstellungen kannst du den, den du
+          nicht mehr brauchst, verlassen.
+        </Notice>
+      )}
+      <JoinHousehold
+        code={code}
+        redirectTo={existing.length > 0 ? "/einstellungen/haushalt" : "/liste"}
+      />
     </Screen>
   );
 }

@@ -29,9 +29,10 @@ export interface Member {
 /**
  * Haushalte des angemeldeten Nutzers.
  *
- * In der Praxis genau einer — die Datenstruktur lässt aber mehrere zu, und
- * eine Abfrage, die stillschweigend den ersten nimmt, wäre später schwer zu
- * debuggen.
+ * Meistens genau einer. Mehrere kommen vor, solange jemand einer weiteren
+ * Einladung folgt, ohne den alten Haushalt vorher zu verlassen — `/liste`
+ * & Co. zeigen dann weiter den ältesten (siehe `requireHousehold()`), bis
+ * `leaveHousehold()` den überzähligen aufräumt.
  */
 export async function listHouseholds(
   supabase: SupabaseClient,
@@ -145,5 +146,20 @@ export async function revokeInvite(
   code: string,
 ): Promise<Result> {
   const { error } = await supabase.from("invites").delete().eq("code", code);
+  return error ? fail(dataErrorMessage(error)) : ok(undefined);
+}
+
+/**
+ * Einen Haushalt verlassen. Ist danach niemand mehr Mitglied, löscht die
+ * Funktion ihn gleich mit — per Kaskade samt Rezepten, Einkaufsliste und
+ * Aufgaben (siehe leave_household in 0023_haushalt_verlassen.sql).
+ */
+export async function leaveHousehold(
+  supabase: SupabaseClient,
+  householdId: string,
+): Promise<Result> {
+  const { error } = await supabase.rpc("leave_household", {
+    p_household_id: householdId,
+  });
   return error ? fail(dataErrorMessage(error)) : ok(undefined);
 }
