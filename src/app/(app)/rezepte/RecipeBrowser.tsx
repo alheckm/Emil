@@ -229,7 +229,7 @@ export function RecipeBrowser({
 
   return (
     <div data-pending={searching ? "" : undefined}>
-      <div className="flex items-center justify-between px-5 pt-1 pb-3.5">
+      <div className="flex items-center justify-between px-5 pb-3.5">
         <span className="flex items-center gap-2">
           <EmilMark size={30} />
           <span className="font-display text-[22px] font-bold tracking-[-0.01em]">

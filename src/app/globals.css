@@ -89,10 +89,10 @@ body {
 }
 
 /* Safe-Area-Helfer für den Standalone-Modus (Notch oben, Home-Indikator
-   unten). DESIGN.md reserviert oben fest 52px, kein simulierter
-   Statusbalken — auf echten Geräten darf `env()` diesen Mindestwert
-   überschreiben (Dynamic Island etc.), nie unterschreiten. */
-@utility pt-safe { padding-top: max(52px, env(safe-area-inset-top)); }
+   unten). Oben zählt der echte `env()`-Wert des Geräts (47px Notch, 59px
+   Dynamic Island) — 16px sind nur der Fallback für Browser-Tab/Android/
+   Desktop, die keinen eigenen Inset liefern. Kein simulierter Statusbalken. */
+@utility pt-safe { padding-top: max(16px, env(safe-area-inset-top)); }
 @utility pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
 @utility px-safe {
   padding-left: max(1.25rem, env(safe-area-inset-left));

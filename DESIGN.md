@@ -77,8 +77,10 @@ ohne Strukturänderung — beide Systeme liegen im Design-Canvas nebeneinander.
 ## Abstand & Form
 
 Raster: 4-px-Basis. Häufige Stufen: 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 32.
-Seitenränder durchgängig 20 px. Safe-Area oben 52 px reserviert, kein
-simulierter Statusbalken.
+Seitenränder durchgängig 20 px. Safe-Area oben folgt `env(safe-area-inset-top)`
+des Geräts (47 px Notch, 59 px Dynamic Island), 16 px nur als Fallback für
+Browser-Tab/Android/Desktop ohne eigenen Inset — kein erfundener fester
+Aufschlag, kein simulierter Statusbalken.
 
 Radien: 999 px (Pillen: Buttons, Chips, Avatare, Tabbar), 12–16 px
 (Eingabefelder, Karten, Leer-/Fehlerzustand), 0 (Fotos im Feed und im
