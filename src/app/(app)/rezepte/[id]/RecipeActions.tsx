@@ -13,7 +13,7 @@ import {
   type RecipeNutrition,
 } from "@/lib/data/recipes";
 import { addRecipeToList, removeRecipeFromList } from "@/lib/data/shoppingList";
-import { CheckIcon, PlusIcon } from "@/components/icons";
+import { CheckIcon, MinusIcon, PlusIcon } from "@/components/icons";
 import { Button, Notice } from "@/components/ui";
 
 /**
@@ -133,16 +133,16 @@ export function RecipeIngredientsAndSteps({
 
   return (
     <>
-      <section className="px-5 pb-6 pt-5">
+      <section className="px-5 pb-6">
       {error && (
         <div className="mb-4">
           <Notice tone="error">{error}</Notice>
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-4 border-b-2 border-text pb-3">
-        <span className="text-[10.5px] font-extrabold tracking-[0.1em] uppercase">
-          Portionen
+      <div className="flex items-center justify-between gap-4">
+        <span className="font-display text-[15px] font-bold text-text">
+          Zutaten
         </span>
         <ServingStepper
           value={servings}
@@ -151,11 +151,7 @@ export function RecipeIngredientsAndSteps({
         />
       </div>
 
-      <h2 className="mt-6 text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
-        Zutaten
-      </h2>
-
-      <ul className="mt-3 divide-y divide-border">
+      <ul className="mt-2 divide-y divide-border">
         {recipe.ingredients.map((line, index) => {
           const previous = recipe.ingredients[index - 1];
           const showGroup =
@@ -169,25 +165,22 @@ export function RecipeIngredientsAndSteps({
           return (
             <li key={line.id}>
               {showGroup && (
-                <p className="pt-4 pb-1 text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
+                <p className="pt-4 pb-1 text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
                   {line.groupLabel}
                 </p>
               )}
-              {/* Der Name steht links in Versalien, die Menge rechtsbündig
-                  gedeckt — untereinander gelesen sind so alle Zahlen an
-                  derselben Kante, und beim Umrechnen springt nichts. */}
-              <div className="flex items-baseline justify-between gap-3 py-2.5">
-                <span className="min-w-0 text-[14.5px] font-bold tracking-[0.01em] uppercase">
+              {/* Menge links in fester Spaltenbreite (tabellarisch), Name
+                  rechts daneben — DESIGN.md „Liste/Zahlen": „Menge 14px
+                  tabellarisch (fixe Spaltenbreite) · Name 15px proportional". */}
+              <div className="tabular flex items-baseline gap-3.5 py-[11px]">
+                <span className="w-[68px] shrink-0 text-[14px] text-muted">
+                  {text || (line.toTaste ? "etwas" : "")}
+                </span>
+                <span className="min-w-0 text-[15px] text-text">
                   {line.ingredientName ?? line.rawText}
                   {line.note && (
-                    <span className="text-[13px] font-normal text-muted normal-case">
-                      {" "}
-                      ({line.note})
-                    </span>
+                    <span className="text-[13px] text-muted"> ({line.note})</span>
                   )}
-                </span>
-                <span className="shrink-0 text-[12.5px] font-extrabold tracking-[0.02em] text-muted uppercase tabular-nums">
-                  {text || (line.toTaste ? "etwas" : "")}
                 </span>
               </div>
             </li>
@@ -218,32 +211,27 @@ export function RecipeIngredientsAndSteps({
  * und Zubereitung, nur durch Haarlinien zwischen den Zeilen gegliedert.
  */
 function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
-  const rows: [string, string][] = [
-    ["Kalorien", `${nutrition.kcal} kcal`],
-    ["Eiweiß", `${nutrition.proteinG} g`],
-    ["Kohlenhydrate", `${nutrition.carbsG} g`],
-    ["Fett", `${nutrition.fatG} g`],
+  const stats: [string, string][] = [
+    [String(nutrition.kcal), "kcal"],
+    [`${nutrition.proteinG} g`, "Eiweiß"],
+    [`${nutrition.fatG} g`, "Fett"],
+    [`${nutrition.carbsG} g`, "Kohlenhydrate"],
   ];
 
   return (
-    <section className="px-5 pb-6">
-      <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
-        Nährwerte
-      </h2>
-      <p className="mt-1 text-[13px] text-muted">Pro Portion</p>
-      <dl className="mt-3">
-        {rows.map(([label, value]) => (
-          <div
-            key={label}
-            className="flex items-center justify-between border-t border-border py-3 text-[15px]"
-          >
-            <dt>{label}</dt>
-            <dd className="font-extrabold tracking-[0.02em] uppercase tabular-nums">
+    <section className="border-t border-border px-5 py-6">
+      <h2 className="font-display text-[15px] font-bold text-text">Nährwert</h2>
+      <p className="mt-1 text-[12.5px] text-muted">Pro Portion</p>
+      <div className="mt-4 flex">
+        {stats.map(([value, label]) => (
+          <div key={label} className="flex flex-1 flex-col items-center gap-[3px]">
+            <span className="tabular font-display text-[18px] font-bold text-text">
               {value}
-            </dd>
+            </span>
+            <span className="text-[11.5px] text-muted">{label}</span>
           </div>
         ))}
-      </dl>
+      </div>
     </section>
   );
 }
@@ -262,20 +250,20 @@ function NutritionTable({ nutrition }: { nutrition: RecipeNutrition }) {
  */
 function RecipeSteps({ steps }: { steps: string[] }) {
   return (
-    <section className="px-5 pb-6">
-      <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
-        Zubereitung
+    <section className="border-t border-border px-5 py-6">
+      <h2 className="mb-3.5 font-display text-[15px] font-bold text-text">
+        Anleitung
       </h2>
-      <ol className="mt-4 space-y-4">
+      <ol className="space-y-[18px]">
         {steps.map((step, index) => (
-          <li key={index} className="flex gap-4">
+          <li key={index} className="flex gap-3.5">
             <span
               aria-hidden
-              className="flex size-6 shrink-0 items-center justify-center rounded-soft bg-accent font-display text-[13px] font-bold text-accent-ink"
+              className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-accent text-[13px] font-bold text-accent-ink"
             >
               {index + 1}
             </span>
-            <span className="min-w-0 text-[15px] leading-[1.55]">{step}</span>
+            <span className="min-w-0 pt-0.5 text-[15px] leading-[1.55]">{step}</span>
           </li>
         ))}
       </ol>
@@ -304,30 +292,30 @@ function ServingStepper({
   onChange: (next: number) => void;
 }) {
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-2.5">
       <StepperButton
         label="Eine Portion weniger"
         disabled={value <= 1}
         onClick={() => onChange(Math.max(1, value - 1))}
       >
-        –
+        <MinusIcon className="h-[13px] w-[13px]" strokeWidth={2.2} />
       </StepperButton>
+      {/* `key` sorgt dafür, dass die neue Zahl kurz aufblendet statt hart
+          umzuspringen — 150 ms, mehr wäre eine Animation. */}
       <span
         aria-live="polite"
-        className="min-w-[4.5rem] text-center text-[15px] font-medium"
+        className="tabular min-w-[66px] text-center text-[14px] font-semibold text-text"
       >
-        {/* `key` sorgt dafür, dass die neue Zahl kurz aufblendet statt hart
-            umzuspringen — 150 ms, mehr wäre eine Animation. */}
-        <span key={value} className="count-swap text-[19px] font-black tabular-nums">
-          {value}
-        </span>{" "}
-        {label}
+        <span key={value} className="count-swap">
+          {value} {label}
+        </span>
       </span>
       <StepperButton
         label="Eine Portion mehr"
+        accent
         onClick={() => onChange(value + 1)}
       >
-        +
+        <PlusIcon className="h-[13px] w-[13px]" strokeWidth={2.2} />
       </StepperButton>
     </div>
   );
@@ -336,11 +324,13 @@ function ServingStepper({
 function StepperButton({
   label,
   disabled,
+  accent,
   onClick,
   children,
 }: {
   label: string;
   disabled?: boolean;
+  accent?: boolean;
   onClick: () => void;
   children: React.ReactNode;
 }) {
@@ -350,9 +340,16 @@ function StepperButton({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="flex h-11 w-11 items-center justify-center text-[19px] font-extrabold press-flat tap-target disabled:opacity-30"
+      className="flex h-11 w-11 items-center justify-center press-flat tap-target disabled:opacity-30"
     >
-      {children}
+      <span
+        className={
+          "flex h-[30px] w-[30px] items-center justify-center rounded-full border " +
+          (accent ? "border-accent bg-accent text-accent-ink" : "border-border text-text")
+        }
+      >
+        {children}
+      </span>
     </button>
   );
 }
@@ -464,7 +461,7 @@ export function DeleteRecipe({
           disabled={deleting}
           onClick={() => (ask ? void onDelete() : setAsk(true))}
           className={
-            "min-h-11 px-4 text-[13px] font-bold tracking-[0.04em] uppercase press tap-target " +
+            "min-h-11 rounded-pill px-4 text-[14px] font-semibold press tap-target " +
             "disabled:opacity-50 " +
             // Leise über Größe und Position, nicht über Blässe: `--muted`
             // wäre hier korrekt lesbar, zöge aber die Aufmerksamkeit auf

@@ -4,8 +4,8 @@ import { startTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getBrowserSupabase } from "@/lib/client/supabase";
 import { addTodo, setTodoDone, type Todo } from "@/lib/data/todos";
-import { CheckIcon } from "@/components/icons";
-import { Notice, Section } from "@/components/ui";
+import { CheckIcon, PlusIcon } from "@/components/icons";
+import { Notice } from "@/components/ui";
 
 /**
  * Die Todo-Liste.
@@ -122,32 +122,46 @@ export function TodoView({
   ];
 
   return (
-    <div className="space-y-6">
-      {error && <Notice tone="error">{error}</Notice>}
+    <div className="space-y-1">
+      {error && (
+        <div className="pb-5">
+          <Notice tone="error">{error}</Notice>
+        </div>
+      )}
 
-      <Section>
+      {/* „Etwas hinzufügen"-Zeile (DESIGN.md): kein schwebender Button —
+          inline erste Zeile der Liste, gestricheltes „+". */}
+      <div className="flex items-center gap-3.5 border-b border-border py-3.5">
+        <span
+          aria-hidden
+          className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-dashed border-inactive"
+        >
+          <PlusIcon className="h-[13px] w-[13px] text-muted" strokeWidth={2.4} />
+        </span>
+        <label htmlFor="add-task-input" className="sr-only">
+          Aufgabe ergänzen
+        </label>
         <input
+          id="add-task-input"
           aria-label="Aufgabe ergänzen"
           value={text}
           onChange={(event) => setText(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter") addByHand();
           }}
-          placeholder="Aufgabe ergänzen"
+          placeholder="Etwas hinzufügen"
           autoCapitalize="sentences"
           enterKeyHint="done"
-          className="h-11 w-full border-0 border-b-2 border-text bg-transparent px-0 text-base font-semibold text-text outline-none placeholder:text-muted/50 focus:border-b-[3px]"
+          className="h-11 min-w-0 flex-1 bg-transparent text-base text-text outline-none placeholder:text-muted"
         />
-      </Section>
+      </div>
 
       {openItems.length === 0 ? (
-        <Section>
-          <p className="text-[15px] leading-relaxed text-muted">
-            Nichts zu tun. Trag oben etwas ein.
-          </p>
-        </Section>
+        <p className="pt-5 text-[15px] leading-relaxed text-muted">
+          Nichts zu tun. Trag oben etwas ein.
+        </p>
       ) : (
-        <ul className="space-y-2">
+        <ul>
           {openItems.map((todo) => (
             <TodoRow key={todo.id} todo={todo} done={false} onToggle={toggle} />
           ))}
@@ -155,11 +169,11 @@ export function TodoView({
       )}
 
       {doneItems.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
+        <section className="pt-5">
+          <h2 className="pb-1 text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
             Erledigt
           </h2>
-          <ul className="space-y-2">
+          <ul>
             {doneItems.map((todo) => (
               <TodoRow key={todo.id} todo={todo} done onToggle={toggle} />
             ))}
@@ -180,31 +194,29 @@ function TodoRow({
   onToggle: (todo: Todo) => void;
 }) {
   return (
-    <li>
+    <li className="flex items-center gap-3.5 border-b border-border py-3.5">
       <button
         type="button"
         onClick={() => onToggle(todo)}
         aria-pressed={done}
-        className="flex min-h-14 w-full items-center gap-3 rounded-soft bg-soft px-4 py-3 text-left press-flat tap-target"
+        aria-label={
+          (done ? "Als offen markieren: " : "Als erledigt markieren: ") + todo.text
+        }
+        className={
+          "flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full press-flat tap-target " +
+          (done ? "bg-accent" : "border-[1.5px] border-inactive")
+        }
       >
-        <span
-          aria-hidden
-          className={
-            "flex h-6 w-6 shrink-0 items-center justify-center rounded-pill " +
-            (done ? "bg-accent text-accent-ink" : "border border-border")
-          }
-        >
-          {done && <CheckIcon className="h-3.5 w-3.5" strokeWidth={2.25} />}
-        </span>
-        <span
-          className={
-            "min-w-0 flex-1 break-words text-[15px] " +
-            (done ? "text-muted line-through" : "text-text")
-          }
-        >
-          {todo.text}
-        </span>
+        {done && <CheckIcon className="h-[13px] w-[13px] text-accent-ink" strokeWidth={3} />}
       </button>
+      <span
+        className={
+          "min-w-0 flex-1 text-[15px] " +
+          (done ? "text-muted line-through" : "text-text")
+        }
+      >
+        {todo.text}
+      </span>
     </li>
   );
 }

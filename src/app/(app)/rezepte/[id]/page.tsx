@@ -83,34 +83,33 @@ async function RecipeDetail({ params }: { params: Params }) {
         )}
       </RecipeHero>
 
-      {/* Titel und Kenndaten stehen jetzt unter dem Foto, auf `--bg` — nicht
-          mehr darauf. 44px statt der Root-Tab-Display-Größe (56px): eigene,
-          etwas kleinere Stufe für den Rezept-Screen, der darunter noch
-          Stepper, Zutaten und Zubereitung unterbringen muss. */}
-      <div className="px-5 pt-5">
+      {/* Titel und Kenndaten stehen unter dem Foto, auf `--bg` — nicht mehr
+          darauf (DESIGN.md „Rezeptdetail": „titel" 20px Unbounded). */}
+      <div className="px-5 pt-[18px]">
         <h1
           lang="de"
-          className="font-display text-[44px] leading-[1.02] font-black tracking-[-0.01em] text-text uppercase [hyphens:auto] [text-wrap:balance]"
+          className="font-display text-[20px] leading-[1.3] font-bold text-text [hyphens:auto] [text-wrap:balance]"
         >
           {value.title}
         </h1>
-        {(value.totalTimeMin || value.tags.length > 0) && (
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {value.totalTimeMin && (
-              <li className="border border-border px-3 py-1 text-[11px] font-bold tracking-[0.08em] uppercase">
-                {value.totalTimeMin} Min
-              </li>
-            )}
+        {value.totalTimeMin && (
+          <p className="tabular mt-2 text-[13px] text-muted">
+            {value.totalTimeMin} Min
+          </p>
+        )}
+        {value.tags.length > 0 && (
+          <ul className="mt-3.5 flex flex-wrap gap-2">
             {value.tags.map((tag) => (
               <li
                 key={tag}
-                className="border border-border px-3 py-1 text-[11px] font-bold tracking-[0.08em] uppercase"
+                className="flex h-7 items-center rounded-pill border border-border px-3 text-[12px] font-semibold text-text"
               >
                 {tag}
               </li>
             ))}
           </ul>
         )}
+        <div className="mt-5 h-px bg-border" />
       </div>
 
       <ListAwareIngredients recipe={value} />
