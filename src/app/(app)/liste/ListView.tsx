@@ -24,8 +24,9 @@ import {
   type Category,
   type ListEntry,
 } from "@/lib/data/shoppingList";
-import { Button, Section, Select, Notice } from "@/components/ui";
-import { CloseIcon } from "@/components/icons";
+import { Button, Select, Notice } from "@/components/ui";
+import { CheckIcon, CloseIcon, PlusIcon } from "@/components/icons";
+import { categoryRingColor } from "@/lib/core/categoryColor";
 
 // Wie lange eine frisch abgehakte Kachel an ihrem Platz stehen bleibt, bevor
 // sie in den Abschnitt „Eingekauft" wandert — lang genug, um das eigene
@@ -500,6 +501,7 @@ export function ListView({
     const amount = amountNow[entry.id] ?? entry.amount;
     const { text } = formatAmount(amount, entry.mergeUnit);
     const src = ingredientImage(entry.name);
+    const ring = categoryRingColor(entry.categoryId);
     const menge = [
       text,
       entry.hasUnquantified ? (text ? "+ etwas" : "etwas") : "",
@@ -508,89 +510,80 @@ export function ListView({
       .join(" ");
 
     return (
-      <li key={entry.id} className="relative">
-        <div className="flex h-full flex-col overflow-hidden rounded-tile bg-chip">
-          <button
-            type="button"
-            aria-pressed={checked}
-            onPointerDown={() => startPress(entry.id)}
-            onPointerUp={cancelPress}
-            onPointerLeave={cancelPress}
-            onPointerCancel={cancelPress}
-            onContextMenu={(event) => event.preventDefault()}
-            onClick={() => tap(entry)}
-            className="flex select-none flex-col press-flat tap-target touch-manipulation"
+      <li key={entry.id} className="flex flex-col items-center gap-[7px]">
+        <button
+          type="button"
+          aria-pressed={checked}
+          onPointerDown={() => startPress(entry.id)}
+          onPointerUp={cancelPress}
+          onPointerLeave={cancelPress}
+          onPointerCancel={cancelPress}
+          onContextMenu={(event) => event.preventDefault()}
+          onClick={() => tap(entry)}
+          className="relative block aspect-square w-full select-none press-flat tap-target touch-manipulation"
+        >
+          {/* Story-Ring-Mechanik (DESIGN.md, Signature-Element): der farbige
+              Ring um die Zutat wird grau, sobald sie erledigt ist, mit einem
+              Haken zentriert auf dem gedimmten Foto — nie als Ecken-Badge. */}
+          <span
+            className="flex h-full w-full items-center justify-center rounded-full p-[2.5px]"
+            style={{ background: checked ? "var(--border)" : ring }}
           >
-            <span className="relative block aspect-square w-full p-3">
-              <span
-                className={
-                  "flex h-full w-full items-center justify-center overflow-hidden rounded-full " +
-                  // Abgehakt wird das Bild blass, das Häkchen
-                  // darüber bleibt kräftig — sonst verschwindet
-                  // genau die Rückmeldung mit, auf die man wartet.
-                  (checked ? "opacity-40" : "")
-                }
-              >
-                {src ? (
-                  /* Kein next/image: die Datei liegt schon in genau
-                     der Größe im public-Ordner, in der sie gebraucht
-                     wird. Der Optimierer hätte hier nichts zu tun
-                     und käme nur als zusätzliche Runde dazu. */
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={src}
-                    alt=""
-                    width={192}
-                    height={192}
-                    loading="lazy"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <span
-                    aria-hidden
-                    className="text-[24px] font-medium text-muted"
-                  >
-                    {entry.name.slice(0, 1).toUpperCase()}
-                  </span>
-                )}
-              </span>
-
-              {checked && (
-                <span className="absolute inset-0 flex items-center justify-center">
-                  <span
-                    aria-hidden
-                    className="flex h-9 w-9 items-center justify-center rounded-pill bg-accent text-[17px] text-accent-ink"
-                  >
-                    ✓
-                  </span>
+            <span
+              className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-full border-[2.5px] border-card"
+              style={{ background: ring, opacity: checked ? 0.45 : 1 }}
+            >
+              {src ? (
+                /* Kein next/image: die Datei liegt schon in genau der
+                   Größe im public-Ordner, in der sie gebraucht wird. */
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={src}
+                  alt=""
+                  width={192}
+                  height={192}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span aria-hidden className="text-[24px] font-bold text-white/70">
+                  {entry.name.slice(0, 1).toUpperCase()}
                 </span>
               )}
             </span>
 
-            <span className="w-full px-2 pt-1 pb-2 text-center">
-              <span
-                className={
-                  "block text-[12px] font-bold tracking-[0.01em] uppercase leading-tight " +
-                  (checked ? "text-muted line-through" : "")
-                }
-              >
-                {entry.name}
+            {checked && (
+              <span className="absolute inset-0 flex items-center justify-center">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full border-[2.5px] border-card bg-accent">
+                  <CheckIcon className="h-[17px] w-[17px] text-accent-ink" strokeWidth={3} />
+                </span>
               </span>
-              {/* Immer gerendert, notfalls unsichtbar: sonst wird
-                  eine Kachel ohne Menge einen Zeile kürzer als ihre
-                  Nachbarn in derselben Reihe. */}
-              <span
-                className={
-                  "mt-0.5 block text-[11px] font-bold uppercase tracking-[0.02em] text-muted leading-tight " +
-                  (menge ? "" : "invisible") +
-                  (checked ? " line-through" : "")
-                }
-              >
-                {menge || " "}
-              </span>
-            </span>
-          </button>
-        </div>
+            )}
+          </span>
+        </button>
+
+        <span className="w-full text-center">
+          <span
+            className={
+              "block text-[13px] leading-tight font-semibold text-text " +
+              (checked ? "text-muted line-through" : "")
+            }
+          >
+            {entry.name}
+          </span>
+          {/* Immer gerendert, notfalls unsichtbar: sonst wird eine Kachel
+              ohne Menge eine Zeile kürzer als ihre Nachbarn in derselben
+              Reihe. */}
+          <span
+            className={
+              "tabular mt-0.5 block text-[12px] leading-tight text-muted " +
+              (menge ? "" : "invisible") +
+              (checked ? " line-through" : "")
+            }
+          >
+            {menge || " "}
+          </span>
+        </span>
       </li>
     );
   }
@@ -619,12 +612,12 @@ export function ListView({
           aria-modal="true"
           aria-label={entry.name}
           onClick={(event) => event.stopPropagation()}
-          className="relative w-full max-w-md border-t border-border bg-card px-5 pt-2.5 pb-safe"
+          className="relative w-full max-w-md rounded-t-[20px] bg-card px-5 pt-2.5 pb-safe"
         >
-          <div aria-hidden className="mx-auto mb-3 h-1 w-9 bg-border" />
+          <div aria-hidden className="mx-auto mb-3 h-1 w-9 rounded-pill bg-border" />
 
           <div className="flex items-center justify-between">
-            <h2 className="text-[17px] font-extrabold uppercase">
+            <h2 className="font-display text-[17px] font-bold text-text">
               {entry.name}
             </h2>
             <button
@@ -640,7 +633,7 @@ export function ListView({
           <div className="space-y-4 pt-2 pb-6 text-left">
             {steppable && (
               <div className="flex items-center justify-between border-t border-border py-3">
-                <span className="text-[13px] font-bold tracking-[0.04em] uppercase">
+                <span className="text-[13px] font-semibold text-text">
                   Menge
                 </span>
                 <AmountStepper
@@ -738,48 +731,59 @@ export function ListView({
         </Notice>
       )}
 
-      <Section>
+      <p className="tabular text-[13px] text-muted">
+        {openCount + adding.length === 0
+          ? "Alles abgehakt"
+          : `Noch ${openCount + adding.length} von ${
+              visibleEntries.length + adding.length
+            } erledigt`}
+      </p>
+
+      {/* „Etwas hinzufügen"-Zeile (DESIGN.md): kein schwebender Button —
+          inline erste Zeile der Liste, gestricheltes „+", echtes <input> mit
+          zugehörigem <label>. */}
+      <div className="-mt-2 flex items-center gap-3.5">
+        <span
+          aria-hidden
+          className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-dashed border-inactive"
+        >
+          <PlusIcon className="h-[13px] w-[13px] text-muted" strokeWidth={2.4} />
+        </span>
+        <label htmlFor="add-item-input" className="sr-only">
+          Zutat hinzufügen
+        </label>
         <input
-          aria-label="Etwas ergänzen"
+          id="add-item-input"
+          aria-label="Zutat hinzufügen"
           value={entryText}
           onChange={(event) => setEntryText(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter") addByHand();
           }}
-          placeholder="Etwas ergänzen"
+          placeholder="Zutat hinzufügen"
           autoCapitalize="sentences"
           enterKeyHint="done"
-          className="h-11 w-full border-0 border-b-2 border-text bg-transparent px-0 text-base font-semibold text-text outline-none placeholder:text-muted/50 focus:border-b-[3px]"
+          className="h-11 min-w-0 flex-1 bg-transparent text-base text-text outline-none placeholder:text-muted"
         />
-      </Section>
+      </div>
 
-      {visibleEntries.length + adding.length === 0 ? (
-        <Section>
-          <p className="text-[15px] leading-relaxed text-muted">
-            Die Liste ist leer. Leg ein Rezept auf die Liste oder ergänze etwas
-            von Hand.
-          </p>
-        </Section>
-      ) : (
-        <p className="text-[11px] font-bold tracking-[0.06em] text-muted uppercase">
-          {openCount + adding.length === 0
-            ? "Alles abgehakt"
-            : `Noch ${openCount + adding.length} von ${
-                visibleEntries.length + adding.length
-              }`}
+      {visibleEntries.length + adding.length === 0 && (
+        <p className="text-[15px] leading-relaxed text-muted">
+          Die Liste ist leer. Leg ein Rezept auf die Liste oder ergänze etwas
+          von Hand.
         </p>
       )}
 
       {adding.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
+          <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
             Wird ergänzt
           </h2>
-          <ul className="grid grid-cols-3 gap-x-2 gap-y-3">
+          <ul className="grid grid-cols-3 gap-x-3.5 gap-y-5">
             {adding.map((item) => (
-              <li key={item.id} className="flex flex-col items-center gap-2 opacity-50">
-                <span className="aspect-square w-full bg-chip" />
-                <span className="w-full text-center text-[12px] font-bold uppercase leading-tight">
+              <li key={item.id} className="flex flex-col items-center gap-[7px] opacity-50">
+                <span className="aspect-square w-full rounded-full bg-soft" />
+                <span className="w-full text-center text-[13px] leading-tight font-semibold">
                   {item.label}
                 </span>
               </li>
@@ -788,16 +792,16 @@ export function ListView({
         </section>
       )}
 
-      <ul className="grid grid-cols-3 items-start gap-x-2 gap-y-3">
+      <ul className="grid grid-cols-3 items-start gap-x-3.5 gap-y-5">
         {openEntries.map(renderEntry)}
       </ul>
 
       {stockCheckEntries.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
+          <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
             Noch vorrätig?
           </h2>
-          <ul className="grid grid-cols-3 items-start gap-x-2 gap-y-3">
+          <ul className="grid grid-cols-3 items-start gap-x-3.5 gap-y-5">
             {stockCheckEntries.map(renderEntry)}
           </ul>
         </section>
@@ -805,10 +809,10 @@ export function ListView({
 
       {checkedEntries.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-[12px] font-extrabold tracking-[0.12em] text-muted uppercase">
+          <h2 className="text-[12px] font-bold tracking-[0.06em] text-muted uppercase">
             Eingekauft
           </h2>
-          <ul className="grid grid-cols-3 items-start gap-x-2 gap-y-3">
+          <ul className="grid grid-cols-3 items-start gap-x-3.5 gap-y-5">
             {checkedEntries.map(renderEntry)}
           </ul>
         </section>
