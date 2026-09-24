@@ -182,9 +182,12 @@ Kachelraster — bewusst kantig, wie bei Instagram).
   dauerhaften Platz über der Tabbar.
 - Pille wie das Suchfeld auf Home (siehe Eingabefeld oben), nicht mehr
   gestricheltes „+" mit freistehendem Feld (2026-09-24).
-- Direkt darunter, nicht darüber: „Noch X von Y erledigt" / „Alles abgehakt"
-  bzw. „Alles erledigt" — gehört zur selben Handlung wie das Ergänzen, auf
-  beiden Screens gleich (Aufgaben hatte vorher gar keinen Fortschritt).
+- Direkt darunter, nicht darüber: „X von Y erledigt" / „Alles abgehakt" bzw.
+  „Alles erledigt" — gehört zur selben Handlung wie das Ergänzen, auf beiden
+  Screens gleich (Aufgaben hatte vorher gar keinen Fortschritt). X zählt die
+  bereits erledigten Einträge (nicht die offenen — das stand vorher verkehrt
+  herum: bei 0 erledigten Einträgen sagte der Text fälschlich "Noch 2 von 2
+  erledigt").
 
 **Leer-/Fehlerzustand**
 - Card auf `surface`-Hintergrund, 16 px Radius, Icon 34 px in

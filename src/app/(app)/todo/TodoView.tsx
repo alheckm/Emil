@@ -193,12 +193,12 @@ export function TodoView({
             className="h-11 w-full rounded-pill bg-border pr-4 pl-11 text-base text-text outline-none placeholder:text-muted"
           />
         </div>
-        <p className="tabular pl-1 text-[13px] text-muted">
+        <p className="tabular pl-4 text-[13px] text-muted">
           {openItems.length === 0
             ? doneItems.length === 0
               ? "Nichts zu tun"
               : "Alles erledigt"
-            : `Noch ${openItems.length} von ${
+            : `${doneItems.length} von ${
                 openItems.length + doneItems.length
               } erledigt`}
         </p>

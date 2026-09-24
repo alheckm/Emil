@@ -753,10 +753,10 @@ export function ListView({
             className="h-11 w-full rounded-pill bg-border pr-4 pl-11 text-base text-text outline-none placeholder:text-muted"
           />
         </div>
-        <p className="tabular pl-1 text-[13px] text-muted">
+        <p className="tabular pl-4 text-[13px] text-muted">
           {openCount + adding.length === 0
             ? "Alles abgehakt"
-            : `Noch ${openCount + adding.length} von ${
+            : `${visibleEntries.length - openCount} von ${
                 visibleEntries.length + adding.length
               } erledigt`}
         </p>
