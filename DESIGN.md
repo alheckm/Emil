@@ -194,6 +194,36 @@ Kachelraster — bewusst kantig, wie bei Instagram).
   `inkInactive`/`signal`, Titel in der `abschnitt`-Stufe, Erklärung als
   `caption`, ein Button darunter.
 
+**Konto** (2026-09-24: ein Screen statt Verteilerseite + Formular-Unterseite)
+- Profilkopf: Avatar 64 px, Klarname als `abschnitt`-Stufe, E-Mail als
+  `caption` darunter, „Bearbeiten" rechts (→ „Profil bearbeiten", eigener
+  Screen: Avatar 96 px zentriert, Foto ändern/entfernen als Textknöpfe,
+  Name-Feld, E-Mail nur lesbar, eine Speichern-Pille). Fehlt der Klarname,
+  wird die E-Mail zum Titel und die Zeile darunter zu „Namen hinzufügen"
+  (Link) statt die E-Mail doppelt zu zeigen.
+- **`SettingsRow`/`SettingsRowButton`**: die Zeile aus dem Konto-Artboard
+  verallgemeinert — 52 px, optionaler Slot links (Avatar oder Icon in
+  gestricheltem Kreis), Label, optionaler Zusatz rechts, Chevron; Variante
+  `danger` (Konto löschen) ohne Chevron, weil sie selbst die letzte Zeile
+  eines Abschnitts ist. Ersetzt das bisher auf Konto und Haushalt duplizierte
+  Eyebrow-`<h2>` auch durch eine gemeinsame **`SectionEyebrow`**.
+- **Haushalt-Zeile**: Mitgliederkreise (32 px) plus „Jemanden einladen" im
+  gestrichelten Kreis mit „+", führt auf `/einstellungen/haushalt`.
+  Darüber der **Haushalts-Wechsler**: ein Knopf mit dem Haushaltsnamen
+  (`abschnitt`-Stufe) und Chevron-Down öffnet ein natives Bottom-Sheet
+  (`<dialog>`, `class="sheet"` in globals.css) — Haushalte mit
+  Eigentümer:in/Mitglied-Label und Haken beim aktiven, darunter „Neuen
+  Haushalt anlegen" (inline im Sheet) und „Haushalt beitreten" (→
+  `/einstellungen/haushalt`). 220 ms `ease-out` über `@starting-style`,
+  `prefers-reduced-motion` schaltet die Animation ab. Grund für den
+  Wechsler: Rezepte, Einkaufsliste und Aufgaben hängen am Haushalt, nicht an
+  der Person — wer in mehreren ist, soll wechseln statt verlassen müssen.
+- **Abweichungen vom Canvas-Artboard `Konto.dc.html`**: kein
+  „Benachrichtigungen" (gibt es in emil nicht), zusätzlich eine
+  Datenschutz-Zeile, „Konto löschen" führt auf eine eigene Unterseite
+  (`/einstellungen/konto/loeschen`) statt auf eine graue Karte im Hub. Das
+  Artboard selbst ist dadurch veraltet und wurde bewusst nicht angeglichen.
+
 ## Niemals
 
 - Keine Systemschrift (SF Pro / `-apple-system`) — immer Public Sans /
