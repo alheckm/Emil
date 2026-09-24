@@ -2,40 +2,21 @@
 
 ## Gestaltung — vor jeder Änderung an der Oberfläche
 
-**Aktuelle Richtung: „Maison Augé"** (entschieden 2026-09-23, über
-`/app-art-director`). Das ist eine bewusste, vom Nutzer bestätigte Abweichung
-von der älteren Fliederblau/Karten-Richtung. `docs/design-system.md` und
-`docs/app_redesign.jpg` sind deshalb gelöscht — sie beschrieben die alte
-Richtung und wären als Referenz irreführend.
+**Keine festgeschriebene Richtung aktuell.** Frühere Design-Dokumente
+(`docs/design-system.md`, `docs/app_redesign.jpg`, `DESIGN.md`,
+`HANDOFF-maison-auge.md`) wurden am 2026-09-24 auf Nutzerwunsch gelöscht —
+Neustart. Wer etwas unter `src/app/`, `src/components/` oder an
+`src/app/globals.css` anfasst, ohne dass eine neue Richtung entschieden ist,
+sollte zuerst über den Skill `app-art-director` (bzw. `design`) eine Richtung
+festlegen lassen, statt aus dem Gedächtnis oder aus Code-Konventionen zu
+improvisieren.
 
-**`DESIGN.md`** im Repo-Root ist die verbindliche Quelle (von
-`impeccable-documenter` aus dem fertigen Code abgeleitet, nicht aus Absicht) —
-Tokens, Typo-Skala, Komponenten-Zustände, Do's/Don'ts. `HANDOFF-maison-auge.md`
-bleibt als Entstehungsgeschichte und Artefakt-Links daneben stehen, ist aber
-nicht mehr die primäre Quelle. Wer etwas unter `src/app/`, `src/components/`
-oder an `src/app/globals.css` anfasst, liest `DESIGN.md` vorher — der Skill
-`design` verweist darauf.
+Direction-unabhängige Untergrenzen, die trotzdem immer gelten:
 
-Die Regeln, die am schnellsten verloren gehen:
-
-- **Nur Tokens.** Farbe, Radius kommen aus `globals.css`. Kein Hex-Wert im
-  Komponentencode.
-- **Radius überall 0px** — das Signature-Element dieser Richtung, ohne
-  Ausnahme im gebauten Code (auch der Web/Einfügen-Umschalter im
-  Import-Screen ist selbst gezeichnet, keine native Segmented Control).
-- **`--card` fällt mit `--bg` zusammen.** Flächen trennen sich über
-  `--border` (Haarlinie), nicht über Schatten — `--shadow-card` ist `none`.
-- **`--accent` fällt mit `--text` zusammen** — kein separater Markenton mehr.
-  CTAs sind Navy-Flächen. Fehler/Löschen laufen über `--danger`.
-- **Eine einzige Schriftfamilie** (Hanken Grotesk), Hierarchie nur über
-  Gewicht/Größe, nicht über Genre oder Kursive.
-- **Kein Dark Mode.** Die Referenz zeigt nur Hell.
-- **Keine pulsierenden Skelette, keine Emojis als Symbole, keine Systemschrift.**
-- 16 px Schrift in Eingabefeldern (sonst zoomt iOS hinein), 44 px
-  Trefferfläche, 15 px Fließtext — diese Untergrenzen gelten unabhängig von
-  der Design-Richtung.
-
-Bewegung: 120–250 ms, `ease-out`, `prefers-reduced-motion` immer mitbedacht.
+- 16 px Schrift in Eingabefeldern (sonst zoomt iOS hinein).
+- 44 px Trefferfläche, 15 px Fließtext.
+- Bewegung: 120–250 ms, `ease-out`, `prefers-reduced-motion` immer mitbedacht.
+- Keine pulsierenden Skelette, keine Emojis als Symbole, keine Systemschrift.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
