@@ -21,11 +21,11 @@ import { HomeIcon, BagIcon, ChecklistIcon } from "@/components/icons";
  * Nutzer-Avatar, kein generisches Icon.
  *
  * Aktiv/inaktiv unterscheidet sich laut Entwurf **nicht** über die Iconfarbe
- * (die bleibt überall `--text`) — Signal ist ein runder `--soft`-Hintergrund
- * hinter dem Icon (Instagram-Vorbild statt Punkt darunter, 2026-09-24). Das
- * erlaubt eine dünnere Leiste, weil kein Platz mehr für einen Punkt unter dem
- * Icon reserviert werden muss, und der Konto-Kreis sitzt dadurch mittig statt
- * nach oben verschoben.
+ * (die bleibt überall `--text`) — Signal ist ein runder Hintergrund
+ * (`bg-tabbar-active`, siehe globals.css) hinter dem Icon (Instagram-Vorbild
+ * statt Punkt darunter, 2026-09-24). Das erlaubt eine dünnere Leiste, weil
+ * kein Platz mehr für einen Punkt unter dem Icon reserviert werden muss, und
+ * der Konto-Kreis sitzt dadurch mittig statt nach oben verschoben.
  *
  * Der Kern gegen die gefühlte Trägheit ist `useOptimistic`: der angetippte Tab
  * wird im selben Frame aktiv, statt erst wenn der Server geantwortet hat.
@@ -75,7 +75,7 @@ function Frame({
                 onClick={() => onSelect?.(href)}
                 className={
                   "flex h-11 w-11 items-center justify-center rounded-full press-flat tap-target " +
-                  (current ? "bg-soft" : "")
+                  (current ? "bg-tabbar-active" : "")
                 }
               >
                 <Icon className="h-[22px] w-[22px] text-text" />
@@ -91,7 +91,7 @@ function Frame({
             onClick={() => onSelect?.("/einstellungen")}
             className={
               "flex h-11 w-11 items-center justify-center rounded-full press-flat tap-target " +
-              (kontoActive ? "bg-soft" : "")
+              (kontoActive ? "bg-tabbar-active" : "")
             }
           >
             <span

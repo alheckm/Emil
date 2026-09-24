@@ -339,3 +339,11 @@ select,
   box-shadow: 0 8px 28px rgba(21, 22, 26, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.6);
 }
+
+/* Runder Hintergrund hinter dem aktiven Tabbar-Icon (TabBar.tsx). Schwarz statt
+   `--soft`, weil `--soft` (#f7f7f7) auf dem Milchglas kaum Kontrast zeigt —
+   die Deckkraft ist so gewählt, dass es auf dem Glas erkennbar grau, aber
+   nicht dunkler als nötig wirkt. */
+@utility bg-tabbar-active {
+  background: rgba(0, 0, 0, 0.08);
+}
