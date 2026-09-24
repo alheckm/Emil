@@ -8,10 +8,10 @@ Haushalts-Kochassistenten, mit eigener Typografie statt Systemschrift.
 Referenzwelt: die aktuelle Instagram-iOS-App (Grundlayout und Verhalten,
 nicht die Farbmarke).
 
-Signature-Element: Die Story-Ring-Mechanik aus Instagram wird zum
-Erledigt-Zustand der Einkaufsliste — der farbige Ring um jede Zutat wird grau,
-sobald sie erledigt ist, mit einem Haken zentriert auf dem gedimmten Foto
-(nicht als Ecken-Badge).
+Signature-Element: Die Kreis-Zutatenbilder der Einkaufsliste, im
+Instagram-Story-Raster angeordnet (nicht der farbige Story-Ring selbst — der
+ist seit 2026-09-24 wieder raus, siehe unten). Erledigt wird durch Dimmen des
+Fotos plus zentriertem Haken markiert, nicht als Ecken-Badge.
 
 ## Prinzipien
 
@@ -116,8 +116,9 @@ Kachelraster — bewusst kantig, wie bei Instagram).
 **Checkbox/Auswahl-Kreis** (Einkaufsliste, Aufgaben)
 - Offen: 1.5 px `inkInactive`-Ring, transparent.
 - Erledigt: `accent`-gefüllt, weißer Haken. Bei Foto-Kreisen (Einkaufsliste
-  „Kreise"): äußerer Ring wird `line`-grau (Story-Ring-Mechanik), Haken sitzt
-  zentriert auf dem gedimmten Foto — nie als Ecken-Badge.
+  „Kreise"): kein Ring mehr um das Foto (Story-Ring-Mechanik entfernt,
+  2026-09-24) — das Foto selbst bleibt rund, dimmt beim Abhaken, Haken sitzt
+  zentriert darauf — nie als Ecken-Badge.
 
 **Tag/Chip**
 - Filter-Chip (Home): 34 px hoch, `line`-Rahmen, aktiver Zustand

@@ -6,8 +6,8 @@
 Source of Truth ist `DESIGN.md` plus der darin verlinkte Design-Canvas
 (Screens, Typografie- und Komponenten-Specimen). Der komplette Rebuild von
 `src/app/`, `src/components/` und `src/app/globals.css` auf diese Richtung ist
-umgesetzt (Tokens, Home-Feed, Rezeptdetail, Einkaufsliste als Story-Ring-
-Kreise, Aufgaben, Konto, Import). Wer die Oberfläche weiter anfasst, hält sich
+umgesetzt (Tokens, Home-Feed, Rezeptdetail, Einkaufsliste als Foto-Kreise im
+Story-Raster, Aufgaben, Konto, Import). Wer die Oberfläche weiter anfasst, hält sich
 an `DESIGN.md`, statt aus Gedächtnis oder alten Code-Konventionen (Maison
 Augé, radiuslos, Versalien) zu improvisieren. Nur wenn der Nutzer ausdrücklich
 eine neue Richtung will, geht es über den Skill `app-art-director` (bzw.

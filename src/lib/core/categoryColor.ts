@@ -1,6 +1,8 @@
 /**
- * Ring-/Kachelfarbe je Abteilung — Story-Ring-Mechanik der Einkaufsliste
- * (DESIGN.md, Signature-Element). Der Design-Canvas hat nur drei Abteilungen
+ * Kreisfarbe je Abteilung — Hintergrund der Foto-Kreise auf der Einkaufsliste
+ * (DESIGN.md, Signature-Element), sichtbar hinter transparenten Bildkanten
+ * und als Grund für den Buchstaben-Avatar ohne Foto. Der Design-Canvas hat
+ * nur drei Abteilungen
  * exakt durchgefärbt (Obst & Gemüse, Milchprodukte, Trockenwaren); die echten
  * Abteilungen (`listCategories`) sind Stammdaten und können mehr oder andere
  * sein. Statt eine Zuordnung an konkrete Datenbank-IDs zu hängen, die beim

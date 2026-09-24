@@ -15,7 +15,7 @@
  *   Inhalt erscheint.
  *
  * Maßgleich mit den echten Screens der Instagram-Baseline-Richtung
- * (DESIGN.md): Story-Ring-Kreise für die Einkaufsliste, randloses Foto für
+ * (DESIGN.md): Foto-Kreise für die Einkaufsliste, randloses Foto für
  * Feed/Rezeptdetail — kein eckiger Kasten mehr.
  *
  * `aria-hidden` und `role="status"`: Screenreader sollen „lädt" hören, nicht
@@ -88,7 +88,7 @@ export function TodoSkeleton({ rows = 6 }: { rows?: number }) {
 }
 
 /**
- * Einkaufsliste: Story-Ring-Kreise im 3er-Raster — maßgleich mit
+ * Einkaufsliste: Foto-Kreise im 3er-Raster — maßgleich mit
  * `renderEntry` (ListView.tsx).
  */
 export function ShoppingListSkeleton({ rows = 9 }: { rows?: number }) {

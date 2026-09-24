@@ -522,44 +522,38 @@ export function ListView({
           onClick={() => tap(entry)}
           className="relative block aspect-square w-full select-none press-flat tap-target touch-manipulation"
         >
-          {/* Story-Ring-Mechanik (DESIGN.md, Signature-Element): der farbige
-              Ring um die Zutat wird grau, sobald sie erledigt ist, mit einem
-              Haken zentriert auf dem gedimmten Foto — nie als Ecken-Badge. */}
+          {/* Erledigt-Zustand (DESIGN.md): das Foto dimmt, ein Haken sitzt
+              zentriert darüber — kein farbiger Ring mehr, nur der Kreis. */}
           <span
-            className="flex h-full w-full items-center justify-center rounded-full p-[2.5px]"
-            style={{ background: checked ? "var(--border)" : ring }}
+            className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-full"
+            style={{ background: ring, opacity: checked ? 0.45 : 1 }}
           >
-            <span
-              className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-full border-[2.5px] border-card"
-              style={{ background: ring, opacity: checked ? 0.45 : 1 }}
-            >
-              {src ? (
-                /* Kein next/image: die Datei liegt schon in genau der
-                   Größe im public-Ordner, in der sie gebraucht wird. */
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={src}
-                  alt=""
-                  width={192}
-                  height={192}
-                  loading="lazy"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span aria-hidden className="text-[24px] font-bold text-white/70">
-                  {entry.name.slice(0, 1).toUpperCase()}
-                </span>
-              )}
-            </span>
-
-            {checked && (
-              <span className="absolute inset-0 flex items-center justify-center">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full border-[2.5px] border-card bg-accent">
-                  <CheckIcon className="h-[17px] w-[17px] text-accent-ink" strokeWidth={3} />
-                </span>
+            {src ? (
+              /* Kein next/image: die Datei liegt schon in genau der
+                 Größe im public-Ordner, in der sie gebraucht wird. */
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={src}
+                alt=""
+                width={192}
+                height={192}
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span aria-hidden className="text-[24px] font-bold text-white/70">
+                {entry.name.slice(0, 1).toUpperCase()}
               </span>
             )}
           </span>
+
+          {checked && (
+            <span className="absolute inset-0 flex items-center justify-center">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full border-[2.5px] border-card bg-accent">
+                <CheckIcon className="h-[17px] w-[17px] text-accent-ink" strokeWidth={3} />
+              </span>
+            </span>
+          )}
         </button>
 
         <span className="w-full text-center">
