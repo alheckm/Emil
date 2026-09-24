@@ -147,9 +147,7 @@ export function RecipeImageField({
 
   return (
     <div className="space-y-2">
-      <span className="block text-[10px] font-extrabold tracking-[0.08em] text-muted uppercase">
-        Bild
-      </span>
+      <span className="block text-[12.5px] font-medium text-muted">Bild</span>
 
       {cropSrc ? (
         <ImageCropper
@@ -171,14 +169,14 @@ export function RecipeImageField({
             <img
               src={shown}
               alt=""
-              className="aspect-[4/3] w-full rounded-soft object-cover"
+              className="aspect-[4/3] w-full rounded-card object-cover"
             />
           )}
 
           <div className="flex gap-2">
             <label
               htmlFor={inputId}
-              className="flex h-13 flex-1 cursor-pointer items-center justify-center gap-2.5 border-2 border-text px-6 text-[13px] font-extrabold tracking-[0.1em] text-text uppercase press"
+              className="flex h-12 flex-1 cursor-pointer items-center justify-center gap-2 rounded-pill border border-text px-6 text-[15px] font-semibold text-text press"
             >
               {busy
                 ? "Wird verkleinert"
@@ -194,14 +192,14 @@ export function RecipeImageField({
                 type="button"
                 onClick={() => void openCrop()}
                 disabled={cropLoading}
-                className="min-h-11 text-[13px] font-extrabold tracking-[0.1em] text-text uppercase press-flat tap-target disabled:opacity-30"
+                className="min-h-11 text-[14px] font-semibold text-text press-flat tap-target disabled:opacity-30"
               >
                 {cropLoading ? "Wird geladen" : "Zuschneiden"}
               </button>
               <button
                 type="button"
                 onClick={remove}
-                className="min-h-11 text-[13px] font-extrabold tracking-[0.1em] text-muted uppercase press-flat tap-target"
+                className="min-h-11 text-[14px] font-semibold text-muted press-flat tap-target"
               >
                 Entfernen
               </button>

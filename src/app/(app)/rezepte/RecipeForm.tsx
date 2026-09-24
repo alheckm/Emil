@@ -19,6 +19,7 @@ import { refreshRecipeOnLists } from "@/lib/data/shoppingList";
 import { removeRecipeImage, uploadRecipeImage } from "@/lib/data/recipeImages";
 import { RecipeImageField, type ImageChange } from "./RecipeImageField";
 import { Button, Section, Field, Notice, Textarea } from "@/components/ui";
+import { CloseIcon } from "@/components/icons";
 
 /**
  * Rezept anlegen und ändern — und zugleich der Prüf-Screen.
@@ -387,14 +388,17 @@ export function RecipeForm({
             return (
               <div
                 key={row.key}
-                className={"p-3 " + (unsure ? "border border-warn" : "bg-soft")}
+                className={
+                  "rounded-card p-3.5 " +
+                  (unsure ? "border border-warn" : "bg-soft")
+                }
               >
                 {row.groupLabel && (
                   <p className="mb-2 text-[11px] font-bold tracking-[0.06em] text-muted uppercase">
                     {row.groupLabel}
                   </p>
                 )}
-                <div className="flex items-center gap-2 border-b-2 border-text pb-1.5">
+                <div className="flex items-center gap-2">
                   <input
                     aria-label="Zutat"
                     value={row.name}
@@ -403,7 +407,7 @@ export function RecipeForm({
                     }
                     placeholder="Zutat"
                     autoCapitalize="sentences"
-                    className="min-w-0 flex-1 bg-transparent text-base font-semibold text-text outline-none placeholder:text-muted/50"
+                    className="h-11 min-w-0 flex-1 bg-transparent text-base text-text outline-none placeholder:text-muted"
                   />
                   <button
                     type="button"
@@ -415,10 +419,10 @@ export function RecipeForm({
                     }
                     className="flex h-11 w-11 shrink-0 items-center justify-center text-muted press-flat tap-target"
                   >
-                    ✕
+                    <CloseIcon className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="mt-3 flex gap-3">
+                <div className="flex gap-2 border-t border-border pt-1">
                   <input
                     aria-label="Menge"
                     value={row.amount}
@@ -427,7 +431,7 @@ export function RecipeForm({
                     }
                     placeholder="Menge"
                     inputMode="decimal"
-                    className="h-11 w-20 shrink-0 border-0 border-b-2 border-text bg-transparent text-base font-semibold text-text outline-none placeholder:text-muted/50"
+                    className="h-11 w-16 min-w-0 shrink-0 bg-transparent text-base text-text outline-none placeholder:text-muted"
                   />
                   <select
                     aria-label="Einheit"
@@ -435,7 +439,7 @@ export function RecipeForm({
                     onChange={(event) =>
                       updateRow(row.key, { unitCode: event.target.value })
                     }
-                    className="h-11 w-24 shrink-0 appearance-none border-0 border-b-2 border-text bg-transparent text-base font-semibold text-text outline-none"
+                    className="h-11 w-20 shrink-0 appearance-none bg-transparent text-base text-text outline-none"
                   >
                     <option value="">ohne</option>
                     {UNITS.map((unit) => (
@@ -451,7 +455,7 @@ export function RecipeForm({
                       updateRow(row.key, { note: event.target.value })
                     }
                     placeholder="Notiz"
-                    className="h-11 min-w-0 flex-1 border-0 border-b-2 border-text bg-transparent text-base font-semibold text-text outline-none placeholder:text-muted/50"
+                    className="h-11 min-w-0 flex-1 bg-transparent text-base text-text outline-none placeholder:text-muted"
                   />
                 </div>
                 {unsure && (

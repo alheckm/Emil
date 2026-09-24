@@ -169,7 +169,7 @@ export function ImportPanel({
 
   return (
     <div className="space-y-6">
-      <div role="tablist" className="flex gap-2">
+      <div role="tablist" className="flex gap-1 rounded-pill bg-soft p-1">
         <TabButton active={tab === "web"} onClick={() => setTab("web")}>
           Webseite
         </TabButton>
@@ -267,14 +267,10 @@ function TabButton({
       aria-selected={active}
       onClick={onClick}
       className={
-        // Reine Auswahl-Markierung, kein Fehler: dieselbe Fläche wie die
-        // aktive Schlagwort-Pille in RecipeBrowser.tsx, nicht `--accent` (das
-        // ist jetzt die Markenfarbe für Aktionen, keine allgemeine
-        // Hervorhebung) und nicht `--danger` (kein Fehlerzustand).
-        "min-h-11 flex-1 border px-4 text-[12px] font-bold tracking-[0.06em] uppercase " +
+        "min-h-11 flex-1 rounded-pill px-4 text-[13px] font-semibold press-flat tap-target " +
         (active
-          ? "border-text bg-text text-card"
-          : "border-border text-muted")
+          ? "bg-card text-text shadow-[0_1px_3px_rgba(0,0,0,0.12)]"
+          : "text-muted")
       }
     >
       {children}
