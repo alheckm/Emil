@@ -25,6 +25,7 @@ export const SUBJECTS = {
   // ── Obst & Gemüse ────────────────────────────────────────────────────────
   "Zwiebel": "a whole yellow onion", "Rote Zwiebel": "a whole red onion",
   "Schalotte": "two brown shallots", "Frühlingszwiebel": "a bunch of spring onions",
+  "Lauchzwiebel": "a bunch of spring onions",
   "Knoblauch": "a whole garlic bulb", "Knoblauchzehe": "a single garlic clove",
   "Karotte": "a fresh carrot with green top",
   "Möhre": "two fresh carrots", "Kartoffel": "a raw potato", "Süßkartoffel": "a raw sweet potato",
@@ -111,7 +112,8 @@ export const SUBJECTS = {
   "Räuchertofu": "a block of smoked tofu", "Blätterteig": "a roll of puff pastry",
   "Pizzateig": "a ball of pizza dough", "Pizza": "a whole baked pizza with melted cheese and toppings",
   "Hafermilch": GLASS("oat milk"),
-  "Sojamilch": GLASS("soy milk"), "Mandelmilch": GLASS("almond milk"), "Hummus": BOWL("hummus"),
+  "Sojamilch": GLASS("soy milk"), "Mandelmilch": GLASS("almond milk"),
+  "Dinkel-Mandel-Drink": GLASS("spelt and almond milk drink"), "Hummus": BOWL("hummus"),
 
   // ── Tiefkühl ─────────────────────────────────────────────────────────────
   "TK-Erbsen": BOWL("frozen green peas"), "TK-Spinat": BOWL("frozen spinach"),
@@ -131,7 +133,8 @@ export const SUBJECTS = {
   "Sardellen": JAR("anchovy fillets"), "Erdnussbutter": JAR("peanut butter"),
   "Marmelade": JAR("strawberry jam"), "Honig": JAR("golden honey"), "Apfelmus": BOWL("apple sauce"),
   "Pesto": JAR("green basil pesto"), "Ajvar": JAR("red ajvar paste"),
-  "Gemüsebrühe": BOWL("vegetable broth"), "Rinderbrühe": BOWL("beef broth"),
+  "Gemüsebrühe": BOWL("vegetable broth"), "Gemüsebrühepulver": BOWL("vegetable broth powder"),
+  "Rinderbrühe": BOWL("beef broth"),
   "Hühnerbrühe": BOWL("chicken broth"), "Brühe": BOWL("clear broth"), "Fond": JAR("dark stock"),
   "Kalbsfond": JAR("veal stock"),
   "Tomatensauce": JAR("tomato sauce"), "Sardinen": "an open tin of sardines",
@@ -193,7 +196,7 @@ export const SUBJECTS = {
   "Currypaste": JAR("red curry paste"), "Olivenöl": JAR("green olive oil"),
   "Rapsöl": JAR("rapeseed oil"), "Sonnenblumenöl": JAR("sunflower oil"),
   "Sesamöl": JAR("sesame oil"), "Kokosöl": JAR("solid coconut oil"), "Essig": JAR("clear vinegar"),
-  "Bratöl": JAR("neutral cooking oil"),
+  "Bratöl": JAR("neutral cooking oil"), "Brat- oder mildes Olivenöl": JAR("neutral cooking oil"),
   "Balsamico": JAR("dark balsamic vinegar"), "Weißweinessig": JAR("white wine vinegar"),
   "Apfelessig": JAR("apple cider vinegar"), "Senf": JAR("yellow mustard"),
   "Dijonsenf": JAR("dijon mustard"), "Ketchup": JAR("tomato ketchup"),
@@ -243,7 +246,7 @@ export const SUBJECTS = {
 export const COLORS = {
   // ── Obst & Gemüse ────────────────────────────────────────────────────────
   "Zwiebel": "yellow", "Rote Zwiebel": "red", "Schalotte": "orange",
-  "Frühlingszwiebel": "green", "Knoblauch": "yellow", "Knoblauchzehe": "yellow",
+  "Frühlingszwiebel": "green", "Lauchzwiebel": "green", "Knoblauch": "yellow", "Knoblauchzehe": "yellow",
   "Karotte": "orange", "Möhre": "orange", "Kartoffel": "orange", "Süßkartoffel": "orange",
   "Tomate": "red", "Cherrytomate": "red", "Paprika": "red", "Zucchini": "green",
   "Aubergine": "purple", "Gurke": "green", "Lauch": "green", "Staudensellerie": "green",
@@ -294,7 +297,8 @@ export const COLORS = {
   "Mascarpone": "yellow", "Gorgonzola": "yellow", "Camembert": "yellow", "Brie": "yellow",
   "Halloumi": "yellow", "Reibekäse": "yellow", "Frische Hefe": "orange", "Tofu": "yellow",
   "Räuchertofu": "orange", "Blätterteig": "yellow", "Pizzateig": "yellow", "Pizza": "red",
-  "Hafermilch": "yellow", "Sojamilch": "yellow", "Mandelmilch": "yellow", "Hummus": "yellow",
+  "Hafermilch": "yellow", "Sojamilch": "yellow", "Mandelmilch": "yellow",
+  "Dinkel-Mandel-Drink": "yellow", "Hummus": "yellow",
 
   // ── Tiefkühl ─────────────────────────────────────────────────────────────
   "TK-Erbsen": "green", "TK-Spinat": "green", "TK-Blattspinat": "green",
@@ -309,7 +313,8 @@ export const COLORS = {
   "Oliven": "green", "Kapern": "green", "Gewürzgurken": "green", "Sauerkraut": "yellow",
   "Rotkohl (Glas)": "purple", "Thunfisch (Dose)": "yellow", "Sardellen": "orange",
   "Erdnussbutter": "orange", "Marmelade": "red", "Honig": "yellow", "Apfelmus": "yellow",
-  "Pesto": "green", "Ajvar": "red", "Gemüsebrühe": "yellow", "Rinderbrühe": "orange",
+  "Pesto": "green", "Ajvar": "red", "Gemüsebrühe": "yellow", "Gemüsebrühepulver": "yellow",
+  "Rinderbrühe": "orange",
   "Hühnerbrühe": "yellow", "Brühe": "yellow", "Fond": "orange", "Kalbsfond": "orange",
   "Tomatensauce": "red", "Sardinen": "yellow",
 
@@ -348,7 +353,8 @@ export const COLORS = {
   "Getrockneter Thymian": "green", "Getrockneter Rosmarin": "green", "Majoran": "green",
   "Italienische Kräuter": "green", "Kräuter der Provence": "green", "Currypaste": "red",
   "Olivenöl": "green", "Rapsöl": "yellow", "Sonnenblumenöl": "yellow", "Sesamöl": "yellow",
-  "Kokosöl": "yellow", "Essig": "yellow", "Bratöl": "yellow", "Balsamico": "orange",
+  "Kokosöl": "yellow", "Essig": "yellow", "Bratöl": "yellow",
+  "Brat- oder mildes Olivenöl": "yellow", "Balsamico": "orange",
   "Weißweinessig": "yellow", "Apfelessig": "yellow", "Senf": "yellow", "Dijonsenf": "yellow",
   "Ketchup": "red", "Mayonnaise": "yellow", "Sojasauce": "orange", "Fischsauce": "orange",
   "Worcestershiresauce": "orange", "Tabasco": "red", "Sriracha": "red", "Harissa": "red",
