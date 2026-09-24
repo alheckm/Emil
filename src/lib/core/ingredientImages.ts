@@ -214,6 +214,7 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Lorbeerblätter": "lorbeerblaetter",
   "Wacholderbeere": "wacholderbeere",
   "Bratöl": "bratoel",
+  "Brat- oder mildes Olivenöl": "brat-oder-mildes-olivenoel",
   "Gemahlener Kreuzkümmel": "gemahlener-kreuzkuemmel",
   "Wasser": "wasser",
   "Orangensaft": "orangensaft",
