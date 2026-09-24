@@ -135,12 +135,15 @@ Kachelraster — bewusst kantig, wie bei Instagram).
   Mengen als dritte Darstellung zu erfinden (2026-09-24). Vier Kreise, 68 px,
   je ein Wert (kcal, Eiweiß, Fett, Kohlenhydrate) zentriert, Label darunter
   wie bei den Foto-Kreisen.
-- Farben fix aus der gedeckten Palette von `categoryColor.ts`, nicht gehasht
-  — dieselben vier Nährwerte stehen immer in derselben Reihenfolge, jeder
-  bekommt eine feste Farbe (kcal Terrakotta `#B3927A`, Eiweiß Salbeigrün
-  `#8C9A7B`, Fett Ocker `#B79A6B`, Kohlenhydrate Salbeiblau `#8FA3A8`).
-- Text in `text` (dunkel), nicht Weiß — die Palette ist zu hell für weißen
-  Text in Fettschrift.
+- Farben fix, an dieselbe Farbfamilie wie `categoryColor.ts` angelehnt aber
+  abgedunkelt statt pastellig, nicht gehasht — dieselben vier Nährwerte
+  stehen immer in derselben Reihenfolge, jeder bekommt eine feste Farbe (kcal
+  Terrakotta `#8A5A3E`, Eiweiß Salbeigrün `#556B45`, Fett Ocker `#8C6A32`,
+  Kohlenhydrate Salbeiblau `#4F6E73`) — dunkel genug für weißen Text in
+  Fettschrift (Kontrast ≥ 4.5:1).
+- Text weiß, nicht `text` — auf den abgedunkelten Kreisen der bessere
+  Kontrast (2026-09-24: erst dunkler Text auf helleren Tönen versucht, auf
+  Nutzerwunsch getauscht).
 
 **Tag/Chip**
 - Filter-Chip (Home): 34 px hoch, `line`-Rahmen, aktiver Zustand
