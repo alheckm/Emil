@@ -42,7 +42,7 @@ export function StartForms() {
     }
 
     router.refresh();
-    router.replace("/haushalt");
+    router.replace("/liste");
   }
 
   return (

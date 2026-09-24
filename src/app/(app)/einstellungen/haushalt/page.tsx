@@ -41,7 +41,8 @@ export default function HouseholdPage() {
           Einladen
         </h2>
         <p className="mt-1 text-[15px] leading-relaxed text-muted">
-          Ein Code gilt 14 Tage und lässt sich einmal einlösen.
+          Ein Code gilt 14 Tage und lässt sich einmal einlösen — geteilt als
+          Link, muss er nicht abgetippt werden.
         </p>
         <div className="mt-4">
           <Suspense fallback={<RowsSkeleton rows={1} />}>

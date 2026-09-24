@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getBrowserSupabase } from "@/lib/client/supabase";
 import { createInvite, revokeInvite } from "@/lib/data/households";
 import { Button, Notice } from "@/components/ui";
+import { ShareIcon } from "@/components/icons";
 
 interface OpenInvite {
   code: string;
@@ -59,6 +60,32 @@ export function InviteSection({
     }
   }
 
+  /**
+   * Teilt den Link, nicht den nackten Code — wer draufklickt, ist danach im
+   * Haushalt, ohne acht Zeichen abzutippen.
+   *
+   * `navigator.share()` steht direkt im Klick-Handler, ohne `await` davor:
+   * iOS erlaubt den Freigabedialog nur innerhalb der Geste, die ihn ausgelöst
+   * hat — ein Netzwerk-Zwischenschritt (etwa ein neuer Code) davor ließe ihn
+   * mit „NotAllowedError" scheitern.
+   */
+  function share(code: string) {
+    const url = `${window.location.origin}/beitreten/${code}`;
+    const text = "Tritt unserem Haushalt bei Emil bei:";
+
+    if (navigator.share) {
+      navigator.share({ title: "Emil – Einladung", text, url }).catch(() => {
+        // Abgebrochener Freigabedialog ist kein Fehler.
+      });
+      return;
+    }
+
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`,
+      "_blank",
+    );
+  }
+
   return (
     <div className="space-y-4">
       {error && <Notice tone="error">{error}</Notice>}
@@ -80,24 +107,34 @@ export function InviteSection({
                   year: "numeric",
                 })}
               </p>
-              <div className="mt-3 flex gap-3">
+              <div className="mt-3 space-y-2">
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={() => void copy(invite.code)}
+                  onClick={() => share(invite.code)}
                 >
-                  {copied === invite.code ? "Kopiert" : "Kopieren"}
+                  <ShareIcon className="h-4 w-4" />
+                  Teilen
                 </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={busy}
-                  onClick={() =>
-                    void withSupabase((supabase) => revokeInvite(supabase, invite.code))
-                  }
-                >
-                  Zurücknehmen
-                </Button>
+                <div className="flex gap-3">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => void copy(invite.code)}
+                  >
+                    {copied === invite.code ? "Kopiert" : "Code kopieren"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={busy}
+                    onClick={() =>
+                      void withSupabase((supabase) => revokeInvite(supabase, invite.code))
+                    }
+                  >
+                    Zurücknehmen
+                  </Button>
+                </div>
               </div>
             </li>
           ))}

@@ -5,7 +5,12 @@ import { getBrowserSupabase } from "@/lib/client/supabase";
 import { signUp } from "@/lib/data/auth";
 import { Button, Field, Notice } from "@/components/ui";
 
-export function RegisterForm() {
+export function RegisterForm({
+  next,
+}: {
+  /** Ziel nach der Bestätigungsmail — etwa zurück zu einer Einladung. */
+  next?: string;
+} = {}) {
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -31,11 +36,15 @@ export function RegisterForm() {
       return;
     }
 
+    const redirectTo = next
+      ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+      : `${window.location.origin}/auth/callback`;
+
     const result = await signUp(
       supabase,
       String(form.get("email") ?? ""),
       password,
-      `${window.location.origin}/auth/callback`,
+      redirectTo,
     );
 
     setBusy(false);
@@ -50,7 +59,8 @@ export function RegisterForm() {
     return (
       <Notice tone="ok">
         Fast geschafft. Wir haben dir eine E-Mail geschickt — öffne den Link
-        darin <strong>auf diesem Gerät</strong>, dann bist du angemeldet.
+        darin <strong>auf diesem Gerät</strong>, dann bist du angemeldet
+        {next ? " und trittst dem Haushalt bei" : ""}.
       </Notice>
     );
   }

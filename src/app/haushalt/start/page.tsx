@@ -29,7 +29,7 @@ export default async function HouseholdStartPage() {
   const supabase = await getServerSupabase();
   if (supabase) {
     const households = await listHouseholds(supabase);
-    if (households.ok && households.value.length > 0) redirect("/haushalt");
+    if (households.ok && households.value.length > 0) redirect("/liste");
   }
 
   return (

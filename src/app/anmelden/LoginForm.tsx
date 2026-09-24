@@ -6,7 +6,14 @@ import { getBrowserSupabase } from "@/lib/client/supabase";
 import { signIn } from "@/lib/data/auth";
 import { Button, Field, Notice } from "@/components/ui";
 
-export function LoginForm({ initialError }: { initialError?: string }) {
+export function LoginForm({
+  initialError,
+  next = "/",
+}: {
+  initialError?: string;
+  /** Ziel nach erfolgreicher Anmeldung — etwa zurück zu einer Einladung. */
+  next?: string;
+}) {
   const router = useRouter();
   const [error, setError] = useState(initialError ?? "");
   const [busy, setBusy] = useState(false);
@@ -36,10 +43,10 @@ export function LoginForm({ initialError }: { initialError?: string }) {
       return;
     }
 
-    // `refresh()` vor `replace()`: sonst zeigt der Server-Cache der Startseite
-    // noch den abgemeldeten Zustand, und man landet direkt wieder hier.
+    // `refresh()` vor `replace()`: sonst zeigt der Server-Cache des Ziels noch
+    // den abgemeldeten Zustand, und man landet direkt wieder hier.
     router.refresh();
-    router.replace("/");
+    router.replace(next);
   }
 
   // method="post": läuft das JavaScript nicht, schickt der Browser das
