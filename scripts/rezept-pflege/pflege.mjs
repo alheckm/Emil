@@ -44,6 +44,44 @@ function stepMarkerPositions(steps) {
   return [...positions];
 }
 
+/**
+ * Technische Sperre gegen genau den Fehler, den die Pflege am 2026-09-22 bei
+ * der Linsen-Curry-Suppe gemacht hat: eine Menge als Zahl in den Text
+ * geschrieben ("150 g Zwiebel") statt als {{z:N}}-Verweis. Die Regel dazu
+ * stand schon vorher in SKILL.md — sie wurde trotzdem nicht befolgt, darum
+ * jetzt zusätzlich hier erzwungen, statt sich nur auf den Prompt zu
+ * verlassen.
+ *
+ * Zählt Ziffernfolgen außerhalb von {{z:N}}-Verweisen vor und nach dem Patch.
+ * Jede Zahl, die neu auftaucht oder öfter vorkommt als vorher, wird abgelehnt
+ * — Zahlen entfernen (z. B. weil sie jetzt hinter einem Verweis stehen) bleibt
+ * erlaubt. Das lehnt nebenbei auch andere erfundene Zahlen ab (z. B. eine
+ * dazuerfundene Ofentemperatur), was zur Regel "keine Kochschritte erfinden"
+ * passt.
+ */
+function neueZahlenAusserhalbVonMarkern(vorherSteps, nachherSteps) {
+  const zaehleZahlen = (steps) => {
+    const ohneMarker = steps.map((step) => step.replace(/\{\{z:\d+\}\}/g, ""));
+    const zahlen = new Map();
+    for (const step of ohneMarker) {
+      for (const match of step.matchAll(/\d+(?:[.,]\d+)?/g)) {
+        zahlen.set(match[0], (zahlen.get(match[0]) ?? 0) + 1);
+      }
+    }
+    return zahlen;
+  };
+
+  const vorher = zaehleZahlen(vorherSteps ?? []);
+  const nachher = zaehleZahlen(nachherSteps);
+
+  const neu = [];
+  for (const [zahl, anzahlNachher] of nachher) {
+    const anzahlVorher = vorher.get(zahl) ?? 0;
+    if (anzahlNachher > anzahlVorher) neu.push(zahl);
+  }
+  return neu;
+}
+
 function loadEnv(path) {
   const env = {};
   for (const line of readFileSync(path, "utf8").split("\n")) {
@@ -275,6 +313,15 @@ async function cmdSchreibe(args) {
     const unbekannt = stepMarkerPositions(patch.instructions).filter((p) => !positions.has(p));
     if (unbekannt.length > 0) {
       fail(`Anleitung verweist auf unbekannte Zutaten-Position(en): ${unbekannt.join(", ")}`);
+    }
+
+    const neueZahlen = neueZahlenAusserhalbVonMarkern(recipe.instructions, patch.instructions);
+    if (neueZahlen.length > 0) {
+      fail(
+        `Anleitung enthält neue Zahl(en) außerhalb von {{z:N}}-Verweisen: ${neueZahlen.join(", ")}. ` +
+          "Mengen gehören als {{z:N}} in die Anleitung, nie als Zahl im Text — auch nicht als " +
+          "korrekt abgeschriebene Menge. Siehe SKILL.md, Abschnitt „Mengenverweise in der Anleitung“.",
+      );
     }
   }
 
