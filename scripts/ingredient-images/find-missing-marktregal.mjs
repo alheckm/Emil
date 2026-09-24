@@ -1,8 +1,15 @@
 /**
  * Gleicht die "durably used" Zutaten der Datenbank gegen die vorhandenen
- * Marktregal-Assets (public/zutaten-marktregal/) ab. Analog zu
- * find-missing.mjs, aber fuer die neue Bild-Familie (vollbild/grau/bold)
- * und mit einer anderen Scope-Definition — siehe unten.
+ * Marktregal-Assets (public/zutaten-marktregal/) ab — der Produktions-
+ * Einstieg des zutatenbilder-Skills (`npm run zutatenbilder`).
+ *
+ * `--generate`: ruft nach dem Abgleich automatisch generate-marktregal.py
+ * fuer alle Zutaten mit vorhandenem Bildmotiv auf (vollbild/grau/bold, die
+ * App nutzt aktuell nur -bold) und schreibt danach publish-map.mjs neu, damit
+ * ingredientImage() die frischen Bilder sofort findet. Zutaten ohne Bildmotiv
+ * ("braucht Agenten-Entscheidung") werden dabei NICHT generiert — die
+ * Alias/Skip/Neues-Motiv-Entscheidung bleibt Aufgabe des Agenten, der den
+ * Skill ausfuehrt (siehe SKILL.md), das laesst sich nicht skripten.
  *
  * Scope: "durably used", nicht bloss "aktuell in Rezept/Liste". Grund:
  * `set_entry_checked` (supabase/migrations/0016_abgehaktes_begrenzen.sql)
@@ -27,7 +34,9 @@
  */
 
 import { readFileSync, readdirSync } from "node:fs";
+import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 import { createClient } from "@supabase/supabase-js";
 import { SUBJECTS } from "./subjects.mjs";
 
@@ -126,4 +135,35 @@ if (withoutSubject.length) {
 
 if (!missing.length) {
   console.log("Alle durably-used Zutaten haben vollstaendige Marktregal-Assets.");
+}
+
+if (process.argv.includes("--generate") && withSubject.length) {
+  console.log(`\ngeneriere ${withSubject.length} Zutat(en) …`);
+  const python = homedir() + "/.mflux/venv/bin/python";
+  const names = withSubject.map((n) => aliases[n] ?? n).join(",");
+  const run = spawnSync(python, ["generate-marktregal.py", "--names", names], {
+    cwd: ROOT + "scripts/ingredient-images",
+    stdio: "inherit",
+  });
+  if (run.status !== 0) {
+    console.error("\ngenerate-marktregal.py fehlgeschlagen");
+    process.exit(run.status ?? 1);
+  }
+  const map = spawnSync(
+    "node",
+    ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "--experimental-strip-types", "publish-map.mjs"],
+    { cwd: ROOT + "scripts/ingredient-images", stdio: "inherit" },
+  );
+  if (map.status !== 0) process.exit(map.status ?? 1);
+
+  const rel = "src/lib/core/ingredientImages.ts";
+  spawnSync("git", ["add", "--", rel], { cwd: ROOT });
+  const staged = spawnSync("git", ["diff", "--cached", "--name-only", "--", rel], { cwd: ROOT });
+  if (staged.stdout.toString().trim()) {
+    spawnSync("git", ["commit", "-m", "ingredientImages.ts: neue Marktregal-Bilder aufgenommen", "--", rel], {
+      cwd: ROOT,
+      stdio: "inherit",
+    });
+    spawnSync("git", ["push"], { cwd: ROOT, stdio: "inherit" });
+  }
 }

@@ -123,12 +123,12 @@ Kachelraster — bewusst kantig, wie bei Instagram).
   2026-09-24) — das Foto selbst bleibt rund, dimmt beim Abhaken, Haken sitzt
   zentriert darauf — nie als Ecken-Badge.
 - Foto-Kreise ohne jeden Rahmen (2026-09-24): nur das Bild, kein Ring, kein
-  Rand, keine `border`. Das Zutatenbild wird dafür ca. 5 % größer als sein
-  Kreis-Container dargestellt (`scale-105` auf dem `<img>`) — die
-  Pastell-Chip-Pipeline füllt den Hintergrund nur bis ~94 % des
-  Kreisdurchmessers (`process.py`, `COVER`), der leichte Farbsaum am
-  äußersten Bildrand wird durch den Zoom aus dem sichtbaren Kreis
-  herausgeschnitten statt als grauer Saum sichtbar zu bleiben.
+  Rand, keine `border`. Bildquelle ist die Marktregal-Pipeline (Skill
+  `zutatenbilder`, `-bold`-Variante): echtes freigestelltes Studiofoto auf
+  kräftigem Farbgrund je Zutatenkategorie, `object-cover` croppt das
+  hochkant generierte Bild (768×1024) auf den Kreis — kein Zoom-Ausgleich
+  nötig, das Motiv steht laut Prompt bereits mittig mit Rand oben und unten.
+  Frühere Pastell-Chip-Pipeline (`process.py`) ist abgelöst und entfernt.
 
 **Nährwert-Kreise** (Rezeptdetail)
 - Nimmt das Kreis-Schema der Einkaufsliste noch einmal auf, statt Zutaten-

@@ -1,8 +1,0 @@
-{
-  "green": { "hex": "#D9EAD6", "prompt": "a soft pastel sage-green, almost white but clearly tinted" },
-  "yellow": { "hex": "#F7EBB8", "prompt": "a soft pastel warm yellow, almost white but clearly tinted" },
-  "orange": { "hex": "#F6DDBE", "prompt": "a soft pastel peachy orange, almost white but clearly tinted" },
-  "red": { "hex": "#F3D6D6", "prompt": "a soft pastel rose-red, almost white but clearly tinted" },
-  "blue": { "hex": "#D7E5F0", "prompt": "a soft pastel powder-blue, almost white but clearly tinted" },
-  "purple": { "hex": "#E4D8EC", "prompt": "a soft pastel mauve-purple, almost white but clearly tinted" }
-}

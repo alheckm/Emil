@@ -1,8 +1,10 @@
 """
-Produktions-Lauf der "Marktregal"-Bildpipeline (siehe DESIGN.md, noch nicht
-im echten App-Code, aber die Assets sollen schon bereitstehen, wenn die
-Oberflaeche kommt): erzeugt vollbild/grau/bold fuer die uebergebenen Zutaten
-und veroeffentlicht sie als WebP unter public/zutaten-marktregal/.
+Produktions-Lauf der "Marktregal"-Bildpipeline (siehe DESIGN.md): erzeugt
+vollbild/grau/bold fuer die uebergebenen Zutaten und veroeffentlicht sie als
+WebP unter public/zutaten-marktregal/. Die App nutzt aktuell nur die
+-bold-Variante als Foto-Kreis (Einkaufsliste); vollbild/grau werden
+mitgeneriert, weil sie fuer eine spaetere Kachel-Oberflaeche vorgesehen sind,
+aber noch nicht konsumiert werden.
 
 Nimmt an, dass subjects.mjs fuer jede Zutat schon ein Bildmotiv (SUBJECTS)
 und eine Farbkategorie (COLORS) hat — das zu pruefen/ergaenzen ist Aufgabe
@@ -18,10 +20,12 @@ Rohbild-Wiederverwendung, damit nichts doppelt durch mflux muss:
      scripts/ingredient-images/raw/ bei der Pastell-Pipeline: gitignored,
      nur die kleinen WebPs unter public/ gehoeren ins Repo).
 
-Keine Groessenanpassung, kein Zuschnitt — die Oberflaeche, die diese Bilder
-konsumiert, gibt es noch nicht. Reine Formatkonvertierung (WebP statt PNG),
-das ist der einzige verlustarme, reversible Schritt, der jetzt schon Sinn
-ergibt. Zuschnitt/Groesse kommt, wenn die Kachel-UI gebaut wird.
+Kein Zuschnitt beim Publizieren — die App croppt die -bold-Variante selbst
+per CSS (`object-cover`, rund) auf den Kreis, das erspart eine zweite
+Bildverarbeitung fuer dieselbe Aufgabe wie im Frontend. Nur eine Groessen-
+deckelung (MAX_EDGE) vor der WebP-Konvertierung, damit ein rohes 768x1024-Bild
+nicht unnoetig gross fuer einen kleinen Kreis/eine kleine Kachel ausgeliefert
+wird.
 
 Veroeffentlichen heisst hier: sobald ein einzelnes Bild fertig ist (egal ob
 wiederverwendet oder frisch generiert), wird es direkt als WebP geschrieben,
@@ -48,6 +52,9 @@ PUBLIC_DIR = ROOT / "public" / "zutaten-marktregal"
 ALIASES_FILE = Path(__file__).resolve().parent / "aliases.json"
 
 QUALITY = 88
+MAX_EDGE = 640  # deckt auch eine grosszuegige Retina-Kachel ab, mehr ist bei
+                # den kleinen Kreisen/Kacheln, die diese Bilder aktuell
+                # zeigen, verschwendete Bandbreite (rohe Bilder sind 768x1024)
 
 
 def resolve_aliases(names: list[str]) -> list[str]:
@@ -72,7 +79,11 @@ def to_webp(src: Path, dst: Path) -> None:
     from PIL import Image
 
     dst.parent.mkdir(parents=True, exist_ok=True)
-    Image.open(src).convert("RGB").save(dst, "WEBP", quality=QUALITY, method=6)
+    im = Image.open(src).convert("RGB")
+    if im.height > MAX_EDGE:
+        scale = MAX_EDGE / im.height
+        im = im.resize((round(im.width * scale), MAX_EDGE), Image.LANCZOS)
+    im.save(dst, "WEBP", quality=QUALITY, method=6)
 
 
 def git(*args: str) -> subprocess.CompletedProcess:

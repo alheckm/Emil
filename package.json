@@ -17,8 +17,8 @@
     "seed:stammdaten": "node scripts/generate-ingredients-seed.mjs",
     "seed": "npm run seed:units && npm run seed:stammdaten && npm run sql",
     "sql": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-setup-sql.mjs",
-    "zutatenbilder": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/ingredient-images/find-missing.mjs --scope=used --generate",
-    "zutatenbilder:marktregal": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/ingredient-images/find-missing-marktregal.mjs"
+    "zutatenbilder": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/ingredient-images/find-missing-marktregal.mjs --generate",
+    "zutatenbilder:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/ingredient-images/find-missing-marktregal.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

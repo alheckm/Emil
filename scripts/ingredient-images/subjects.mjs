@@ -9,17 +9,9 @@
  * Haufen Staub im Nichts. Das Gefäß ist absichtlich immer dasselbe weiße
  * Schälchen bzw. Glas — sonst wird die Reihe unruhig.
  */
-import { readFileSync } from "node:fs";
-
 const BOWL = (what) => `a small plain white ceramic bowl filled with ${what}`;
 const JAR = (what) => `a small clear glass jar of ${what}`;
 const GLASS = (what) => `a plain clear drinking glass of ${what}`;
-
-/** Sieben feste Pastelltöne — Werte + Prompt-Text stehen in palette.json,
- * damit process.py (Python) dieselben Hex-Werte liest wie hier. */
-export const PALETTE = JSON.parse(
-  readFileSync(new URL("./palette.json", import.meta.url), "utf8"),
-);
 
 export const SUBJECTS = {
   // ── Obst & Gemüse ────────────────────────────────────────────────────────
@@ -376,81 +368,3 @@ export const COLORS = {
 export function colorFor(name) {
   return COLORS[name] ?? "yellow";
 }
-
-/**
- * Komplementärpaare auf dem (vereinfachten Sechs-Ton-)Farbkreis.
- */
-export const COMPLEMENT = {
-  green: "red", red: "green",
-  yellow: "purple", purple: "yellow",
-  orange: "blue", blue: "orange",
-};
-
-/**
- * "same" = Hintergrund in der Eigenfarbe der Zutat (Banane auf Pastellgelb) —
- * entschieden nach Vergleich mit "complement" (Gegenton, z. B. Banane auf
- * Pastelllila): Eigenfarbe wirkt als Familie ruhiger, das war die Wahl.
- */
-export const BACKGROUND_MODE = "same";
-
-export function backgroundColorFor(name) {
-  const own = colorFor(name);
-  return BACKGROUND_MODE === "complement" ? COMPLEMENT[own] : own;
-}
-
-export function hexFor(name) {
-  return PALETTE[backgroundColorFor(name)].hex;
-}
-
-/**
- * Ein Template fuer alle: nur so sehen die Bilder wie eine Familie aus.
- * Fotorealistisch, freigestellt auf einem einfarbigen, hellen Pastellgrund
- * ohne Verlauf — die Farbe kommt fest aus COLORS/PALETTE, nicht vom Modell
- * geraten, damit gleichfarbige Zutaten (Tomate, Erdbeeren) denselben
- * Hintergrund bekommen.
- *
- * Hervorgegangen aus style-tests/tinted-master-prompt.py (siehe Git-Historie
- * fuer die verworfenen Zwischenstaende). Drei Punkte mussten gegen die
- * Trainingsgewohnheit des Modells gegengesteuert werden:
- * 1. Ohne "wie ein zentriertes App-Icon"-Vergleich rutscht das Motiv immer
- *    Richtung untere Bildhaelfte (gelernt aus Boden-Produktfotos) — deshalb
- *    Hochformat 3:4 mit explizitem Rand oben UND unten.
- * 2. Die Hintergrundfarbe muss als fertige Endfarbe benannt werden, nicht als
- *    Mischanweisung ("Basis X mit Farbe Y gemischt") — das brachte sichtbar
- *    Unruhe (Farbverlaeufe/Flecken) in den Hintergrund, vermutlich weil
- *    "Basis + mischen" zwei widerspruechliche Anweisungen im selben Satz
- *    sind. Der PALETTE-Text ist deshalb schon die fertige Formulierung.
- * 3. "floats"/"floats in the vertical middle" (fruehere Fassung) wurde vom
- *    Modell bei manchen Zutaten woertlich genommen: sichtbare Luecke
- *    zwischen Motiv und Schatten, das Motiv schwebt erkennbar (z. B.
- *    Paprika), waehrend andere Zutaten trotzdem geerdet blieben (z. B.
- *    Tomate, Karotte) — inkonsistent innerhalb derselben Bilderreihe.
- *    Jetzt steht explizit "rests on the surface" plus ein beruehrender
- *    Kontaktschatten, das Wort "floats" kommt nicht mehr vor.
- */
-export const buildPrompt = (subject, name) => {
-  const { prompt: tint } = PALETTE[backgroundColorFor(name)];
-  return (
-    `Photorealistic studio product photograph of ${subject}, composed like a ` +
-    "centered app icon: the subject rests naturally on the same flat " +
-    "backdrop surface as the background, in full contact with it — not " +
-    "floating, not suspended in mid-air, no gap between the subject and " +
-    "the surface. Positioned in the vertical middle of the frame with an " +
-    "empty, equally wide band of background above it and an equal empty " +
-    "band below it around its shadow — NOT shoved down to the bottom " +
-    "edge, NOT a cropped floor-level product shot. Photographed from the " +
-    "front at a slight eye-level angle (not from above), portrait " +
-    "orientation. The entire background is one completely flat, uniform, " +
-    `matte colour filling the frame edge to edge: ${tint} studio backdrop ` +
-    "colour — a gentle pastel wash, more than just a whisper of colour, " +
-    "but still light and airy, not vivid, not saturated, not a bold " +
-    "colour block. No gradient, no vignette, no darkened corners, no " +
-    "texture, no visible objects besides the subject. A soft, realistic, " +
-    "naturally soft-edged contact shadow touches the subject directly " +
-    "where it meets the surface, anchoring it firmly in place — never a " +
-    "visible gap between the subject and its shadow. Natural studio " +
-    "lighting, sharp focus, high detail, realistic colours and textures, " +
-    "no text, no labels, no hands, no props, no other objects, no frame, " +
-    "no border."
-  );
-};

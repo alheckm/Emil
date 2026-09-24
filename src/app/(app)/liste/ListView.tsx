@@ -529,21 +529,16 @@ export function ListView({
             style={{ background: ring, opacity: checked ? 0.45 : 1 }}
           >
             {src ? (
-              /* Kein next/image: die Datei liegt schon in genau der
-                 Größe im public-Ordner, in der sie gebraucht wird.
-                 scale-105: die Pipeline füllt den Pastellgrund nur bis 94 %
-                 des Kreisdurchmessers (process.py, COVER) — der leichte
-                 Farbsaum am äußersten Bildrand landet ungezoomt sichtbar im
-                 Kreis. Der Zoom schneidet genau diesen Rand weg, ohne das
-                 Motiv selbst anzuschneiden. */
+              /* Kein next/image: die Marktregal-Pipeline liefert ein
+                 hochkant freigestelltes Studiofoto (768x1024), object-cover
+                 croppt es serverlos auf den Kreis — das Motiv steht laut
+                 Prompt in der vertikalen Mitte mit Rand oben und unten. */
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={src}
                 alt=""
-                width={192}
-                height={192}
                 loading="lazy"
-                className="h-full w-full scale-105 object-cover"
+                className="h-full w-full object-cover"
               />
             ) : (
               <span aria-hidden className="text-[24px] font-bold text-white/70">

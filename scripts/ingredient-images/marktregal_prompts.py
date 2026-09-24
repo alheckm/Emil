@@ -9,9 +9,7 @@ Formulierungen fuer denselben Job gibt:
   generate-marktregal.py — Produktions-Lauf fuer die Deploy-Pipeline,
                            Ergebnis (WebP) nach public/zutaten-marktregal/.
 
-Liest subjects.mjs (SUBJECTS, colorFor) nur lesend. buildPrompt/PALETTE/
-process.py (die Pastell-Chip-Produktion) bleiben unberuehrt — andere
-Bild-Familie, anderes Farbschema, eigener Lebenszyklus.
+Liest subjects.mjs (SUBJECTS, colorFor) nur lesend.
 """
 
 import json
@@ -46,6 +44,24 @@ CATEGORY_TO_BOLD = {
     "purple": "blau",
 }
 
+# Drei Punkte mussten gegen die Trainingsgewohnheit des Modells
+# gegengesteuert werden (aus der fruehesten Fassung dieses Prompts, damals in
+# subjects.mjs buildPrompt, siehe Git-Historie):
+# 1. Ohne "wie ein zentriertes App-Icon"-Vergleich rutscht das Motiv immer
+#    Richtung untere Bildhaelfte (gelernt aus Boden-Produktfotos) — deshalb
+#    Hochformat 3:4 mit explizitem Rand oben UND unten.
+# 2. Die Hintergrundfarbe muss als fertige Endfarbe benannt werden, nicht als
+#    Mischanweisung ("Basis X mit Farbe Y gemischt") — das brachte sichtbar
+#    Unruhe (Farbverlaeufe/Flecken) in den Hintergrund, vermutlich weil
+#    "Basis + mischen" zwei widerspruechliche Anweisungen im selben Satz
+#    sind. Der Palette-Text ist deshalb schon die fertige Formulierung.
+# 3. "floats"/"floats in the vertical middle" (fruehere Fassung) wurde vom
+#    Modell bei manchen Zutaten woertlich genommen: sichtbare Luecke
+#    zwischen Motiv und Schatten, das Motiv schwebt erkennbar (z. B.
+#    Paprika), waehrend andere Zutaten trotzdem geerdet blieben (z. B.
+#    Tomate, Karotte) — inkonsistent innerhalb derselben Bilderreihe. Jetzt
+#    steht explizit "rests on the surface" plus ein beruehrender
+#    Kontaktschatten, das Wort "floats" kommt nicht mehr vor.
 CENTERED_BASE = (
     "Photorealistic studio product photograph of {subject}, composed like a "
     "centered app icon: the subject rests naturally on the same flat "
