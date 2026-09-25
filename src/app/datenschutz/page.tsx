@@ -34,9 +34,14 @@ export default function PrivacyPage() {
           Alexander Heckmann, Herzenstr. 15, 78315 Radolfzell.
           <br />
           E-Mail:{" "}
-          <a href="mailto:alexander.heckmann@outlook.com" className="underline underline-offset-4">
-            alexander.heckmann@outlook.com
+          <a href="mailto:writeemil@outlook.com" className="underline underline-offset-4">
+            writeemil@outlook.com
           </a>
+          , oder über das{" "}
+          <Link href="/kontakt" className="underline underline-offset-4">
+            Kontaktformular
+          </Link>
+          .
         </p>
       </Section>
 

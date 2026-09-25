@@ -125,6 +125,12 @@ Kurz:
 
 ## Angaben (geliefert 2026-09-25)
 - Verantwortlich / Anbieter: **Alexander Heckmann, Herzenstr. 15, 78315 Radolfzell**
-- E-Mail: **alexander.heckmann(at)outlook.com** (so im Impressum, Datenschutz, DSA-Kontaktstelle und Meldeweg eintragen)
+- E-Mail: **writeemil(at)outlook.com** (aktualisiert 2026-09-25, vorher alexander.heckmann(at)outlook.com — in Impressum, Datenschutz, DSA-Kontaktstelle und Meldeweg eingetragen)
 - Aufsichtsbehörde: **Landesbeauftragter für den Datenschutz und die Informationsfreiheit Baden-Württemberg (LfDI BW)**, Lautenschlagerstraße 20, 70173 Stuttgart
-- Offen: ein zweiter schneller Kontaktweg (EuGH C-298/07), also Telefonnummer oder Kontaktformular. Bis dahin bleibt der Platzhalter `[Telefon]` sichtbar. In der Abschlussmeldung darauf hinweisen.
+
+## Nachtrag 2026-09-25: Kontaktformular
+Zweiter schneller Kontaktweg (EuGH C-298/07) ist jetzt `/kontakt` — ein
+mailto-Formular ohne eigenen Server-Versand (`ContactForm.tsx`), verlinkt von
+Impressum, Datenschutz, Nutzungsbedingungen, Anmeldung und Einstellungen.
+Kein neuer API-Key, keine laufenden Kosten (passt zu PRODUCT.md). Der
+`[Telefon]`-Platzhalter im Impressum ist damit ersetzt.

@@ -64,6 +64,7 @@ export default function SettingsPage() {
         <SettingsRow href="/impressum">Impressum</SettingsRow>
         <SettingsRow href="/datenschutz">Datenschutz</SettingsRow>
         <SettingsRow href="/nutzungsbedingungen">Nutzungsbedingungen</SettingsRow>
+        <SettingsRow href="/kontakt">Kontakt</SettingsRow>
       </div>
 
       <div className="h-px bg-border" />

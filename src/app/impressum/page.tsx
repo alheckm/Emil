@@ -42,11 +42,15 @@ export default function ImprintPage() {
         </h2>
         <p className="mt-2 text-[15px] leading-relaxed">
           E-Mail:{" "}
-          <a href="mailto:alexander.heckmann@outlook.com" className="underline underline-offset-4">
-            alexander.heckmann@outlook.com
+          <a href="mailto:writeemil@outlook.com" className="underline underline-offset-4">
+            writeemil@outlook.com
           </a>
           <br />
-          [Telefon]
+          Oder über das{" "}
+          <Link href="/kontakt" className="underline underline-offset-4">
+            Kontaktformular
+          </Link>
+          .
         </p>
       </Section>
 

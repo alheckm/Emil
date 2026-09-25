@@ -74,6 +74,13 @@ export default async function LoginPage({
           >
             Nutzungsbedingungen
           </Link>
+          {" · "}
+          <Link
+            href="/kontakt"
+            className="text-muted underline underline-offset-4"
+          >
+            Kontakt
+          </Link>
         </p>
       </div>
     </Screen>
