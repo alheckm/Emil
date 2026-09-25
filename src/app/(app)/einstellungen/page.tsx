@@ -61,7 +61,9 @@ export default function SettingsPage() {
       <div>
         <SectionEyebrow>Konto</SectionEyebrow>
         <SettingsRow href="/passwort-neu">Passwort ändern</SettingsRow>
+        <SettingsRow href="/impressum">Impressum</SettingsRow>
         <SettingsRow href="/datenschutz">Datenschutz</SettingsRow>
+        <SettingsRow href="/nutzungsbedingungen">Nutzungsbedingungen</SettingsRow>
       </div>
 
       <div className="h-px bg-border" />

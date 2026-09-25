@@ -55,10 +55,24 @@ export default async function LoginPage({
         </p>
         <p>
           <Link
+            href="/impressum"
+            className="text-muted underline underline-offset-4"
+          >
+            Impressum
+          </Link>
+          {" · "}
+          <Link
             href="/datenschutz"
             className="text-muted underline underline-offset-4"
           >
             Datenschutz
+          </Link>
+          {" · "}
+          <Link
+            href="/nutzungsbedingungen"
+            className="text-muted underline underline-offset-4"
+          >
+            Nutzungsbedingungen
           </Link>
         </p>
       </div>

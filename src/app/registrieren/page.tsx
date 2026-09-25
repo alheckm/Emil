@@ -33,6 +33,17 @@ export default async function RegisterPage() {
       <Section>
         <RegisterForm />
       </Section>
+      <p className="text-center text-[13px] text-muted leading-relaxed">
+        Mit dem Anlegen akzeptierst du die{" "}
+        <Link href="/nutzungsbedingungen" className="underline underline-offset-4">
+          Nutzungsbedingungen
+        </Link>
+        . Wie wir deine Daten verarbeiten, steht im{" "}
+        <Link href="/datenschutz" className="underline underline-offset-4">
+          Datenschutz
+        </Link>
+        .
+      </p>
       <p className="text-center text-[15px]">
         <Link href="/anmelden" className="text-muted underline underline-offset-4">
           Ich habe schon ein Konto

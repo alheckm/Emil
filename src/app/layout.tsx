@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Public_Sans, Unbounded } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "./ServiceWorkerRegistration";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 /**
  * Die zwei Schriften der Instagram-Baseline-Richtung (DESIGN.md,
@@ -78,7 +77,6 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ServiceWorkerRegistration />
         {children}
-        <SpeedInsights />
       </body>
     </html>
   );

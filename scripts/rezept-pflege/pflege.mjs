@@ -10,7 +10,12 @@
  * alle Zutatenzeilen ersetzt (supabase/migrations/0009_rezepte_speichern.sql).
  *
  * Auth wie scripts/ingredient-images/find-missing-marktregal.mjs: SUPABASE_SECRET_KEY aus
- * .env.local, umgeht RLS bewusst — ein Skript mit Zugriff auf alle Haushalte.
+ * .env.local, umgeht RLS bewusst.
+ *
+ * Trotzdem nicht auf alle Haushalte losgelassen: `PFLEGE_HOUSEHOLD_ID` (ebenfalls
+ * .env.local) grenzt jeden Befehl auf einen einzigen Haushalt ein. Ohne diesen
+ * Wert bricht das Skript ab, statt fremde Rezepte an eine KI zu schicken —
+ * das wäre eine unangekündigte Datenweitergabe (siehe /datenschutz).
  *
  *   node scripts/rezept-pflege/pflege.mjs <befehl> [optionen]
  *
@@ -99,6 +104,15 @@ if (!url || !key) {
   process.exit(1);
 }
 
+const HOUSEHOLD_ID = env.PFLEGE_HOUSEHOLD_ID;
+if (!HOUSEHOLD_ID) {
+  console.error(
+    "PFLEGE_HOUSEHOLD_ID fehlt in .env.local — ohne diese Grenze würde die " +
+      "Pflege Rezepte fremder Haushalte lesen und an eine KI schicken. Siehe .env.example.",
+  );
+  process.exit(1);
+}
+
 const supabase = createClient(url, key);
 
 function fail(message) {
@@ -138,9 +152,13 @@ async function loadRecipe(id) {
     .from("recipes")
     .select(RECIPE_COLUMNS)
     .eq("id", id)
+    // Haushalt-Grenze direkt in der Abfrage, nicht erst danach geprüft: ein
+    // Rezept aus einem fremden Haushalt soll aussehen wie ein nicht
+    // vorhandenes, nie wie eines, das man erst nachträglich abweist.
+    .eq("household_id", HOUSEHOLD_ID)
     .maybeSingle();
   if (error) fail(dbError(error));
-  if (!data) fail(`Kein Rezept mit id ${id}`);
+  if (!data) fail(`Kein Rezept mit id ${id} im Haushalt ${HOUSEHOLD_ID}`);
   return data;
 }
 
@@ -198,7 +216,10 @@ async function cmdListe(args) {
   const alle = flag(args, "alle");
   const limit = Number(option(args, "limit") ?? Infinity);
 
-  const { data, error } = await supabase.from("recipes").select(RECIPE_COLUMNS);
+  const { data, error } = await supabase
+    .from("recipes")
+    .select(RECIPE_COLUMNS)
+    .eq("household_id", HOUSEHOLD_ID);
   if (error) fail(dbError(error));
 
   const rezepte = data
@@ -442,6 +463,10 @@ async function cmdVerlauf(args) {
   const id = args[0];
   if (!id) fail("Aufruf: verlauf <id>");
 
+  // loadRecipe() prüft nebenbei die Haushalt-Grenze — ohne sie ließe sich der
+  // Verlauf eines fremden Rezepts einfach durch Raten der id abfragen.
+  await loadRecipe(id);
+
   const { data, error } = await supabase
     .from("recipe_revisions")
     .select("id, felder, quelle, lauf_id, created_at")
@@ -460,9 +485,10 @@ async function cmdZurueck(args) {
     .from("recipe_revisions")
     .select("*")
     .eq("id", revisionId)
+    .eq("household_id", HOUSEHOLD_ID)
     .maybeSingle();
   if (error) fail(dbError(error));
-  if (!revision) fail(`Keine Revision mit id ${revisionId}`);
+  if (!revision) fail(`Keine Revision mit id ${revisionId} im Haushalt ${HOUSEHOLD_ID}`);
 
   const recipe = await loadRecipe(revision.recipe_id);
   const ingredientRows = recipe.recipe_ingredients ?? [];

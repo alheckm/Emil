@@ -197,10 +197,18 @@ Erwähnung die volle Menge meint: überspringen (siehe „Im Zweifel
 
 ## Rezeptbild erzeugen
 
-Nur wenn `imagePath` fehlt, per `mcp__gemini-image__generate_image`:
-fotorealistisch, das fertig angerichtete Gericht von oben, natürliches Licht,
-ruhiger, unaufdringlicher Hintergrund — passend zu den echten Fotos, die
-schon in der App liegen. `output_path` unter `scripts/rezept-pflege/tmp/<slug>.jpg`
-legen (das Verzeichnis ist gitignored, dort darf Erzeugtes liegen bleiben —
-die Werkzeugliste des headless-Laufs erlaubt kein `rm`), danach
+Nur wenn `imagePath` fehlt, lokal per mflux (siehe Memory „Bildgenerierung
+immer mflux" — nie eine Cloud-Bild-API wie Gemini, das wäre eine
+unangekündigte Datenweitergabe an einen weiteren Anbieter, siehe
+/datenschutz):
+
+```
+~/.mflux/venv/bin/mflux-generate \
+  --model z-image-turbo --steps 4 \
+  --prompt "<fotorealistisch, das fertig angerichtete Gericht von oben, natürliches Licht, ruhiger, unaufdringlicher Hintergrund>" \
+  --output scripts/rezept-pflege/tmp/<slug>.jpg
+```
+
+`scripts/rezept-pflege/tmp/` ist gitignored, dort darf Erzeugtes liegen
+bleiben — die Werkzeugliste des headless-Laufs erlaubt kein `rm`. Danach
 `node scripts/rezept-pflege/pflege.mjs bild <id> --datei <output_path>`.

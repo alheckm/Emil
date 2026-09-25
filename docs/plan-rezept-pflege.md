@@ -4,6 +4,13 @@
 > Datenbank getestet (Schema, `steps.ts`, UI-Verdrahtung, `pflege.mjs`,
 > `SKILL.md`, `lauf.sh` + Plist). Der launchd-Job ist **noch nicht
 > installiert** — das braucht ausdrückliches OK, siehe unten.
+>
+> **Nachtrag 2026-09-25** (docs/plan-recht.md): `pflege.mjs` liest und schreibt
+> jetzt nur noch den einen Haushalt aus `PFLEGE_HOUSEHOLD_ID` (.env.local) —
+> vorher hätte der Lauf Rezepte *aller* Haushalte an Claude geschickt, ohne
+> dass die Datenschutzerklärung das ankündigt. Die Bilderzeugung läuft über
+> lokales mflux statt über den `gemini-image`-MCP-Server, damit keine
+> zweite, unangekündigte Weitergabe an Google entsteht.
 
 ## Kontext
 
@@ -30,7 +37,7 @@ launchd  (So 03:00)
        └─ claude -p "/rezepte-pflegen --limit 10"     (headless, enge Werkzeugliste)
             ├─ node pflege.mjs liste --offen     → JSON: Rezepte mit Lücken
             ├─ Claude entscheidet: Tags, Saison, Nährwerte, Mengen in der Anleitung
-            ├─ mcp gemini-image generate_image   → nur wenn image_path fehlt
+            ├─ mflux-generate (lokal)            → nur wenn image_path fehlt
             ├─ node pflege.mjs schreibe <id> --datei patch.json
             │     └─ Zod-Prüfung → Snapshot in recipe_revisions → gezieltes UPDATE
             └─ node pflege.mjs bild <id> --datei bild.jpg   → Storage-Upload
@@ -152,7 +159,7 @@ sind Schätzungen, Bild nie ein vorhandenes ersetzen, im Zweifel überspringen).
 ```sh
 claude -p "/rezepte-pflegen --limit 10" \
   --permission-mode acceptEdits --permission-prompts none \
-  --allowedTools "Read,Write,Bash(node scripts/rezept-pflege/pflege.mjs:*),mcp__gemini-image__generate_image"
+  --allowedTools "Read,Write,Bash(node scripts/rezept-pflege/pflege.mjs:*),Bash(~/.mflux/venv/bin/mflux-generate:*)"
 ```
 
 `--permission-prompts none` heißt: alles, was nicht auf der Liste steht, wird

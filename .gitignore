@@ -64,6 +64,12 @@ next-env.d.ts
 /.claude/helpers/
 .claude/settings.local.json
 
+# Von mflux erzeugte Rezeptfotos, bevor pflege.mjs sie in Supabase Storage
+# hochlädt (siehe .claude/skills/rezepte-pflegen/SKILL.md) — Zwischenstand,
+# gehört nicht ins Repo.
+/scripts/rezept-pflege/tmp/
+/scripts/rezept-pflege/logs/
+
 # Impeccable: config.json und design.json sind Projektzustand (Design-
 # Sidecar zu DESIGN.md), gehören ins Repo. Rest ist lokaler/Session-Zustand.
 .impeccable/config.local.json
