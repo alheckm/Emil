@@ -5,8 +5,8 @@
  *
  * `--generate`: ruft nach dem Abgleich automatisch generate-marktregal.py
  * fuer alle Zutaten mit vorhandenem Bildmotiv auf (nur die in
- * production-variants.json aktivierten Varianten, aktuell nur bold) und schreibt danach publish-map.mjs neu, damit
- * ingredientImage() die frischen Bilder sofort findet. Zutaten ohne Bildmotiv
+ * production-variants.json aktivierten Varianten, aktuell nur bold) und setzt danach per publish-map.mjs den
+ * image_slug der Zutaten, damit die App die frischen Bilder sofort zeigt. Zutaten ohne Bildmotiv
  * ("braucht Agenten-Entscheidung") werden dabei NICHT generiert — die
  * Alias/Skip/Neues-Motiv-Entscheidung bleibt Aufgabe des Agenten, der den
  * Skill ausfuehrt (siehe SKILL.md), das laesst sich nicht skripten.
@@ -161,15 +161,4 @@ if (process.argv.includes("--generate") && withSubject.length) {
     { cwd: ROOT + "scripts/ingredient-images", stdio: "inherit" },
   );
   if (map.status !== 0) process.exit(map.status ?? 1);
-
-  const rel = "src/lib/core/ingredientImages.ts";
-  spawnSync("git", ["add", "--", rel], { cwd: ROOT });
-  const staged = spawnSync("git", ["diff", "--cached", "--name-only", "--", rel], { cwd: ROOT });
-  if (staged.stdout.toString().trim()) {
-    spawnSync("git", ["commit", "-m", "ingredientImages.ts: neue Marktregal-Bilder aufgenommen", "--", rel], {
-      cwd: ROOT,
-      stdio: "inherit",
-    });
-    spawnSync("git", ["push"], { cwd: ROOT, stdio: "inherit" });
-  }
 }

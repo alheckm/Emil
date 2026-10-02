@@ -28,6 +28,8 @@ export interface ListEntry {
   id: string;
   ingredientId: string;
   name: string;
+  /** Bild der Zutat (`image_slug`), `null`, solange keins erzeugt ist. */
+  imageSlug: string | null;
   /** Einheit, in der `amount` steht — Basiseinheit bei Gewicht und Volumen. */
   mergeUnit: string;
   /** Summe aus Rezepten und Handeintrag; `null`, wenn niemand eine Menge nannte. */
@@ -90,6 +92,7 @@ interface EntryRow {
   updated_at: string;
   ingredients: {
     display_name: string;
+    image_slug: string | null;
     household_id: string | null;
     category_id: string | null;
     categories: { name: string; sort_order: number } | null;
@@ -132,7 +135,7 @@ export async function listEntries(
       .select(
         `id, ingredient_id, merge_unit, total_amount::text, has_unquantified,
          checked, checked_at, note, is_manual, updated_at,
-         ingredients ( display_name, household_id, category_id,
+         ingredients ( display_name, image_slug, household_id, category_id,
                        categories ( name, sort_order ) ),
          shopping_list_sources ( recipe_id, servings, amount_base::text,
                                  recipes ( title ) )`,
@@ -159,6 +162,7 @@ export async function listEntries(
       id: row.id,
       ingredientId: row.ingredient_id,
       name: row.ingredients?.display_name ?? "Unbekannte Zutat",
+      imageSlug: row.ingredients?.image_slug ?? null,
       mergeUnit: row.merge_unit,
       amount: row.total_amount,
       hasUnquantified: row.has_unquantified,

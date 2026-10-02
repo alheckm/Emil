@@ -4,7 +4,7 @@ import { startTransition, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { formatAmount } from "@/lib/core/format";
-import { ingredientImage } from "@/lib/core/ingredientImages";
+import { ingredientImageUrl } from "@/lib/core/ingredientImages";
 import { parseAmountText, parseQuickAdd } from "@/lib/core/parseIngredient";
 import { getUnit, mergeUnitFor } from "@/lib/core/units";
 import { toMergeAmount } from "@/lib/core/mergeList";
@@ -550,7 +550,7 @@ export function ListView({
     const checked = checkedNow[entry.id] ?? entry.checked;
     const amount = amountNow[entry.id] ?? entry.amount;
     const { text } = formatAmount(amount, entry.mergeUnit);
-    const src = ingredientImage(entry.name);
+    const src = ingredientImageUrl(entry.imageSlug);
     const ring = categoryRingColor(entry.categoryId);
     const menge = [
       text,

@@ -80,8 +80,10 @@ Das ist `find-missing-marktregal.mjs --generate`. Ablauf:
    landet gitignored in `raw-marktregal/`), skaliert auf max. 640 px lange
    Kante und veröffentlicht als WebP unter `public/zutaten-marktregal/` — pro
    Bild sofort committet + gepusht (nicht erst am Batch-Ende).
-4. Schreibt danach `src/lib/core/ingredientImages.ts` neu
-   (`publish-map.mjs`) und committet + pusht das ebenfalls.
+4. Setzt danach `ingredients.image_slug` in der Datenbank
+   (`publish-map.mjs`, findet Zutaten über ihre Grundform, überschreibt
+   nichts Vorhandenes). Das Bild hängt an der Zutat, nicht am Namen — es gibt
+   keine Namenstabelle im Code mehr.
 
 Braucht `SUPABASE_SECRET_KEY` in `.env.local` (umgeht RLS) und die lokale
 mflux-Installation unter `~/.mflux/venv`.
@@ -121,8 +123,8 @@ Prüfen).
   Studiofoto auf kräftigem Farbgrund passend zur Zutatenkategorie, echter
   Kontaktschatten, Motiv mittig mit Rand oben/unten.
 - Alles committen und pushen (siehe Nutzer-Vorgabe: nach jedem Arbeitsschritt
-  direkt nach `main`) — `generate-marktregal.py` und `publish-map.mjs` tun
-  das im `--generate`-Lauf bereits selbst pro Bild bzw. am Ende.
+  direkt nach `main`) — `generate-marktregal.py` tut das im `--generate`-Lauf
+  bereits selbst pro Bild; `publish-map.mjs` schreibt nur in die Datenbank.
 
 ## Modus 2: Design-Exploration
 
