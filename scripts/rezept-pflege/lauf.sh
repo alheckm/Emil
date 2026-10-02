@@ -21,5 +21,5 @@ LOG_FILE="$LOG_DIR/$(date +%F).log"
 claude -p "/rezepte-pflegen --limit 10" \
   --permission-mode acceptEdits \
   --permission-prompts none \
-  --allowedTools "Read,Write,Bash(node scripts/rezept-pflege/pflege.mjs:*),Bash(~/.mflux/venv/bin/mflux-generate:*)" \
+  --allowedTools "Read,Write,Bash(node scripts/rezept-pflege/pflege.mjs:*),Bash(~/.mflux/venv/bin/python scripts/rezept-pflege/rezeptbild.py:*)" \
   >> "$LOG_FILE" 2>&1

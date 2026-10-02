@@ -217,11 +217,15 @@ unangekündigte Datenweitergabe an einen weiteren Anbieter, siehe
 /datenschutz):
 
 ```
-~/.mflux/venv/bin/mflux-generate \
-  --model z-image-turbo --steps 4 \
+~/.mflux/venv/bin/python scripts/rezept-pflege/rezeptbild.py \
   --prompt "<fotorealistisch, das fertig angerichtete Gericht von oben, natürliches Licht, ruhiger, unaufdringlicher Hintergrund>" \
   --output scripts/rezept-pflege/tmp/<slug>.jpg
 ```
+
+(Nicht `mflux-generate --model z-image-turbo`: dem Standardmodell fehlt lokal
+`text_encoder_2`. Das Skript lädt das 4-Bit-Modell der Zutatenbilder; ein Bild
+dauert gut eine Minute.) Das Ergebnis ansehen, bevor es gesetzt wird — passt es
+nicht zum Gericht, mit anderem `--seed` neu erzeugen.
 
 `scripts/rezept-pflege/tmp/` ist gitignored, dort darf Erzeugtes liegen
 bleiben — die Werkzeugliste des headless-Laufs erlaubt kein `rm`. Danach
