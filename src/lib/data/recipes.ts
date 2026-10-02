@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { dataErrorMessage } from "./errors";
 import { fail, ok, type Result } from "./result";
+import { normalizeTags } from "@/lib/core/recipeTags";
 
 /**
  * Rezepte lesen und schreiben.
@@ -24,9 +25,8 @@ export interface RecipeSummary {
   totalTimeMin: number | null;
   tags: string[];
   /**
-   * Monate (1–12), in denen das Rezept Saison hat — vorbereitet für die
-   * geplante automatische Verschlagwortung, die diese Spalte befüllt. Bis
-   * dahin leer.
+   * Monate (1–12), in denen das Rezept Saison hat — von der Rezeptpflege aus
+   * den Zutaten bestimmt, nicht von Hand gesetzt.
    */
   seasonMonths: number[];
   imagePath: string | null;
@@ -183,23 +183,6 @@ export async function searchRecipes(
   return ok(((data ?? []) as SummaryRow[]).map(toSummary));
 }
 
-/** Vergebene Schlagwörter mit Anzahl, für die Filterleiste. */
-export async function listHouseholdTags(
-  supabase: SupabaseClient,
-  householdId: string,
-): Promise<Result<{ tag: string; count: number }[]>> {
-  const { data, error } = await supabase.rpc("household_tags", {
-    p_household_id: householdId,
-  });
-  if (error) return fail(dataErrorMessage(error));
-  return ok(
-    ((data ?? []) as { tag: string; anzahl: number }[]).map((row) => ({
-      tag: row.tag,
-      count: Number(row.anzahl),
-    })),
-  );
-}
-
 export async function getRecipe(
   supabase: SupabaseClient,
   recipeId: string,
@@ -297,7 +280,7 @@ export async function saveRecipe(
       total_time_min: input.totalTimeMin,
       instructions: input.instructions,
       notes: input.notes,
-      tags: input.tags,
+      tags: normalizeTags(input.tags),
     },
     p_ingredients: input.ingredients.map((line) => ({
       name: line.name,

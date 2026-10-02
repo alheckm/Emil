@@ -186,7 +186,6 @@ function offenSeit(recipe) {
 
 function findeLuecken(recipe, ingredients) {
   const gefunden = [];
-  if (recipe.tags.length === 0) gefunden.push("keine Tags");
   if (recipe.season_months.length === 0) gefunden.push("keine Saison");
   if (!recipe.nutrition) gefunden.push("keine Nährwerte");
   if (!recipe.image_path) gefunden.push("kein Bild");
@@ -308,9 +307,19 @@ const NUTRITION = z
   })
   .nullable();
 
+// Feste Liste wie in src/lib/core/recipeTags.ts (Node lädt die TS-Datei hier
+// nicht direkt; die Datenbank erzwingt dieselbe Liste per Check-Constraint).
+// „saisonal" und „≤ 30 Min" gehören nicht dazu — die folgen aus season_months
+// und total_time_min.
+const TAGS = z.enum(["vegan", "vegetarisch", "proteinreich", "snack"]);
+
 const PATCH = z
   .object({
-    tags: z.array(z.string().trim().min(1)).max(10).optional(),
+    tags: z
+      .array(TAGS)
+      .max(4)
+      .transform((tags) => (tags.includes("vegan") && !tags.includes("vegetarisch") ? [...tags, "vegetarisch"] : tags))
+      .optional(),
     season_months: z.array(z.number().int().min(1).max(12)).optional(),
     nutrition: NUTRITION.optional(),
     instructions: z.array(z.string()).optional(),

@@ -15,6 +15,13 @@ import { getRecipe } from "@/lib/data/recipes";
 import { addRecipeToList, removeRecipeFromList } from "@/lib/data/shoppingList";
 import { buildListItems } from "@/lib/core/mergeList";
 import { formatRelativeTime } from "@/lib/core/format";
+import {
+  RECIPE_TAGS,
+  RECIPE_TAG_LABELS,
+  derivedTags,
+  normalizeTags,
+  type RecipeTag,
+} from "@/lib/core/recipeTags";
 import { getBrowserSupabase } from "@/lib/client/supabase";
 import { EmilMark, Notice } from "@/components/ui";
 import {
@@ -43,9 +50,9 @@ import {
  *   `history.replaceState` — das ändert die Adresszeile, ohne zu navigieren,
  *   und bleibt damit teilbar. Zwei feste Pillen laufen über denselben
  *   Mechanismus, sind aber keine Schlagwörter: „≤ 30 Min" prüft
- *   `totalTimeMin`, „Saisonal" den aktuellen Monat gegen `seasonMonths` — bis
- *   die geplante automatische Verschlagwortung `seasonMonths` befüllt, findet
- *   die Pille nichts.
+ *   `totalTimeMin`, „Saisonal" den aktuellen Monat gegen `seasonMonths`, das
+ *   die Rezeptpflege aus den Zutaten bestimmt. Die übrigen Pillen sind die
+ *   festen Schlagwörter aus `recipeTags.ts`.
  * - **Der Suchtext** bleibt auf dem Server. Gesucht wird per Volltext über
  *   Titel *und* Zutaten; das im Browser nachzubauen hieße, alle Zutaten aller
  *   Rezepte mitzuschicken und die Suche trotzdem anders aussehen zu lassen als
@@ -63,13 +70,11 @@ const QUICK_SAISON = "__saisonal";
 
 export function RecipeBrowser({
   recipes,
-  tags,
   planned,
   images,
   listId,
 }: {
   recipes: RecipeSummary[];
-  tags: { tag: string; count: number }[];
   planned: Record<string, number>;
   /** Pfad → signierte URL, gebündelt geholt (siehe getRecipeImageUrls). */
   images: Record<string, string>;
@@ -145,14 +150,20 @@ export function RecipeBrowser({
   // ein Rezept wechselt seine Saison nicht während eine Liste offen ist.
   const [currentMonth] = useState(() => new Date().getMonth() + 1);
 
+  const tagCounts = useMemo(
+    () =>
+      Object.fromEntries(
+        RECIPE_TAGS.map((tag) => [tag, recipes.filter((r) => r.tags.includes(tag)).length]),
+      ) as Record<RecipeTag, number>,
+    [recipes],
+  );
+
   const visible = useMemo(() => {
     if (isZeitFilter) {
-      return recipes.filter(
-        (r) => r.totalTimeMin !== null && r.totalTimeMin <= 30,
-      );
+      return recipes.filter((r) => derivedTags(r, currentMonth).quick);
     }
     if (isSaisonFilter) {
-      return recipes.filter((r) => r.seasonMonths.includes(currentMonth));
+      return recipes.filter((r) => derivedTags(r, currentMonth).seasonal);
     }
     if (activeTag) {
       return recipes.filter((r) => r.tags.includes(activeTag));
@@ -296,14 +307,14 @@ export function RecipeBrowser({
         <FilterChip active={isSaisonFilter} onClick={() => toggleFilter(QUICK_SAISON)}>
           Saisonal
         </FilterChip>
-        {tags.map(({ tag, count }) => (
+        {RECIPE_TAGS.map((tag) => (
           <FilterChip
             key={tag}
             active={activeTag === tag}
             onClick={() => toggleFilter(tag)}
           >
-            {tag}
-            <span className="ml-1.5 opacity-60">{count}</span>
+            {RECIPE_TAG_LABELS[tag]}
+            <span className="ml-1.5 opacity-60">{tagCounts[tag]}</span>
           </FilterChip>
         ))}
       </div>
@@ -404,7 +415,11 @@ export function RecipeBrowser({
                   </div>
                   <p className="px-5 pt-1 pb-4 text-[13px] text-muted">
                     {formatRelativeTime(recipe.createdAt)}
-                    {recipe.tags.length > 0 && ` · ${recipe.tags.slice(0, 2).join(", ")}`}
+                    {recipe.tags.length > 0 &&
+                      ` · ${normalizeTags(recipe.tags)
+                        .slice(0, 2)
+                        .map((tag) => RECIPE_TAG_LABELS[tag])
+                        .join(", ")}`}
                   </p>
 
                   <div className="h-px bg-border" />

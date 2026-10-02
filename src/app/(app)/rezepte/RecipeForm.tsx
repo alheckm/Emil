@@ -7,6 +7,12 @@ import { parseIngredient } from "@/lib/core/parseIngredient";
 import { parseAmount } from "@/lib/core/numbers";
 import { formatNumber } from "@/lib/core/format";
 import { stripStepMarkers } from "@/lib/core/steps";
+import {
+  RECIPE_TAGS,
+  RECIPE_TAG_LABELS,
+  normalizeTags,
+  type RecipeTag,
+} from "@/lib/core/recipeTags";
 import { UNITS } from "@/lib/core/units";
 import {
   CONFIDENCE_REVIEW_THRESHOLD,
@@ -154,7 +160,7 @@ export function RecipeForm({
   const [time, setTime] = useState(
     String(recipe?.totalTimeMin ?? draft?.totalTimeMin ?? "") || "",
   );
-  const [tags, setTags] = useState((recipe?.tags ?? []).join(", "));
+  const [tags, setTags] = useState<RecipeTag[]>(normalizeTags(recipe?.tags ?? []));
   const [instructions, setInstructions] = useState(
     (recipe
       ? stripStepMarkers(recipe.instructions, recipe.ingredients, recipe.baseServings)
@@ -254,10 +260,7 @@ export function RecipeForm({
         .map((step) => step.trim())
         .filter(Boolean),
       notes: notes.trim() || null,
-      tags: tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean),
+      tags: normalizeTags(tags),
       // Herkunft festhalten: beim Ändern die bisherige, beim Import die des
       // Entwurfs. Sie steht später auf der Rezeptkarte als Quellenangabe.
       sourceType: recipe?.sourceType ?? draft?.sourceType ?? "manual",
@@ -517,13 +520,7 @@ export function RecipeForm({
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
           />
-          <Field
-            label="Schlagwörter"
-            value={tags}
-            onChange={(event) => setTags(event.target.value)}
-            placeholder="Sonntagsessen, Schmorgericht"
-            hint="Mit Komma getrennt."
-          />
+          <TagPicker value={tags} onChange={setTags} />
         </div>
       </Section>
 
@@ -541,5 +538,59 @@ export function RecipeForm({
         </p>
       </div>
     </div>
+  );
+}
+
+/**
+ * Feste Schlagwörter zum Antippen. „Vegan" schließt „Vegetarisch" ein
+ * (`normalizeTags`); „Saisonal" und „≤ 30 Min" gibt es hier nicht, weil sie aus
+ * Saison und Zeit folgen.
+ */
+function TagPicker({
+  value,
+  onChange,
+}: {
+  value: RecipeTag[];
+  onChange: (next: RecipeTag[]) => void;
+}) {
+  function toggle(tag: RecipeTag) {
+    const next = value.includes(tag)
+      ? value.filter((t) => t !== tag)
+      : [...value, tag];
+    // „Vegetarisch" abwählen heißt auch „nicht vegan".
+    onChange(
+      normalizeTags(
+        tag === "vegetarisch" && value.includes(tag)
+          ? next.filter((t) => t !== "vegan")
+          : next,
+      ),
+    );
+  }
+
+  return (
+    <fieldset>
+      <legend className="mb-2 text-[15px] font-semibold text-text">Schlagwörter</legend>
+      <div className="flex flex-wrap gap-2">
+        {RECIPE_TAGS.map((tag) => {
+          const active = value.includes(tag);
+          return (
+            <button
+              key={tag}
+              type="button"
+              aria-pressed={active}
+              onClick={() => toggle(tag)}
+              className={
+                "flex h-11 items-center rounded-pill border px-4 text-[15px] font-semibold press-flat " +
+                (active
+                  ? "border-accent bg-accent text-accent-ink"
+                  : "border-border bg-card text-text")
+              }
+            >
+              {RECIPE_TAG_LABELS[tag]}
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
   );
 }

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { requireHousehold } from "@/lib/server/household";
 import { getListState } from "@/lib/server/listState";
-import { listHouseholdTags, searchRecipes } from "@/lib/data/recipes";
+import { searchRecipes } from "@/lib/data/recipes";
 import { getRecipeImageUrls } from "@/lib/data/recipeImages";
 import { Notice } from "@/components/ui";
 import { RecipeGridSkeleton } from "@/components/skeletons";
@@ -54,9 +54,8 @@ async function Results({ searchParams }: { searchParams: SearchParams }) {
   // Browser (siehe RecipeBrowser). Sonst wären Chips wieder eine Netzrunde,
   // und schlimmer — die Liste könnte den Filter nie ohne Server wieder
   // aufheben, weil sie die weggefilterten Rezepte gar nicht hätte.
-  const [recipes, tags, list] = await Promise.all([
+  const [recipes, list] = await Promise.all([
     searchRecipes(supabase, household.id, query, null),
-    listHouseholdTags(supabase, household.id),
     getListState(),
   ]);
 
@@ -77,7 +76,6 @@ async function Results({ searchParams }: { searchParams: SearchParams }) {
   return (
     <RecipeBrowser
       recipes={recipes.value}
-      tags={tags.ok ? tags.value : []}
       planned={list.planned}
       images={images}
       listId={list.listId}

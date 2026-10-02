@@ -44,7 +44,7 @@ Nur diese vier Felder, alle optional, mindestens eines gesetzt:
 
 ```json
 {
-  "tags": ["italienisch", "vegetarisch"],
+  "tags": ["vegetarisch", "proteinreich"],
   "season_months": [9, 10, 11],
   "nutrition": { "kcal": 480, "protein_g": 22, "carbs_g": 58, "fat_g": 14 },
   "instructions": ["{{z:1}} und {{z:2}} anschwitzen.", "Den Ofen vorheizen."]
@@ -181,12 +181,26 @@ Erwähnung die volle Menge meint: überspringen (siehe „Im Zweifel
   (als `{{z:N}}`, nie als Zahl im Text — siehe oben) und sprachliche
   Glättung. Reihenfolge, Handgriffe, Gar- und Ruhezeiten bleiben, wie sie in
   der Originalanleitung stehen.
-- **Tags: Küche, Ernährungsform, Anlass — höchstens fünf, klein geschrieben.**
-  Vor dem Vergeben neuer Tags an vorhandene anlehnen — `liste --alle` zeigt
-  die Tags aller Rezepte im Haushalt, das ist die verfügbare Übersicht.
-- **`season_months` nur bei wirklich saisonalen Rezepten.** Ein Gericht, das
-  ganzjährig passt (die meisten Suppen, Pastagerichte, Currys), bleibt leer —
-  sonst wird der „Saisonal"-Filter in der App wertlos.
+- **Tags: nur aus der festen Liste `vegan`, `vegetarisch`, `proteinreich`,
+  `snack`** (`src/lib/core/recipeTags.ts`; `pflege.mjs` und die Datenbank
+  lehnen alles andere ab). Ein Rezept darf auch gar keinen Tag haben. Regeln:
+  - `vegan`: keine tierischen Zutaten (Fleisch, Fisch, Ei, Milchprodukte,
+    Honig, Gelatine, Fond/Brühe tierischer Herkunft). `vegan` schließt
+    `vegetarisch` ein; beide setzen.
+  - `vegetarisch`: kein Fleisch und kein Fisch (Fond, Schmalz, Gelatine zählen
+    als Fleisch/Fisch).
+  - `proteinreich`: mindestens 20 g Protein je Portion laut `nutrition` —
+    Nährwerte zuerst schätzen, dann entscheiden.
+  - `snack`: kleine Zwischenmahlzeit zum Mitnehmen/Naschen (Riegel, Bällchen,
+    Dips, Aufstriche), kein vollständiges Gericht.
+  - **Nicht vergeben:** „saisonal" und „≤ 30 Min" — die folgen aus
+    `season_months` und `total_time_min` und werden in der App berechnet.
+- **`season_months` bestimmst du aus den Zutaten, nicht nach Gefühl:** die
+  Monate, in denen die prägenden Frischzutaten (Gemüse, Obst, Kräuter — nicht
+  Vorrat wie Linsen, Zwiebeln, Kartoffeln, Konserven) in Deutschland aus
+  Freilandanbau Saison haben, und zwar der Schnitt über alle prägenden
+  Frischzutaten. Hat das Rezept keine solche Zutat, bleibt es leer — sonst wird
+  der „Saisonal"-Filter in der App wertlos.
 - **Nährwerte sind Schätzungen je Portion** (bezogen auf `baseServings`),
   keine Laboranalyse. Plausibel schätzen, nicht auf die Nachkommastelle.
 - **Bild nur erzeugen, wenn `imagePath` fehlt.** Niemals ein vorhandenes Bild

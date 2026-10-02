@@ -4,6 +4,7 @@ import { requireHousehold } from "@/lib/server/household";
 import { getListState } from "@/lib/server/listState";
 import { getRecipe, type Recipe } from "@/lib/data/recipes";
 import { getRecipeImageUrl } from "@/lib/data/recipeImages";
+import { RECIPE_TAG_LABELS, normalizeTags } from "@/lib/core/recipeTags";
 import { Notice, Screen, ScreenHeader } from "@/components/ui";
 import { RecipeCardSkeleton } from "@/components/skeletons";
 import { RecipeIngredientsAndSteps } from "./RecipeActions";
@@ -99,12 +100,12 @@ async function RecipeDetail({ params }: { params: Params }) {
         )}
         {value.tags.length > 0 && (
           <ul className="mt-3.5 flex flex-wrap gap-2">
-            {value.tags.map((tag) => (
+            {normalizeTags(value.tags).map((tag) => (
               <li
                 key={tag}
                 className="flex h-7 items-center rounded-pill border border-border px-3 text-[12px] font-semibold text-text"
               >
-                {tag}
+                {RECIPE_TAG_LABELS[tag]}
               </li>
             ))}
           </ul>
