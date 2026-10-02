@@ -206,6 +206,50 @@ const QUICK_ADD_PATTERN = new RegExp(
   `^(.*?)\\s*(${NUMBER_PATTERN})\\s*([A-Za-zÄÖÜäöüß]+)?$`,
 );
 
+const LEADING_PATTERN = new RegExp(
+  `^(${NUMBER_PATTERN})(\\s*)([A-Za-zÄÖÜäöüß]+)?(?:\\s+(.+))?$`,
+);
+
+/**
+ * Menge vorn: „300 g Beeren", „300g Beeren", „4 Äpfel". Ohne Einheit zählt
+ * die Zahl als Stückzahl. „7up" bleibt ein Name: klebt ein Wort ohne
+ * Einheit direkt an der Zahl, ist es keine Menge.
+ */
+function parseLeadingAmount(
+  text: string,
+): { name: string; amount: string; unitCode: string } | null {
+  const match = text.match(LEADING_PATTERN);
+  if (!match) return null;
+  const [, amountPart, gap, word, rest] = match;
+  const amount = parseAmount(amountPart);
+  if (amount === null || !word) return null;
+
+  const unit = findUnit(word);
+  if (unit) {
+    const name = rest?.trim();
+    return name ? { name, amount, unitCode: unit.code } : null;
+  }
+  if (!gap) return null;
+  const name = [word, rest].filter(Boolean).join(" ").trim();
+  return { name, amount, unitCode: IMPLICIT_COUNT_UNIT };
+}
+
+/** Nur Menge und Einheit, z. B. „300 g" oder „0,3 kg" — ohne Namen. */
+export function parseAmountText(
+  text: string,
+): { amount: string; unitCode: string | null } | null {
+  const match = text
+    .replace(/\s+/g, " ")
+    .trim()
+    .match(new RegExp(`^(${NUMBER_PATTERN})\\s*([A-Za-zÄÖÜäöüß]+)?$`));
+  if (!match) return null;
+  const amount = parseAmount(match[1]);
+  if (amount === null) return null;
+  if (!match[2]) return { amount, unitCode: null };
+  const unit = findUnit(match[2]);
+  return unit ? { amount, unitCode: unit.code } : null;
+}
+
 export function parseQuickAdd(rawText: string): {
   name: string;
   amount: string | null;
@@ -214,6 +258,9 @@ export function parseQuickAdd(rawText: string): {
   const trimmed = rawText.replace(/\s+/g, " ").trim();
   const fallback = { name: trimmed, amount: null, unitCode: null };
   if (!trimmed) return fallback;
+
+  const leading = parseLeadingAmount(trimmed);
+  if (leading) return leading;
 
   const match = trimmed.match(QUICK_ADD_PATTERN);
   if (!match) return fallback;

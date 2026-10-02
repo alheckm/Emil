@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { formatAmount } from "@/lib/core/format";
 import { ingredientImage } from "@/lib/core/ingredientImages";
-import { parseQuickAdd } from "@/lib/core/parseIngredient";
+import { parseAmountText, parseQuickAdd } from "@/lib/core/parseIngredient";
 import { getUnit, mergeUnitFor } from "@/lib/core/units";
 import { toMergeAmount } from "@/lib/core/mergeList";
 import { getBrowserSupabase } from "@/lib/client/supabase";
@@ -21,10 +21,11 @@ import {
   setEntryChecked,
   setHouseholdIngredientCategory,
   setIngredientCategory,
+  updateManualEntry,
   type Category,
   type ListEntry,
 } from "@/lib/data/shoppingList";
-import { Button, Select, Notice } from "@/components/ui";
+import { Button, Field, Select, Notice } from "@/components/ui";
 import { CheckIcon, CloseIcon, PlusIcon } from "@/components/icons";
 import { categoryRingColor } from "@/lib/core/categoryColor";
 
@@ -388,6 +389,55 @@ export function ListView({
     });
   }
 
+  /**
+   * Eintippen im Detailfeld. Von Hand ergänzte Zeilen: „300 g Beeren" ändert
+   * Menge, Einheit und Name zugleich. Zeilen aus Rezepten: „300 g" ändert nur
+   * die Menge, und zwar in der Einheit des Rezepts (g/kg, nicht Stück).
+   */
+  function saveEdit(entry: ListEntry, text: string) {
+    const input = text.trim();
+    if (!input) return;
+    const supabase = getBrowserSupabase();
+    if (!supabase) {
+      setError("Supabase ist nicht konfiguriert.");
+      return;
+    }
+
+    if (entry.sources.length === 0) {
+      const { name, amount, unitCode } = parseQuickAdd(input);
+      const unit = unitCode || null;
+      setOpenSheet(null);
+      run(() =>
+        updateManualEntry(
+          supabase,
+          householdId,
+          entry.id,
+          name,
+          mergeUnitFor(unit),
+          toMergeAmount(amount, unit),
+        ),
+      );
+      return;
+    }
+
+    const parsed = parseAmountText(input);
+    const converted = parsed
+      ? toMergeAmount(parsed.amount, parsed.unitCode)
+      : null;
+    const sameUnit =
+      parsed && mergeUnitFor(parsed.unitCode) === entry.mergeUnit;
+    if (converted === null || !sameUnit) {
+      setError(
+        `Diese Zeile kommt aus einem Rezept — die Menge geht nur in ${
+          getUnit(entry.mergeUnit)?.display ?? entry.mergeUnit
+        }.`,
+      );
+      return;
+    }
+    setOpenSheet(null);
+    void changeAmount(entry, Number(converted));
+  }
+
   function removeEntry(entry: ListEntry) {
     // Zuerst verschwinden lassen, dann senden. Kommt ein Fehler zurück, steht
     // die Zeile wieder da und die Meldung erklärt, warum.
@@ -638,6 +688,41 @@ export function ListView({
                 />
               </div>
             )}
+
+            <form
+              key={`${entry.id}-${entry.name}-${amount}-${entry.mergeUnit}`}
+              onSubmit={(event) => {
+                event.preventDefault();
+                const data = new FormData(event.currentTarget);
+                saveEdit(entry, String(data.get("edit") ?? ""));
+              }}
+              className="space-y-2"
+            >
+              <Field
+                name="edit"
+                label={entry.sources.length === 0 ? "Menge und Zutat" : "Menge"}
+                hint={
+                  entry.sources.length === 0
+                    ? "z. B. „300 g Beeren“ oder „4 Äpfel“."
+                    : "z. B. „300 g“. Name und Einheit kommen vom Rezept."
+                }
+                defaultValue={
+                  entry.sources.length === 0
+                    ? [
+                        formatAmount(amount, entry.mergeUnit).text,
+                        entry.name,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")
+                    : formatAmount(amount, entry.mergeUnit).text
+                }
+                autoCapitalize="sentences"
+                enterKeyHint="done"
+              />
+              <Button type="submit" variant="secondary">
+                Speichern
+              </Button>
+            </form>
 
             {entry.note && (
               <p className="text-[13px] text-muted">{entry.note}</p>

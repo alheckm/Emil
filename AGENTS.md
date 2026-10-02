@@ -22,6 +22,12 @@ Direction-unabhängige Untergrenzen, die trotzdem immer gelten:
 
 <!-- BEGIN:nextjs-agent-rules -->
 
+# Git — immer direkt nach `main`
+
+Alle Änderungen werden nach jedem Arbeitsschritt committet und nach `main`
+gepusht. Davon nicht abweichen: keine Feature-Branches, kein Liegenlassen
+uncommitteter Änderungen. (Nutzervorgabe, mehrfach bestätigt.)
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.

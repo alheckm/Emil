@@ -45,7 +45,7 @@ export const INGREDIENTS = {
     "Zuckerschoten", "Ingwer", "Chilischote", "Petersilie", "Basilikum",
     "Schnittlauch", "Dill", "Koriander", "Minze", "Rosmarin", "Thymian",
     "Salbei", "Zitrone", "Limette", "Orange", "Apfel", "Banane", "Birne",
-    "Erdbeeren", "Himbeeren", "Blaubeeren", "Weintrauben", "Pfirsich",
+    "Beeren", "Salat", "Erdbeeren", "Himbeeren", "Blaubeeren", "Weintrauben", "Pfirsich",
     "Nektarine", "Pflaume", "Kirschen", "Mango", "Ananas", "Avocado",
     "Wassermelone", "Kiwi", "Datteln", "Feige", "Granatapfel",
   ],

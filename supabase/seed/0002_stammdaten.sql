@@ -85,6 +85,8 @@ from (values
   ('Apfel', 'obst-gemuese', false),
   ('Banane', 'obst-gemuese', false),
   ('Birne', 'obst-gemuese', false),
+  ('Beeren', 'obst-gemuese', false),
+  ('Salat', 'obst-gemuese', false),
   ('Erdbeeren', 'obst-gemuese', false),
   ('Himbeeren', 'obst-gemuese', false),
   ('Blaubeeren', 'obst-gemuese', false),

@@ -311,6 +311,34 @@ export async function addManualEntry(
   return error ? fail(dataErrorMessage(error)) : ok(undefined);
 }
 
+/**
+ * Name, Einheit und Menge einer von Hand ergänzten Zeile ändern. Der Name
+ * läuft wie beim Ergänzen über `resolve_ingredient`; `amount` steht schon in
+ * `mergeUnit`. Zeilen aus Rezepten weist die Datenbank ab.
+ */
+export async function updateManualEntry(
+  supabase: SupabaseClient,
+  householdId: string,
+  entryId: string,
+  name: string,
+  mergeUnit: string,
+  amount: string | null,
+): Promise<Result> {
+  const resolved = await supabase.rpc("resolve_ingredient", {
+    p_household_id: householdId,
+    p_name: name,
+  });
+  if (resolved.error) return fail(dataErrorMessage(resolved.error));
+
+  const { error } = await supabase.rpc("update_manual_entry", {
+    p_entry_id: entryId,
+    p_ingredient_id: resolved.data as string,
+    p_merge_unit: mergeUnit,
+    p_amount: amount,
+  });
+  return error ? fail(dataErrorMessage(error)) : ok(undefined);
+}
+
 /** Ganze Zeile von der Liste nehmen, samt ihrer Herkunft. */
 export async function deleteEntry(
   supabase: SupabaseClient,

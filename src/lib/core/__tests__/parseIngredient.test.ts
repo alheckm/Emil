@@ -188,6 +188,27 @@ describe("parseIngredient – Schreibweisen aus Kochbüchern", () => {
 });
 
 describe('parseQuickAdd – Freitext im „Etwas ergänzen"-Feld', () => {
+  it("liest die Menge auch vorn: Gewicht", () => {
+    expect(parseQuickAdd("300 g Beeren")).toEqual({
+      name: "Beeren",
+      amount: "300",
+      unitCode: "g",
+    });
+    expect(parseQuickAdd("300g Beeren")).toEqual(parseQuickAdd("300 g Beeren"));
+  });
+
+  it("liest vorn stehende Zahl ohne Einheit als Stück", () => {
+    expect(parseQuickAdd("4 Äpfel")).toEqual({
+      name: "Äpfel",
+      amount: "4",
+      unitCode: "Stück",
+    });
+  });
+
+  it("lässt 7up einen Namen bleiben", () => {
+    expect(parseQuickAdd("7up")).toEqual({ name: "7up", amount: null, unitCode: null });
+  });
+
   it("liest Menge ohne Einheit", () => {
     expect(parseQuickAdd("erdbeeren 3")).toEqual({
       name: "erdbeeren",
