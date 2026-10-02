@@ -313,6 +313,18 @@ const NUTRITION = z
 // und total_time_min.
 const TAGS = z.enum(["vegan", "vegetarisch", "proteinreich", "snack"]);
 
+// Schwelle für „proteinreich": Gramm Protein je Portion. Gleicher Wert wie
+// PROTEIN_RICH_MIN_G in src/lib/core/recipeTags.ts.
+const PROTEIN_RICH_MIN_G = 20;
+
+// „proteinreich" folgt aus den Nährwerten und wird nie von Hand vergeben:
+// ohne Nährwerte oder unter der Schwelle fällt das Schlagwort weg.
+function mitProteinTag(tags, nutrition) {
+  const rest = tags.filter((tag) => tag !== "proteinreich");
+  const reich = nutrition != null && nutrition.protein_g >= PROTEIN_RICH_MIN_G;
+  return reich ? [...rest, "proteinreich"] : rest;
+}
+
 const PATCH = z
   .object({
     tags: z
@@ -360,6 +372,11 @@ async function cmdSchreibe(args) {
   if (patch.season_months) update.season_months = [...new Set(patch.season_months)];
   if ("nutrition" in patch) update.nutrition = patch.nutrition;
   if (patch.instructions) update.instructions = patch.instructions;
+
+  if (patch.tags || "nutrition" in patch) {
+    const nutrition = "nutrition" in patch ? patch.nutrition : recipe.nutrition;
+    update.tags = mitProteinTag(patch.tags ?? recipe.tags ?? [], nutrition);
+  }
 
   if (flag(args, "probe")) {
     console.log("Vorher:", JSON.stringify(Object.fromEntries(Object.keys(update).map((k) => [k, recipe[k]])), null, 2));

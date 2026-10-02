@@ -188,8 +188,10 @@ Erwähnung die volle Menge meint: überspringen (siehe „Im Zweifel
     `vegetarisch` ein; beide setzen.
   - `vegetarisch`: kein Fleisch und kein Fisch (Fond, Schmalz, Gelatine zählen
     als Fleisch/Fisch).
-  - `proteinreich`: mindestens 20 g Protein je Portion laut `nutrition` —
-    Nährwerte zuerst schätzen, dann entscheiden.
+  - `proteinreich`: **wird nicht von Hand gesetzt.** `pflege.mjs schreiben`
+    leitet es aus `nutrition.protein_g` ab (mindestens 20 g je Portion) und
+    setzt oder entfernt es selbst, sobald Tags oder Nährwerte im Patch stehen.
+    Nährwerte also sorgfältig schätzen — daran hängt das Schlagwort.
   - `snack`: kleine Zwischenmahlzeit zum Mitnehmen/Naschen (Riegel, Bällchen,
     Dips, Aufstriche), kein vollständiges Gericht.
   - **Nicht vergeben:** „saisonal" und „≤ 30 Min" — die folgen aus
