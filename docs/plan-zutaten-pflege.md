@@ -35,4 +35,4 @@ Status: umgesetzt (Migration 0029, Skill `zutaten-pflegen`); offen: erster Aufr�
 - Datenmigration der Bild-Zuordnung: Abgleich vor/nach (Zahl Zutaten mit Bild muss gleich bleiben).
 
 ## Offene Entscheidung
-KI-Lauf: nur auf Zuruf (empfohlen) oder zusätzlich wöchentlich geplant?
+Entschieden: KI-Läufe gibt es nur auf Zuruf über `/emil-pflege`, nichts läuft zeitgesteuert.

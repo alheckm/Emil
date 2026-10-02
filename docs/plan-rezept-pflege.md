@@ -1,4 +1,8 @@
-# Rezept-Pflege: wöchentlicher Claude-Lauf
+# Rezept-Pflege: Claude-Lauf
+
+> **Nachtrag 2026-10-02:** Der wöchentliche launchd-Lauf ist entfernt
+> (`lauf.sh`, Plist, installierter Job). Die Pflege läuft nur noch von Hand über
+> `/emil-pflege rezepte`. Die Abschnitte unten zu launchd sind historisch.
 
 > Umsetzungsplan, 2026-09-20. Stand: Schritt 1–6 gebaut und gegen die echte
 > Datenbank getestet (Schema, `steps.ts`, UI-Verdrahtung, `pflege.mjs`,

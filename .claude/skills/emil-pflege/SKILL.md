@@ -42,7 +42,7 @@ Grundsätze, die für jede Aufgabe gelten:
 | Aufgabe | Fach-Skill / Ort | Status |
 | --- | --- | --- |
 | `bilder` — fehlende Zutatenbilder erzeugen | Skill `zutatenbilder` | aktiv |
-| `rezepte` — Tags, Saison, Nährwerte, Mengen, Rezeptbilder | Skill `rezepte-pflegen` (läuft zusätzlich wöchentlich per launchd) | aktiv |
+| `rezepte` — Tags, Saison, Nährwerte, Mengen, Rezeptbilder | Skill `rezepte-pflegen` | aktiv |
 | `zutaten` — Dubletten, Plural/Aliase, Abteilung, Bild-Zuordnung | Skill `zutaten-pflegen` (Hintergrund: `docs/plan-zutaten-pflege.md`) | aktiv |
 
 ### Statusabfragen (nur lesen)

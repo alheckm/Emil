@@ -56,7 +56,7 @@ next-env.d.ts
 # ein frischer Klon DESIGN.md nie.
 !/.claude/skills/design/
 # Ebenso `rezepte-pflegen`: treibt den headless-Lauf aus
-# scripts/rezept-pflege/lauf.sh an, siehe docs/plan-rezept-pflege.md.
+# scripts/rezept-pflege/pflege.mjs an, siehe docs/plan-rezept-pflege.md.
 !/.claude/skills/rezepte-pflegen/
 # `emil-pflege`: der eine manuelle Einstieg für alle Aufräumläufe.
 !/.claude/skills/emil-pflege/

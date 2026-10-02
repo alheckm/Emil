@@ -2,9 +2,8 @@
 name: rezepte-pflegen
 description: Automatische Rezept-Pflege — bestimmt Tags, Saison, Nährwerte,
   ergänzt Mengen in der Anleitung, bessert unsichere Zutaten-Zuordnungen nach
-  und erzeugt fehlende Rezeptbilder. Läuft wöchentlich headless per launchd
-  (siehe scripts/rezept-pflege/lauf.sh), lässt sich aber auch von Hand
-  starten: `/rezepte-pflegen [--limit N] [--alle]`.
+  und erzeugt fehlende Rezeptbilder. Läuft nur von Hand, am besten über
+  `/emil-pflege rezepte` oder `/rezepte-pflegen [--limit N] [--alle]`.
 ---
 
 # Rezepte pflegen
@@ -36,7 +35,7 @@ Skript prüft die Form, legt vor jeder Änderung einen Snapshot in
 4. Fehlt `imagePath`: ein Foto erzeugen (siehe unten) und mit
    `bild <id> --datei pfad.jpg` setzen.
 5. Am Ende eine kurze Zusammenfassung ausgeben (wie viele Rezepte bearbeitet,
-   was übersprungen wurde und warum) — das landet im Log des launchd-Laufs.
+   was übersprungen wurde und warum) — das ist die Rückmeldung an den Nutzer.
 
 ## Was in `patch.json` darf
 
