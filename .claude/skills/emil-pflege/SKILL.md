@@ -17,13 +17,12 @@ steckt in den Fach-Skills, auf die er verweist. Er schreibt nichts selbst.
 1. **Überblick holen.** Für jede Aufgabe in der Tabelle die Statusabfrage laufen
    lassen (nur lesen, nie schreiben) und knapp zusammenfassen: eine Zeile pro
    Aufgabe, mit Zahl und „braucht Pflege" / „sauber".
-2. **Fragen, was laufen soll** (AskUserQuestion, Mehrfachauswahl, Aufgaben mit
-   offenem Bedarf zuerst). Wurde `<aufgabe>` übergeben, diesen Schritt
-   überspringen.
-3. **Je gewählter Aufgabe den Fach-Skill ausführen** und dessen Regeln
-   einhalten. Reihenfolge, wenn mehrere gewählt sind: Zutaten → Zutatenbilder →
-   Rezepte (Zutaten zuerst, weil Bilder und Rezept-Zuordnung auf ihnen
-   aufbauen).
+2. **Nicht fragen, was laufen soll.** Es werden immer alle Aufgaben gepflegt
+   (Nutzervorgabe). Wurde `<aufgabe>` übergeben, läuft nur diese.
+3. **Je Aufgabe den Fach-Skill ausführen** und dessen Regeln einhalten, auch
+   wenn der Überblick „sauber" zeigt (der Fach-Skill entscheidet, ob etwas zu
+   tun ist). Reihenfolge: Zutaten → Zutatenbilder → Rezepte (Zutaten zuerst,
+   weil Bilder und Rezept-Zuordnung auf ihnen aufbauen).
 4. **Abschluss:** pro Aufgabe ein Satz, was sich geändert hat, und was für
    später offen bleibt.
 
