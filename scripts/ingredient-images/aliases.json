@@ -5,11 +5,21 @@
     "Lauchzwiebel": "Frühlingszwiebel",
     "Schmand 150 g": "Schmand",
     "Brat- oder mildes Olivenöl": "Bratöl",
-    "Dinkel-Mandel-Drink": "Mandelmilch"
+    "Dinkel-Mandel-Drink": "Mandelmilch",
+    "Lachs": "Lachsfilet",
+    "250 g Quark": "Quark",
+    "300 g möhren": "Möhre",
+    "800 g Buschbohnen": "Grüne Bohnen",
+    "Glatte Petersilie": "Petersilie",
+    "Radischen": "Radieschen",
+    "Stückige Tomaten": "Gehackte Tomaten",
+    "Buschbohnen": "Grüne Bohnen"
   },
   "skipped": {
     "Testkachel Longpress Drei": "QA/Test-Fixture aus der Entwicklung, keine echte Zutat",
     "Testkachel Swipe": "QA/Test-Fixture aus der Entwicklung, keine echte Zutat",
-    "Salz und Pfeffer": "Freitext-Kombination zweier bereits einzeln bebilderter Zutaten (Salz, Pfeffer) — kein eindeutiges Einzelmotiv, keine Zuordnung ohne die andere falsch darzustellen"
+    "Salz und Pfeffer": "Freitext-Kombination zweier bereits einzeln bebilderter Zutaten (Salz, Pfeffer) — kein eindeutiges Einzelmotiv, keine Zuordnung ohne die andere falsch darzustellen",
+    "Brötchen, Brezeln, Croissant": "Freitext-Aufzaehlung mehrerer Backwaren — kein eindeutiges Einzelmotiv",
+    "Sarti": "Markenname ohne erkennbares Produkt — Motiv nicht eindeutig bestimmbar"
   }
 }

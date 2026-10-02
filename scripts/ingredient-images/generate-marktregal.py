@@ -1,10 +1,11 @@
 """
 Produktions-Lauf der "Marktregal"-Bildpipeline (siehe DESIGN.md): erzeugt
-vollbild/grau/bold fuer die uebergebenen Zutaten und veroeffentlicht sie als
-WebP unter public/zutaten-marktregal/. Die App nutzt aktuell nur die
--bold-Variante als Foto-Kreis (Einkaufsliste); vollbild/grau werden
-mitgeneriert, weil sie fuer eine spaetere Kachel-Oberflaeche vorgesehen sind,
-aber noch nicht konsumiert werden.
+die in production-variants.json aktivierten Varianten (aktuell nur bold) fuer
+die uebergebenen Zutaten und veroeffentlicht sie als WebP unter
+public/zutaten-marktregal/. Die App nutzt nur die -bold-Variante als
+Foto-Kreis (Einkaufsliste). Die Prompts fuer vollbild/grau bleiben in
+marktregal_prompts.py erhalten und werden durch Aufnahme in
+production-variants.json wieder eingeschaltet.
 
 Nimmt an, dass subjects.mjs fuer jede Zutat schon ein Bildmotiv (SUBJECTS)
 und eine Farbkategorie (COLORS) hat — das zu pruefen/ergaenzen ist Aufgabe
@@ -44,7 +45,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from marktregal_prompts import ROOT, build_jobs, generate_missing_pngs
+from marktregal_prompts import ROOT, build_jobs, generate_missing_pngs, production_variants
 
 DESIGN_DIR = ROOT / "design" / "ingredients_directions"
 RAW_DIR = Path(__file__).resolve().parent / "raw-marktregal"
@@ -133,7 +134,7 @@ def main() -> int:
     args = ap.parse_args()
 
     names = resolve_aliases([n.strip() for n in args.names.split(",")])
-    jobs, ohne_motiv = build_jobs(names)
+    jobs, ohne_motiv = build_jobs(names, variants=production_variants())
     if ohne_motiv:
         print(
             f"Abbruch — kein Bildmotiv in subjects.mjs fuer: {ohne_motiv}\n"

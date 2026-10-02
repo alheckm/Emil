@@ -2,8 +2,9 @@
 name: zutatenbilder
 description: Fehlende Zutatenbilder für aktuell genutzte Zutaten (Rezepte +
   Einkaufsliste) lokal per mflux generieren und verarbeiten — die
-  "Marktregal"-Bildfamilie (vollbild/grau/bold), von der die App aktuell die
-  -bold-Variante als Foto-Kreis in der Einkaufsliste zeigt. Nutzen, wenn der
+  "Marktregal"-Bildfamilie (produziert wird nur -bold, die farbige Variante;
+  vollbild/grau sind per production-variants.json abgeschaltet), die die App
+  als Foto-Kreis in der Einkaufsliste zeigt. Nutzen, wenn der
   Nutzer nach fehlenden/neuen Zutatenbildern fragt, "Zutatenbilder
   generieren/auffüllen" sagt, oder wenn Rezepte importiert wurden, die neue
   Zutaten angelegt haben. Auch einschlägig für die Design-Exploration
@@ -26,14 +27,21 @@ Pastell-Chips triffst: das ist erledigte Vergangenheit, keine Anleitung.
 
 ## Modus 1: Produktion, auf Bedarf
 
-Erzeugt zu jeder Zutat drei Bildvarianten — vollbild/grau/bold — und
+Erzeugt zu jeder Zutat nur die **-bold**-Variante (kräftiger Farbgrund) und
 veröffentlicht sie unter `public/zutaten-marktregal/`. Die App
-(`ingredientImage()`, `src/lib/core/ingredientImages.ts`) nutzt aktuell nur
-**-bold** als runder Foto-Kreis in der Einkaufsliste (`ListView.tsx`,
-`object-cover` croppt das hochkant generierte Bild per CSS). vollbild/grau
-werden mitgeneriert, weil sie für eine spätere Kachel-Oberfläche vorgesehen
-sind (`DESIGN.md`), aber noch nicht konsumiert werden — nicht wundern, wenn
-nur die -bold-Datei irgendwo im App-Code auftaucht.
+(`ingredientImage()`, `src/lib/core/ingredientImages.ts`) nutzt **-bold** als
+runder Foto-Kreis in der Einkaufsliste (`ListView.tsx`, `object-cover` croppt
+das hochkant generierte Bild per CSS).
+
+**vollbild und grau sind abgeschaltet, nicht gelöscht.** Ihre Prompts bleiben
+in `marktregal_prompts.py` (`build_jobs`) erhalten. Welche Varianten der
+Produktions-Lauf erzeugt, steht in
+`scripts/ingredient-images/production-variants.json` (`"enabled": ["bold"]`) —
+`generate-marktregal.py` und `find-missing-marktregal.mjs` lesen beide diese
+Datei. Wieder einschalten: `"vollbild"` und/oder `"grau"` ergänzen, danach
+`npm run zutatenbilder` (die Lücken werden dann als „fehlend" erkannt und
+nachgeneriert). Modus 2 (Design-Exploration) ignoriert die Liste und erzeugt
+weiterhin alle drei.
 
 ### Scope: "durably used", nicht nur "gerade aktiv"
 

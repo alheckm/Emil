@@ -1,0 +1,4 @@
+{
+  "_comment": "Welche Marktregal-Varianten der Produktions-Lauf (npm run zutatenbilder) generiert und veroeffentlicht. Die Prompts fuer ALLE Varianten bleiben in marktregal_prompts.py erhalten — zum Wiedereinschalten einfach den Namen hier ergaenzen (z. B. [\"vollbild\", \"grau\", \"bold\"]). Die Design-Exploration (design-variants.py) ignoriert diese Liste und erzeugt immer alle drei.",
+  "enabled": ["bold"]
+}

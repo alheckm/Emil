@@ -21,6 +21,7 @@ from typing import Callable, Optional
 
 ROOT = Path(__file__).resolve().parents[2]
 PALETTE_FILE = Path(__file__).resolve().parent / "design-palette.json"
+PRODUCTION_VARIANTS_FILE = Path(__file__).resolve().parent / "production-variants.json"
 MODEL_REPO = "filipstrand/Z-Image-Turbo-mflux-4bit"
 SEED = 42
 STEPS = 4
@@ -122,10 +123,21 @@ def load_subjects_and_categories(names: list[str]) -> dict[str, tuple[str, str] 
     return json.loads(raw.stdout)
 
 
-def build_jobs(names: list[str]) -> tuple[list[tuple[str, str]], list[str]]:
-    """-> (jobs, ohne_motiv). jobs: [(jobname, prompt)], drei pro Zutat mit
-    Motiv in subjects.mjs. ohne_motiv: Namen, fuer die subjects.mjs noch
-    kein SUBJECTS/COLORS hat — die muessen zuerst ergaenzt werden."""
+def production_variants() -> list[str]:
+    """Varianten, die der Produktions-Lauf erzeugt (production-variants.json)."""
+    return json.loads(PRODUCTION_VARIANTS_FILE.read_text())["enabled"]
+
+
+def build_jobs(
+    names: list[str], variants: Optional[list[str]] = None
+) -> tuple[list[tuple[str, str]], list[str]]:
+    """-> (jobs, ohne_motiv). jobs: [(jobname, prompt)], je eine pro Variante
+    und Zutat mit Motiv in subjects.mjs. `variants` filtert, welche der drei
+    Prompts (vollbild/grau/bold) tatsaechlich als Job rausgehen — None = alle.
+    Die Prompts selbst bleiben immer definiert, damit eine Variante nur durch
+    Aufnahme in production-variants.json wieder aktiv wird.
+    ohne_motiv: Namen, fuer die subjects.mjs noch kein SUBJECTS/COLORS hat —
+    die muessen zuerst ergaenzt werden."""
     palette = json.loads(PALETTE_FILE.read_text())
     resolved = load_subjects_and_categories(names)
 
@@ -139,9 +151,14 @@ def build_jobs(names: list[str]) -> tuple[list[tuple[str, str]], list[str]]:
         slug = slugify(name)
         bold_key = CATEGORY_TO_BOLD[category]
 
-        jobs.append((f"{slug}-vollbild", FULLSCREEN_TEMPLATE.format(subject=subject)))
-        jobs.append((f"{slug}-grau", CENTERED_BASE.format(subject=subject, tint=palette["gray"]["prompt"])))
-        jobs.append((f"{slug}-bold", CENTERED_BASE.format(subject=subject, tint=palette[bold_key]["prompt"])))
+        prompts = {
+            "vollbild": FULLSCREEN_TEMPLATE.format(subject=subject),
+            "grau": CENTERED_BASE.format(subject=subject, tint=palette["gray"]["prompt"]),
+            "bold": CENTERED_BASE.format(subject=subject, tint=palette[bold_key]["prompt"]),
+        }
+        for variant, prompt in prompts.items():
+            if variants is None or variant in variants:
+                jobs.append((f"{slug}-{variant}", prompt))
     return jobs, ohne_motiv
 
 

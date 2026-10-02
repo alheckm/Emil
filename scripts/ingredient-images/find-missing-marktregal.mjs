@@ -4,8 +4,8 @@
  * Einstieg des zutatenbilder-Skills (`npm run zutatenbilder`).
  *
  * `--generate`: ruft nach dem Abgleich automatisch generate-marktregal.py
- * fuer alle Zutaten mit vorhandenem Bildmotiv auf (vollbild/grau/bold, die
- * App nutzt aktuell nur -bold) und schreibt danach publish-map.mjs neu, damit
+ * fuer alle Zutaten mit vorhandenem Bildmotiv auf (nur die in
+ * production-variants.json aktivierten Varianten, aktuell nur bold) und schreibt danach publish-map.mjs neu, damit
  * ingredientImage() die frischen Bilder sofort findet. Zutaten ohne Bildmotiv
  * ("braucht Agenten-Entscheidung") werden dabei NICHT generiert — die
  * Alias/Skip/Neues-Motiv-Entscheidung bleibt Aufgabe des Agenten, der den
@@ -105,9 +105,15 @@ try {
   publicFiles = new Set();
 }
 
+// Welche Varianten der Produktions-Lauf erzeugt — gleiche Quelle wie
+// generate-marktregal.py (production-variants.json).
+const { enabled: ENABLED_VARIANTS } = JSON.parse(
+  readFileSync(ROOT + "scripts/ingredient-images/production-variants.json", "utf8"),
+);
+
 function hasAllVariants(name) {
   const slug = slugify(name);
-  return ["vollbild", "grau", "bold"].every((v) => publicFiles.has(`${slug}-${v}.webp`));
+  return ENABLED_VARIANTS.every((v) => publicFiles.has(`${slug}-${v}.webp`));
 }
 
 const missing = names.filter((name) => {
