@@ -1,6 +1,6 @@
 # Plan: Zutaten-Stammdaten pflegen (Plural, Synonyme, Kategorie, Bild)
 
-Status: Entwurf, wartet auf Freigabe
+Status: umgesetzt (Migration 0029, Skill `zutaten-pflegen`); offen: erster Aufräumlauf
 
 ## Befund (geprüft)
 - Eingabe → `resolve_ingredient` (supabase/migrations/0028): exakt → Alias → Ähnlichkeit ≥ 0,62 → sonst neue eigene Zutat in „Sonstiges".

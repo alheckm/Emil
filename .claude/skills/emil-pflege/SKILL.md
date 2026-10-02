@@ -43,7 +43,7 @@ Grundsätze, die für jede Aufgabe gelten:
 | --- | --- | --- |
 | `bilder` — fehlende Zutatenbilder erzeugen | Skill `zutatenbilder` | aktiv |
 | `rezepte` — Tags, Saison, Nährwerte, Mengen, Rezeptbilder | Skill `rezepte-pflegen` (läuft zusätzlich wöchentlich per launchd) | aktiv |
-| `zutaten` — Dubletten, Plural/Aliase, Abteilung, Bild-Zuordnung | Plan `docs/plan-zutaten-pflege.md` | **geplant**, noch kein Fach-Skill; bis dahin nur den Überblick zeigen |
+| `zutaten` — Dubletten, Plural/Aliase, Abteilung, Bild-Zuordnung | Skill `zutaten-pflegen` (Hintergrund: `docs/plan-zutaten-pflege.md`) | aktiv |
 
 ### Statusabfragen (nur lesen)
 
@@ -53,14 +53,8 @@ Grundsätze, die für jede Aufgabe gelten:
   der genutzten Zutaten ohne Bild.
 - **rezepte:** `node scripts/rezept-pflege/pflege.mjs liste --offen` — Zahl
   der Rezepte mit offener Pflege.
-- **zutaten:**
-  ```sql
-  select
-    count(*) filter (where household_id is not null and category_id = 'sonstiges') as eigene_in_sonstiges,
-    count(*) filter (where household_id is not null and display_name ~ '[0-9]') as mit_zahl_im_namen,
-    count(*) filter (where household_id is not null and display_name ~ '^[a-zäöü]') as kleingeschrieben
-  from ingredients;
-  ```
+- **zutaten:** `node scripts/zutaten-pflege/kandidaten.mjs` — Zahl der eigenen
+  Zutaten mit Pflegebedarf (nur die erste Zeile zusammenfassen).
 
 ## Neue Pflegeaufgabe aufnehmen
 

@@ -60,6 +60,8 @@ next-env.d.ts
 !/.claude/skills/rezepte-pflegen/
 # `emil-pflege`: der eine manuelle Einstieg für alle Aufräumläufe.
 !/.claude/skills/emil-pflege/
+# `zutaten-pflegen`: Fach-Skill hinter `/emil-pflege zutaten`.
+!/.claude/skills/zutaten-pflegen/
 # Ebenso `zutatenbilder`: treibt `npm run zutatenbilder`
 # (scripts/ingredient-images/find-missing.mjs --scope=used --generate) an.
 !/.claude/skills/zutatenbilder/
