@@ -56,8 +56,15 @@ writeFileSync(
     "export const INGREDIENT_IMAGES: Record<string, string> = {\n" +
     `${body}\n` +
     "};\n\n" +
+    "// Groß-/Kleinschreibung zählt nicht: „äpfel\" und „Äpfel\" meinen dasselbe Bild.\n" +
+    "const IMAGES_BY_LOWERCASE = new Map(\n" +
+    "  Object.entries(INGREDIENT_IMAGES).map(([name, slug]) => [\n" +
+    "    name.toLocaleLowerCase(\"de\"),\n" +
+    "    slug,\n" +
+    "  ]),\n" +
+    ");\n\n" +
     "export function ingredientImage(name: string): string | null {\n" +
-    "  const slug = INGREDIENT_IMAGES[name];\n" +
+    "  const slug = IMAGES_BY_LOWERCASE.get(name.toLocaleLowerCase(\"de\"));\n" +
     "  return slug ? `/zutaten-marktregal/${slug}-bold.webp` : null;\n" +
     "}\n",
   "utf8",

@@ -91,7 +91,15 @@ export const INGREDIENT_IMAGES: Record<string, string> = {
   "Zwiebel": "zwiebel",
 };
 
+// Groß-/Kleinschreibung zählt nicht: „äpfel" und „Äpfel" meinen dasselbe Bild.
+const IMAGES_BY_LOWERCASE = new Map(
+  Object.entries(INGREDIENT_IMAGES).map(([name, slug]) => [
+    name.toLocaleLowerCase("de"),
+    slug,
+  ]),
+);
+
 export function ingredientImage(name: string): string | null {
-  const slug = INGREDIENT_IMAGES[name];
+  const slug = IMAGES_BY_LOWERCASE.get(name.toLocaleLowerCase("de"));
   return slug ? `/zutaten-marktregal/${slug}-bold.webp` : null;
 }
